@@ -1,0 +1,48 @@
+<libAbstract_learning>
+<ALPackageLearn_GPpackage>
+<output>ALFloatPredictor</output>
+<status></status>
+<inputType>ALIChainLearner ALLabeldData </inputType>
+</ALPackageLearn_GPpackage>
+
+<ALPackageCreateDivider_GPpackage>
+<output>ALIChainLearner</output>
+<status>ALDividerParameter</status>
+<inputType>ALIChainLearner ALIChainLearner</inputType>
+</ALPackageCreateDivider_GPpackage>
+
+<ALPackageCreateRegress_GPpackage>
+<output>ALIChainLearner</output>
+<status>ALARStructure</status>
+</ALPackageCreateRegress_GPpackage>
+
+<ALPackageLoadData_GPpackage>
+<output>ALFloatDataChain</output>
+<status></status>
+<inputType>char </inputType>
+</ALPackageLoadData_GPpackage>
+
+<ALPackageLabled_GPpackage>
+<output>ALLabeldData</output>
+<status></status>
+<inputType>ALFloatDataChain </inputType>
+</ALPackageLabled_GPpackage>
+
+<ALPackageCrossValidate_GPpackage>
+<output>double</output>
+<status></status>
+<inputType>ALIChainLearner ALLabeldData </inputType>
+</ALPackageCrossValidate_GPpackage>
+
+<ALPackageCombine_GPpackage>
+<output>ALIChainLearner</output>
+<status>ALARStructure</status>
+</ALPackageCombine_GPpackage>
+
+<ALPackageCreateSVM_GPpackage>
+<output>ALISuperviseLearner</output>
+<status>ALSVMParameter</status>
+<inputType></inputType>
+</ALPackageCreateSVM_GPpackage>
+
+</libAbstract_learning>

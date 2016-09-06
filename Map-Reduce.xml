@@ -1,0 +1,5 @@
+<libAbstract_learning>
+    <ALPackageC45Tree_GPpackage>
+        MAP((x0), C45Tree(x0), [a0]->[a0])
+    </ALPackageC45Tree_GPpackage>
+</libAbstract_learning>

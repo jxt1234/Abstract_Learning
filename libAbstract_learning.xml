@@ -1,0 +1,226 @@
+<libAbstract_learning>
+<ALPackageCreateClassify_GPpackage>
+<shortName>CreateClassify</shortName>
+<output>ALClassifier</output>
+<status></status>
+<input>ALClassifierCreator ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageCreateClassify_GPpackage>
+
+<ALPackageRandomForest_GPpackage>
+<shortName>RandomForest</shortName>
+<output>ALClassifier</output>
+<status></status>
+<input>ALFloatMatrix </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageRandomForest_GPpackage>
+
+<ALPackageClassify_GPpackage>
+<shortName>Classify</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALClassifier ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageClassify_GPpackage>
+
+<ALPackageClassifyProb_GPpackage>
+<shortName>ClassifyProb</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALClassifier ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageClassifyProb_GPpackage>
+
+<ALPackageClassifyProbValues_GPpackage>
+<shortName>ClassifyProbValues</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALClassifier </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageClassifyProbValues_GPpackage>
+
+<ALPackageCrossValidateClassify_GPpackage>
+<shortName>CrossValidateClassify</shortName>
+<output>double</output>
+<status></status>
+<input>ALClassifierCreator ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageCrossValidateClassify_GPpackage>
+
+<ALPackageC45Tree_GPpackage>
+<shortName>C45Tree</shortName>
+<output>ALClassifier</output>
+<status>ALDecisionTreeParameter </status>
+<input>ALFloatMatrix </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageC45Tree_GPpackage>
+
+<ALPackageNBM_GPpackage>
+<shortName>NBM</shortName>
+<output>ALClassifier</output>
+<status></status>
+<input>ALFloatMatrix </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageNBM_GPpackage>
+
+<ALPackageC45TreeUnit_GPpackage>
+<shortName>C45TreeUnit</shortName>
+<output>ALClassifierSet</output>
+<status>ALDecisionTreeParameter </status>
+<input>ALFloatMatrix </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageC45TreeUnit_GPpackage>
+
+<ALPackageMergeClassifierSet_GPpackage>
+<shortName>MergeClassifierSet</shortName>
+<output>ALClassifierSet</output>
+<status></status>
+<input>ALClassifierSet ALClassifierSet </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageMergeClassifierSet_GPpackage>
+
+<ALPackageComposeClassifierSet_GPpackage>
+<shortName>ComposeClassifierSet</shortName>
+<output>ALClassifier</output>
+<status></status>
+<input>ALClassifierSet </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageComposeClassifierSet_GPpackage>
+
+<ALPackageValidateMatrix_GPpackage>
+<shortName>ValidateMatrix</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALIMatrixPredictor ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageValidateMatrix_GPpackage>
+
+<ALPackageValidateChain_GPpackage>
+<shortName>ValidateChain</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatPredictor ALLabeldData </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageValidateChain_GPpackage>
+
+<ALPackageSuperLearning_GPpackage>
+<shortName>SuperLearning</shortName>
+<output>ALIMatrixPredictor</output>
+<status></status>
+<input>ALISuperviseLearner ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageSuperLearning_GPpackage>
+
+<ALPackageUnSuperLearning_GPpackage>
+<shortName>UnSuperLearning</shortName>
+<output>ALIMatrixPredictor</output>
+<status></status>
+<input>ALIUnSuperLearner ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageUnSuperLearning_GPpackage>
+
+<ALPackageLearn_GPpackage>
+<shortName>Learn</shortName>
+<output>ALFloatPredictor</output>
+<status></status>
+<input>ALIChainLearner ALLabeldData </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageLearn_GPpackage>
+
+<ALPackageCreateDivider_GPpackage>
+<shortName>CreateDivider</shortName>
+<output>ALIChainLearner</output>
+<status>ALDividerParameter </status>
+<input>ALIChainLearner ALIChainLearner </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageCreateDivider_GPpackage>
+
+<ALPackageCreateCGP_GPpackage>
+<shortName>CreateCGP</shortName>
+<output>ALIChainLearner</output>
+<status>ALCGPParameter </status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateCGP_GPpackage>
+
+<ALPackageCreateRegress_GPpackage>
+<shortName>CreateRegress</shortName>
+<output>ALISuperviseLearner</output>
+<status></status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateRegress_GPpackage>
+
+<ALPackageLabled_GPpackage>
+<shortName>Labled</shortName>
+<output>ALLabeldData</output>
+<status></status>
+<input>ALFloatDataChain double </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageLabled_GPpackage>
+
+<ALPackageCrossValidate_GPpackage>
+<shortName>CrossValidate</shortName>
+<output>double</output>
+<status></status>
+<input>ALIChainLearner ALLabeldData </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageCrossValidate_GPpackage>
+
+<ALPackageCombine_GPpackage>
+<shortName>Combine</shortName>
+<output>ALIChainLearner</output>
+<status>ALARStructure </status>
+<input>ALISuperviseLearner </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageCombine_GPpackage>
+
+<ALPackageCreateSVM_GPpackage>
+<shortName>CreateSVM</shortName>
+<output>ALClassifierCreator</output>
+<status>ALSVMParameter </status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateSVM_GPpackage>
+
+<ALPackageCreateGMM_GPpackage>
+<shortName>CreateGMM</shortName>
+<output>ALClassifierCreator</output>
+<status></status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateGMM_GPpackage>
+
+<ALPackageCreateLogicalRegress_GPpackage>
+<shortName>CreateLogicalRegress</shortName>
+<output>ALClassifierCreator</output>
+<status></status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateLogicalRegress_GPpackage>
+
+<ALPackageCreateDecisionTree_GPpackage>
+<shortName>CreateDecisionTree</shortName>
+<output>ALClassifierCreator</output>
+<status>ALDecisionTreeParameter </status>
+<input></input>
+<inputNeedComplete></inputNeedComplete>
+</ALPackageCreateDecisionTree_GPpackage>
+
+<ALPackageMatrixMerge_GPpackage>
+<shortName>MatrixMerge</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALFloatMatrix double double double double </input>
+<inputNeedComplete>False False False False False False </inputNeedComplete>
+</ALPackageMatrixMerge_GPpackage>
+
+<ALPackageMatrixCrop_GPpackage>
+<shortName>MatrixCrop</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix double double </input>
+<inputNeedComplete>False False False </inputNeedComplete>
+</ALPackageMatrixCrop_GPpackage>
+
+</libAbstract_learning>
