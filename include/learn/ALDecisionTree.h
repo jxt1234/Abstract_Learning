@@ -7,7 +7,7 @@
 class ALDecisionTree:public ALISuperviseLearner
 {
 public:
-    ALDecisionTree(size_t maxDepth=10, bool needReduce=true, bool discrete = false);
+    ALDecisionTree(size_t maxDepth=10, size_t divideSize=2);
     virtual ~ALDecisionTree();
     void setFixTypes(ALSp<ALFloatMatrix> types);
     virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const override;
@@ -33,7 +33,6 @@ private:
     Tree::Node* _train(const ALFloatMatrix* X, const ALFloatMatrix* YT, size_t depth, const ALFloatMatrix* types) const;
     size_t mMaxDepth;
     ALSp<ALFloatMatrix> mFixTypes;
-    bool mNeedReduce;
-    bool mDiscrete;
+    size_t mDivideSize;
 };
 #endif

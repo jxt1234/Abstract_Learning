@@ -184,7 +184,7 @@ ALIMatrixPredictor* ALRandomForestMatrix::vLearn(const ALFloatMatrix* X, const A
     int number = mTree;
     ALAUTOSTORAGE(X_Random_Addr, ALFLOAT*, random_h);
     ALSp<ALFloatMatrix> Y_Random_T = ALFloatMatrix::create(random_h, 1);
-    ALSp<ALDecisionTree> learner = new ALDecisionTree(10, false, mDiscrete);
+    ALSp<ALDecisionTree> learner = new ALDecisionTree;
     learner->setFixTypes(types);
     auto y_random_t = Y_Random_T->vGetAddr();
     auto y_t = YT->vGetAddr();

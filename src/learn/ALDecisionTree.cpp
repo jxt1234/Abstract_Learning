@@ -294,11 +294,10 @@ void ALDecisionTree::Tree::predictProbability(const ALFLOAT* X, ALFLOAT* Y)
 }
 
 
-ALDecisionTree::ALDecisionTree(size_t maxdepth, bool needreduce, bool discrete)
+ALDecisionTree::ALDecisionTree(size_t maxdepth, size_t divideSize)
 {
     mMaxDepth = maxdepth;
-    mNeedReduce = needreduce;
-    mDiscrete = discrete;
+    mDivideSize = divideSize;
 }
 ALDecisionTree::~ALDecisionTree()
 {
@@ -318,10 +317,6 @@ ALDecisionTree::Tree* ALDecisionTree::train(const ALFloatMatrix* X, const ALFloa
         n = new Tree::Node(0, 0, types->width());
     }
     ALASSERT(NULL!=n);
-    if (mNeedReduce)
-    {
-        //n->reduce();
-    }
     return new ALDecisionTree::Tree(n);
 }
 
@@ -359,12 +354,12 @@ static size_t collectLR(const std::vector<ALFLOAT>& types, const ALFloatMatrix* 
     return leftsize;
 }
 
-static void _GenerateSpliteValues(const ALFloatMatrix* X, std::vector<ALFLOAT>* target, size_t w)
+static void _GenerateSpliteValues(const ALFloatMatrix* X, std::vector<ALFLOAT>* target, size_t w, size_t step)
 {
     ALASSERT(NULL!=X);
     ALASSERT(NULL!=target);
     ALASSERT(w == X->width());
-    const int step = 1;
+    ALASSERT(step>=1);
     ALSp<ALFloatMatrix> stas = ALStatistics::statistics(X);
     auto Max = stas->vGetAddr(1);
     auto Min = stas->vGetAddr(2);
@@ -414,7 +409,7 @@ ALDecisionTree::Tree::Node* ALDecisionTree::_train(const ALFloatMatrix* X, const
     ALAUTOSTORAGE(numbersright, size_t, types.size());
     
     ALAUTOSTORAGE(possibleValues, std::vector<ALFLOAT>, w);
-    _GenerateSpliteValues(X, possibleValues, w);
+    _GenerateSpliteValues(X, possibleValues, w, mDivideSize-1);
     {
         //ALFORCEAUTOTIME;
         for (size_t k=0; k<w; ++k)
