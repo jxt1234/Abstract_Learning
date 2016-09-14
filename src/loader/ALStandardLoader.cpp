@@ -73,7 +73,7 @@ ALFloatDataChain* ALStandardLoader::load(ALStream* input)
         ALASSERT(0);//FIXME
         return NULL;
     }
-    const int buffersize = 4096;
+    const int buffersize = 32768;
     ALAUTOSTORAGE(buffer, char, buffersize);
     ALSp<ALStreamReader> reader = new ALStreamReader(input);
     auto len = reader->readline(buffer, buffersize-1);

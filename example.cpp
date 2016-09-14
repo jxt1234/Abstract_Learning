@@ -10,6 +10,7 @@
 #include "math/ALStatistics.h"
 #include "compose/ALRandomForestMatrix.h"
 #include "learn/ALMatrixNormalizer.h"
+#include "learn/ALLearnFactory.h"
 #include <math.h>
 using namespace std;
 
@@ -35,9 +36,10 @@ int test_main(int argc, char* argv[])
         ALFloatMatrix::print(X.get(), output);
     }
     
-    ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25, true);
+    //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25, true);
     //ALSp<ALISuperviseLearner> learner = new ALGMMClassify;
-    //ALSp<ALISuperviseLearner> learner = new ALDecisionTree;
+    ALSp<ALISuperviseLearner> learner = new ALDecisionTree;
+    FUNC_PRINT_ALL(ALLearnFactory::crossValidateForClassify(learner.get(), X.get(), Y.get()), f);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X.get(), Y.get());
     ALSp<ALFloatMatrix> YP = ALFloatMatrix::create(1, Y->height());
     ALSp<ALFloatMatrix> YYP = ALFloatMatrix::create(3, Y->height());
@@ -92,7 +94,8 @@ int test_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     ALAUTOTIME;
-    char* _argv[] = {"", "/Users/jiangxiaotang/machine_exam/handset/train.txt"};
+    //char* _argv[] = {"", "/Users/jiangxiaotang/machine_exam/handset/train.txt"};
+    char* _argv[] = {"", "/Users/jiangxiaotang/third/caffe/train.txt"};
     test_main(2, _argv);
     //test_main(argc, argv);
     return 1;
