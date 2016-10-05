@@ -29,6 +29,12 @@ public:
     static ALFloatMatrix* transpose(const ALFloatMatrix* A);
     static ALFloatMatrix* sts(const ALFloatMatrix* A, bool transpose = false);
     
+    
+    /*Merge two matrix into one:
+     (Y, X) -> [Y, X]
+     */
+    static ALFloatMatrix* unionHorizontal(const ALFloatMatrix* Y, const ALFloatMatrix* X);
+    
     /*
      X -> [E, 0
      [0, X]
@@ -54,6 +60,7 @@ public:
     /*For Virtual Matrix*/
     static ALFloatMatrix* createCropVirtualMatrix(const ALFloatMatrix* base, size_t l, size_t t, size_t r, size_t b);
     static ALFloatMatrix* createIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h);
+    static ALFloatMatrix* randomeSelectMatrix(const ALFloatMatrix* base, size_t height);
     
     /*General function*/
     static void productBasic(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, size_t a_stride, const ALFLOAT* b, size_t b_stride, size_t w, size_t h, size_t k);

@@ -18,7 +18,7 @@ namespace ALRandom
     }
     int mid(int min_, int max_)
     {
-        if (min_ == max_)
+        if (min_ >= max_)
         {
             return min_;
         }

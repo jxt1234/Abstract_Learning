@@ -895,3 +895,33 @@ ALFloatMatrix* ALFloatMatrix::genTypes(const ALFloatMatrix* Y)
     }
     return result;
 }
+
+ALFloatMatrix* ALFloatMatrix::randomeSelectMatrix(const ALFloatMatrix* base, size_t height)
+{
+    ALASSERT(NULL!=base);
+    ALASSERT(height < base->height());
+    ALAUTOSTORAGE(indexes, ALFLOAT*, height);
+    auto totalHeight = base->height();
+    for (int i=0; i<height; ++i)
+    {
+        int selectH = ALRandom::mid(0, (int)totalHeight);
+        indexes[i] = base->vGetAddr(selectH);
+    }
+    ALFloatMatrix* result = new ALIndexVirtualMatrix(indexes, base->width(), height, true);
+    return result;
+}
+
+ALFloatMatrix* ALFloatMatrix::unionHorizontal(const ALFloatMatrix* Y, const ALFloatMatrix* X)
+{
+    ALASSERT(NULL!=Y);
+    ALASSERT(NULL!=X);
+    ALASSERT(Y->height() == X->height());
+    auto totalWidth = Y->width() + X->width();
+    auto height = Y->height();
+    ALFloatMatrix* unionMatrix = ALFloatMatrix::create(totalWidth, height);
+    ALSp<ALFloatMatrix> virtualY = createCropVirtualMatrix(unionMatrix, 0, 0, Y->width()-1, height-1);
+    copy(virtualY.get(), Y);
+    ALSp<ALFloatMatrix> virtualX = createCropVirtualMatrix(unionMatrix, Y->width(), 0, totalWidth-1, height-1);
+    copy(virtualX.get(), X);
+    return unionMatrix;
+}

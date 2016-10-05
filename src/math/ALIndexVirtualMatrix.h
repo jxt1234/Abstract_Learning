@@ -4,11 +4,12 @@
 class ALIndexVirtualMatrix:public ALFloatMatrix
 {
 public:
-    ALIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h);
+    ALIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h, bool copy=false);
     virtual ~ALIndexVirtualMatrix();
     
     virtual ALFLOAT* vGetAddr(size_t y) const;
 private:
     ALFLOAT** mIndexes;
+    bool mOwn;
 };
 #endif

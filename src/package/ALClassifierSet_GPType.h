@@ -1,3 +1,5 @@
+#ifndef SRC_PACKAGE_ALCLASSIFIERSET_GPTYPE_H
+#define SRC_PACKAGE_ALCLASSIFIERSET_GPTYPE_H
 class ALClassifierSet_GPType:public IStatusType
 {
 public:
@@ -29,3 +31,4 @@ return mapnumber;
 virtual bool vCheckCompleted(void* content) const {return NULL!=content;}
 virtual void* vMerge(void* dst, void* src) const {return NULL;}
 };
+#endif
