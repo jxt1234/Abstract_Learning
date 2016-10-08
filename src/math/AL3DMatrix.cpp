@@ -13,8 +13,7 @@ AL3DMatrix::~ AL3DMatrix()
 {
 }
 
-
-ALFLOAT* AL3DMatrix::getAddr(int y, int z)
+ALFLOAT* AL3DMatrix::getAddr(int y, int z) const
 {
     ALFLOAT* basic = mOrigin->vGetAddr(z);
     return basic + mWidth*y;
@@ -22,4 +21,10 @@ ALFLOAT* AL3DMatrix::getAddr(int y, int z)
 AL3DMatrix* AL3DMatrix::create(ALSp<ALFloatMatrix> origin, int w, int h)
 {
     return new AL3DMatrix(origin, w, h);
+}
+
+ALSp<ALFloatMatrix> AL3DMatrix::getReferenceMatrix(int z) const
+{
+    ALFLOAT* basic = mOrigin->vGetAddr(z);
+    return ALFloatMatrix::createRefMatrix(basic, mWidth, mHeight);
 }

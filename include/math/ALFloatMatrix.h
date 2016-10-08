@@ -12,6 +12,7 @@ public:
     
     /*Functional API, Don't change inputs*/
     static ALFloatMatrix* create(size_t w, size_t h);
+    static ALFloatMatrix* createRefMatrix(ALFLOAT* base, size_t w, size_t h);
     static ALFLOAT norm(const ALFloatMatrix* X);
     static ALFloatMatrix* createIdentity(size_t n);
     static ALFloatMatrix* createDiag(const ALFloatMatrix* X);
@@ -46,6 +47,7 @@ public:
     /*These API may change the value of input pointer*/
     static void zero(ALFloatMatrix* X/*Output*/);
     static void copy(ALFloatMatrix* dst/*Output*/, const ALFloatMatrix* src);
+    static void linear(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b);
     static void print(const ALFloatMatrix* A, std::ostream& os/*Output*/);
     static ALFLOAT inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst);
     

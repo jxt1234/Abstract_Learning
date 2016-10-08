@@ -13,7 +13,7 @@ static int test_main()
 {
     ALStandardLoader s;
     ALSp<ALFloatDataChain> c = s.load("a1a.tra");
-    ALSp<ALISuperviseLearner> l = new ALLogicalRegress(10000, 1.0);
+    ALSp<ALISuperviseLearner> l = new ALLogicalRegress(100000, 0.1);
     ALSp<ALFloatMatrix> X;
     ALSp<ALFloatMatrix> Y;
     ALStandardLoader::divide(c.get(), X, Y, 0);

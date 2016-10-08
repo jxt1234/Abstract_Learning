@@ -3,6 +3,7 @@
 #include "loader/ALStandardLoader.h"
 #include "math/ALFloatMatrix.h"
 #include "ALBaseFloatMatrix.h"
+#include "ALRefMatrix.h"
 #include "ALCropVirtualMatrix.h"
 #include "ALIndexVirtualMatrix.h"
 #include "ALLargeMatrix.h"
@@ -924,4 +925,35 @@ ALFloatMatrix* ALFloatMatrix::unionHorizontal(const ALFloatMatrix* Y, const ALFl
     ALSp<ALFloatMatrix> virtualX = createCropVirtualMatrix(unionMatrix, Y->width(), 0, totalWidth-1, height-1);
     copy(virtualX.get(), X);
     return unionMatrix;
+}
+
+ALFloatMatrix* ALFloatMatrix::createRefMatrix(ALFLOAT* base, size_t w, size_t h)
+{
+    return new ALRefMatrix(base, w, h);
+}
+
+void ALFloatMatrix::linear(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT pa, const ALFloatMatrix* B, ALFLOAT pb)
+{
+    ALASSERT(NULL!=A);
+    ALASSERT(NULL!=B);
+    ALASSERT(NULL!=C);
+    ALASSERT(A->width() == B->width());
+    ALASSERT(A->height() == B->height());
+    ALASSERT(C->width() == A->width());
+    ALASSERT(C->height() == A->height());
+    auto w = A->width();
+    auto h = B->height();
+    for (size_t i=0; i<h; ++i)
+    {
+        ALFLOAT* a = A->vGetAddr(i);
+        ALFLOAT* b = B->vGetAddr(i);
+        ALFLOAT* c = C->vGetAddr(i);
+        for (size_t j=0; j<w; ++j)
+        {
+            auto _a = a[j];
+            auto _b = b[j];
+            *(c+j) = _a*pa + _b*pb;
+        }
+    }
+
 }

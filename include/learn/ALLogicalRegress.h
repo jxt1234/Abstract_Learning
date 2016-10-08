@@ -6,7 +6,7 @@
 class ALLogicalRegress:public ALISuperviseLearner
 {
 public:
-    ALLogicalRegress(int iter=1000, ALFLOAT alpha = 1.0);
+    ALLogicalRegress(int iter=1000, ALFLOAT alpha = 0.1);
     virtual ~ALLogicalRegress();
     virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const override;
     static ALSp<ALFloatMatrix> learn(const ALFloatMatrix* X, const ALFloatMatrix* Y, size_t maxiter, ALFLOAT alpha);
