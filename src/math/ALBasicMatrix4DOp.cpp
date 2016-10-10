@@ -1,4 +1,5 @@
 #include "ALBasicMatrix4DOp.h"
+#include <fstream>
 
 static ALSp<ALFloatMatrix> _expand(const ALBasicMatrix4DOp::Matrix4D& src, const ALBasicMatrix4DOp::Matrix4D& kernelData, int stride, int z)
 {
@@ -42,6 +43,7 @@ static ALSp<ALFloatMatrix> _expand(const ALBasicMatrix4DOp::Matrix4D& src, const
         lastLine[i] = 1.0f;
     }
     //Expand End
+
     return srcExpand;
 }
 
@@ -108,19 +110,18 @@ void ALBasicMatrix4DOp::vFilter(Matrix4D& output, const Matrix4D& src, const Mat
 }
 
 
-void ALBasicMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& src, Matrix4D& srcDiff, const Matrix4D& kernelData, Matrix4D& kernelDataDiff, int stride) const
+void ALBasicMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& dst, const Matrix4D& src, Matrix4D& srcDiff, const Matrix4D& kernelData, Matrix4D& kernelDataDiff, int stride) const
 {
     ALASSERT(dstDiff.valid());
     ALASSERT(srcDiff.valid());
-    ALASSERT(src.valid());
+    ALASSERT(dst.valid());
     ALASSERT(kernelData.valid());
     ALASSERT(kernelDataDiff.valid());
     ALASSERT(kernelDataDiff.getTotalWidth() == kernelData.getTotalWidth());
-    ALASSERT(srcDiff.getTotalWidth() == src.getTotalWidth());
     ALASSERT(stride>=1);
     ALASSERT(kernelData.iExpand == 1);
-    ALASSERT(src.iExpand == 0);
-    auto batchSize = src.pOrigin->height();
+    ALASSERT(dst.iExpand == 0);
+    auto batchSize = dst.pOrigin->height();
     
     ALFloatMatrix::zero(kernelDataDiff.getMutable());
     ALFloatMatrix::zero(srcDiff.getMutable());
@@ -130,7 +131,19 @@ void ALBasicMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& sr
         auto outputDiffBatch = dstDiff.pOrigin->vGetAddr(z);
         ALSp<ALFloatMatrix> outputDiffM = ALFloatMatrix::createRefMatrix(outputDiffBatch, dstDiff.iWidth*dstDiff.iHeight, dstDiff.iDepth);
         ALSp<ALFloatMatrix> inputExpandTemp = _expand(src, kernelData, stride, z);
-        ALSp<ALFloatMatrix> kernelDiffTemp = ALFloatMatrix::productT(outputDiffM.get(), inputExpandTemp.get());;
+        ALSp<ALFloatMatrix> kernelDiffTemp = ALFloatMatrix::productT(outputDiffM.get(), inputExpandTemp.get());
+        if (false)
+        {
+            std::ofstream output_inputT("/Users/jiangxiaotang/Documents/Abstract_Learning/inputTotal.txt");
+            ALFloatMatrix::print(src.pOrigin, output_inputT);
+            ALSp<ALFloatMatrix> ett = ALFloatMatrix::transpose(inputExpandTemp.get());
+            std::ofstream output_ii("/Users/jiangxiaotang/Documents/Abstract_Learning/inputExpandTemp.txt");
+            ALFloatMatrix::print(ett.get(), output_ii);
+            std::ofstream output_ie("/Users/jiangxiaotang/Documents/Abstract_Learning/outputDiffM.txt");
+            ALFloatMatrix::print(outputDiffM.get(), output_ie);
+            std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/kernelDiffTemp.txt");
+            ALFloatMatrix::print(kernelDiffTemp.get(), output);
+        }
         ALFloatMatrix::linear(kernelDataDiff.getMutable(), kernelDiffTemp.get(), 1.0, kernelDataDiff.pOrigin, 1.0);
         
         inputExpandTemp = ALFloatMatrix::product(kernelDataT.get(), outputDiffM.get());

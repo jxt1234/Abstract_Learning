@@ -9,7 +9,7 @@ void GradientDecent::vOptimize(ALFloatMatrix* coefficient, const ALFloatMatrix* 
     for (int i=0; i<iteration; ++i)
     {
         ALSp<ALFloatMatrix> deltaC = delta->vCompute(coefficient, X);
-        ALSp<ALFloatMatrix> C = ALFloatMatrix::linear(coefficient, 1.0, deltaC.get(), alpha);
+        ALSp<ALFloatMatrix> C = ALFloatMatrix::linear(coefficient, 1.0, deltaC.get(), -alpha);
         ALFloatMatrix::copy(coefficient, C.get());
     }
 }

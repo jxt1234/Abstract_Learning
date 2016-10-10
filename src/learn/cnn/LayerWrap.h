@@ -1,6 +1,7 @@
 #ifndef LEARN_CNN_LAYERWRAP_H
 #define LEARN_CNN_LAYERWRAP_H
 #include "ILayer.h"
+#include <ostream>
 namespace ALCNN {
     
     class LayerWrap : public ALRefCount
@@ -17,11 +18,11 @@ namespace ALCNN {
         void connectInput(LayerWrap* input);
         void connectOutput(ALSp<LayerWrap> output);
         
-        ALSp<ALFloatMatrix> getOutput() const;
-        
-        void forward(ALSp<ALFloatMatrix> input);
+        ALSp<ALFloatMatrix> forward(ALSp<ALFloatMatrix> input);
         
         void backward(ALSp<ALFloatMatrix> error);
+        
+        void setForwardDebug(std::ostream* output) {mForwardDump = output;}
         
     private:
         ALSp<ILayer> mLayer;
@@ -30,14 +31,13 @@ namespace ALCNN {
         ALSp<LayerWrap> mNext;
         
         
-        ALSp<ALFloatMatrix> mOutput;
-        ALSp<ALFloatMatrix> mOutputDiff;
-        
         ALSp<ALFloatMatrix> mParameters;
         ALSp<ALFloatMatrix> mParameterDiff;
         
+        ALSp<ALFloatMatrix> mOutput;
         ALSp<ALFloatMatrix> mInput;
-        ALSp<ALFloatMatrix> mInputError;
+        
+        std::ostream* mForwardDump = NULL;
     };
 }
 #endif

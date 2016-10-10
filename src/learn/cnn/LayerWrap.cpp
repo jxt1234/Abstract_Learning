@@ -15,15 +15,6 @@ namespace ALCNN {
     
     void LayerWrap::resetBatchSize(int batchSize)
     {
-        if (NULL == mOutput.get() || mOutput->height() != batchSize)
-        {
-            mOutput = mLayer->vInitOutput(batchSize);
-            mOutputDiff = mLayer->vInitOutput(batchSize);
-        }
-        if (NULL!=mNext.get())
-        {
-            mNext->resetBatchSize(batchSize);
-        }
     }
     
     int LayerWrap::getParameterSize() const
@@ -100,27 +91,33 @@ namespace ALCNN {
         }
     }
 
-    void LayerWrap::forward(ALSp<ALFloatMatrix> input)
+    ALSp<ALFloatMatrix> LayerWrap::forward(ALSp<ALFloatMatrix> input)
     {
-        ALASSERT(input->height() == mOutput->height());
         ALASSERT(mLayer->vCheckInput(input.get()));
+        mOutput= mLayer->vInitOutput((int)input->height());
         mInput = input;
-        mInputError = ALFloatMatrix::create(input->width(), input->height());
-        mLayer->vForward(mInput.get(), mOutput.get(), mParameters.get());
+        mLayer->vForward(input.get(), mOutput.get(), mParameters.get());
+        if (NULL != mForwardDump)
+        {
+            ALFloatMatrix::print(mOutput.get(), *mForwardDump);
+            mForwardDump->flush();
+        }
         if (NULL!=mNext.get())
         {
-            mNext->forward(mOutput);
+            return mNext->forward(mOutput);
         }
+        return mOutput;
     }
     
     void LayerWrap::backward(ALSp<ALFloatMatrix> error)
     {
         ALASSERT(error->height() == mOutput->height());
-        mOutputDiff = error;
-        mLayer->vBackward(error.get(), mInput.get(), mParameters.get(), mInputError.get(), mParameters.get());
+        ALASSERT(mInput.get()!=NULL);
+        ALSp<ALFloatMatrix> inputError = ALFloatMatrix::create(mInput->width(), mInput->height());
+        mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get());
         if (NULL!=mBefore)
         {
-            mBefore->backward(mInputError);
+            mBefore->backward(inputError);
         }
     }
 
@@ -135,13 +132,5 @@ namespace ALCNN {
         ALASSERT(NULL == mNext.get());
         ALASSERT(NULL!=output.get());
         mNext = output;
-    }
-    ALSp<ALFloatMatrix> LayerWrap::getOutput() const
-    {
-        if (NULL!=mNext.get())
-        {
-            return mNext->getOutput();
-        }
-        return mOutput;
     }
 }

@@ -28,6 +28,8 @@ public:
     
     static ALFloatMatrix* inverse(const ALFloatMatrix* A);
     static ALFloatMatrix* transpose(const ALFloatMatrix* A);
+    static void transpose(const ALFloatMatrix* src, ALFloatMatrix* dst);
+
     static ALFloatMatrix* sts(const ALFloatMatrix* A, bool transpose = false);
     
     
@@ -48,6 +50,10 @@ public:
     static void zero(ALFloatMatrix* X/*Output*/);
     static void copy(ALFloatMatrix* dst/*Output*/, const ALFloatMatrix* src);
     static void linear(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b);
+
+    /*x[i][j] = a*x[i][j]+b*/
+    static void linearDirect(ALFloatMatrix* X, ALFLOAT a, ALFLOAT b);
+    
     static void print(const ALFloatMatrix* A, std::ostream& os/*Output*/);
     static ALFLOAT inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst);
     
@@ -73,6 +79,10 @@ public:
     
     /*For Discrete Matrix*/
     static ALFloatMatrix* genTypes(const ALFloatMatrix* Y);
+    
+    /*Return YT*/
+    static ALFloatMatrix* getTypes(const ALFloatMatrix* YP, const ALFloatMatrix* prop);
+
     
 protected:
     ALFloatMatrix(size_t w, size_t h):mWidth(w), mHeight(h){}

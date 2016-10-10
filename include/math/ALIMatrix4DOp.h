@@ -20,7 +20,7 @@ public:
     
     
     virtual void vFilter(Matrix4D& dst, const Matrix4D& src, const Matrix4D& kernelData, int stride) const = 0;
-    virtual void vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& src, Matrix4D& srcDiff/*Output*/, const Matrix4D& kernelData, Matrix4D& kernelDataDiff/*Output*/, int stride) const = 0;
+    virtual void vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& dst, const Matrix4D& src, Matrix4D& srcDiff/*Output*/, const Matrix4D& kernelData, Matrix4D& kernelDataDiff/*Output*/, int stride) const = 0;
 
     
     ALIMatrix4DOp(){}

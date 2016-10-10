@@ -45,7 +45,7 @@ public:
             ALFLOAT* x = X->vGetAddr(i)+1;
             for (size_t j=0; j<w; ++j)
             {
-                det[j] -= (error[i])*x[j];
+                det[j] += (error[i])*x[j];
             }
         }
         
@@ -57,6 +57,10 @@ ALLogicalRegress::ALLogicalRegress(int iter, ALFLOAT alpha)
 {
     mMaxIter = iter;
     mAlpha = alpha;
+    if (mAlpha < 0)
+    {
+        mAlpha = -mAlpha;
+    }
 }
 ALLogicalRegress::~ALLogicalRegress()
 {

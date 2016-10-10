@@ -9,6 +9,7 @@
 #include "ALLargeMatrix.h"
 #include <stdio.h>
 #include <sstream>
+#include <algorithm>
 #ifdef ALOPENCL_MAC
 #include "opencl/ALOpenCL.h"
 #endif
@@ -474,6 +475,25 @@ ALFloatMatrix* ALFloatMatrix::transpose(const ALFloatMatrix* A)
     return result;
 }
 
+void ALFloatMatrix::transpose(const ALFloatMatrix* src, ALFloatMatrix* dst)
+{
+    ALASSERT(NULL!=src);
+    ALASSERT(NULL!=dst);
+    ALASSERT(src->width() == dst->height());
+    ALASSERT(src->height() == dst->width());
+    auto w = src->width();
+    auto h = src->height();
+    for (size_t i=0; i<w; ++i)
+    {
+        auto dst_ = dst->vGetAddr(i);
+        for (size_t j=0; j<h; ++j)
+        {
+            auto src_ = src->vGetAddr(j);
+            dst_[j] = src_[i];
+        }
+    }
+}
+
 /*TODO*/
 ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
 {
@@ -903,10 +923,24 @@ ALFloatMatrix* ALFloatMatrix::randomeSelectMatrix(const ALFloatMatrix* base, siz
     ALASSERT(height < base->height());
     ALAUTOSTORAGE(indexes, ALFLOAT*, height);
     auto totalHeight = base->height();
+//    ALAUTOSTORAGE(allIndexes, ALFLOAT*, totalHeight);
+//    for (int i=0; i<totalHeight; ++i)
+//    {
+//        allIndexes[i] = base->vGetAddr(i);
+//    }
+//    /*random shuffle*/
+//    for (int i=1; i<totalHeight; ++i)
+//    {
+//        int j = ALRandom::mid(0, i);
+//        ALFLOAT* temp = allIndexes[i];
+//        allIndexes[i] = allIndexes[j];
+//        allIndexes[j] = temp;
+//    }
+    
     for (int i=0; i<height; ++i)
     {
-        int selectH = ALRandom::mid(0, (int)totalHeight);
-        indexes[i] = base->vGetAddr(selectH);
+        int j = ALRandom::mid(0, (int)totalHeight);
+        indexes[i] = base->vGetAddr(j);
     }
     ALFloatMatrix* result = new ALIndexVirtualMatrix(indexes, base->width(), height, true);
     return result;
@@ -956,4 +990,48 @@ void ALFloatMatrix::linear(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT pa,
         }
     }
 
+}
+
+void ALFloatMatrix::linearDirect(ALFloatMatrix* X, ALFLOAT a, ALFLOAT b)
+{
+    ALASSERT(NULL!=X);
+    auto w = X->width();
+    auto h = X->height();
+    for (int i=0; i<h; ++i)
+    {
+        auto x = X->vGetAddr(i);
+        for (int j=0; j<w; ++j)
+        {
+            x[j] = a*x[j]+b;
+        }
+    }
+}
+ALFloatMatrix* ALFloatMatrix::getTypes(const ALFloatMatrix* YP, const ALFloatMatrix* prop)
+{
+    ALASSERT(NULL!=YP);
+    ALASSERT(NULL!=prop);
+    ALASSERT(YP->width() == prop->width());
+    ALASSERT(1 == prop->height());
+    ALFloatMatrix* result = ALFloatMatrix::create(YP->height(), 1);
+    auto dst = result->vGetAddr();
+    auto w = YP->width();
+    auto h = YP->height();
+    
+    auto p = prop->vGetAddr();
+    for (int i=0; i<h; ++i)
+    {
+        auto yp = YP->vGetAddr(i);
+        int maxIndex = 0;
+        ALFLOAT maxNumber = yp[0];
+        for (int j=1; j<w; ++j)
+        {
+            if (yp[j] > maxNumber)
+            {
+                maxNumber = yp[j];
+                maxIndex = j;
+            }
+        }
+        dst[i] = p[maxIndex];
+    }
+    return result;
 }

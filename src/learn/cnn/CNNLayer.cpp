@@ -2,7 +2,7 @@
 namespace ALCNN {
     CNNLayer::CNNLayer(int inputSize, int inputChannel, int kernelSize, int kernelNumber, int stride)
     {
-        ALASSERT(inputSize>kernelSize);
+        ALASSERT(inputSize>=kernelSize);
         ALASSERT(kernelSize>=1);
         ALASSERT(kernelNumber>=1);
         ALASSERT(stride>=1);
@@ -35,7 +35,7 @@ namespace ALCNN {
     
     ALFloatMatrix* CNNLayer::vInitParameters() const
     {
-        auto w = mKernelInfo.iWidth*mKernelInfo.iHeight*mKernelInfo.iWidth+mKernelInfo.iExpand;
+        auto w = mKernelInfo.iWidth*mKernelInfo.iHeight*mKernelInfo.iDepth+mKernelInfo.iExpand;
         auto h = mFilterNumber;
         return ALFloatMatrix::create(w, h);
     }
@@ -63,23 +63,26 @@ namespace ALCNN {
         
         mMatrixOp->vFilter(output, input, kernel, mStride);
     }
-    void CNNLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* before, const ALFloatMatrix* parameters, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void CNNLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
         ALIMatrix4DOp::Matrix4D output_diff = mOutputInfo;
         output_diff.pOrigin = after_diff;
         
-        ALIMatrix4DOp::Matrix4D input = mInputInfo;
-        input.pOrigin = before;
+        ALIMatrix4DOp::Matrix4D output = mOutputInfo;
+        output.pOrigin = after;
         
         ALIMatrix4DOp::Matrix4D kernel = mKernelInfo;
         kernel.pOrigin = parameters;
 
         ALIMatrix4DOp::Matrix4D input_diff= mInputInfo;
         input_diff.pOrigin = before_diff;
-        
+
+        ALIMatrix4DOp::Matrix4D input= mInputInfo;
+        input.pOrigin = before;
+
         ALIMatrix4DOp::Matrix4D kernel_diff = mKernelInfo;
         kernel_diff.pOrigin = parameters_diff;
         
-        mMatrixOp->vDeterFilter(output_diff, input, input_diff, kernel, kernel_diff, mStride);
+        mMatrixOp->vDeterFilter(output_diff, output, input, input_diff, kernel, kernel_diff, mStride);
     }
 }

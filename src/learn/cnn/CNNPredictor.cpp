@@ -1,16 +1,20 @@
 #include "CNNPredictor.h"
+#include <fstream>
 namespace ALCNN {
     void CNNPredictor::vPredict(const ALFloatMatrix* X, ALFloatMatrix* Y/*Output*/) const
     {
-        ALASSERT(false);
+        ALASSERT(X->height() == Y->height());
+        ALSp<ALFloatMatrix> YP = ALFloatMatrix::create(mProbability->width(), Y->height());
+        this->vPredictProbability(X, YP.get());
+        ALSp<ALFloatMatrix> YT = ALFloatMatrix::getTypes(YP.get(), mProbability.get());
+        ALFloatMatrix::transpose(YT.get(), Y);
     }
     void CNNPredictor::vPredictProbability(const ALFloatMatrix* X, ALFloatMatrix* Y/*Output*/) const
     {
-        mNet->resetBatchSize((int)X->height());
+        ALASSERT(X->height() == Y->height());
         ALSp<ALFloatMatrix> X_C = ALFloatMatrix::create(X->width(), X->height());
         ALFloatMatrix::copy(X_C.get(), X);
-        mNet->forward(X_C);
-        ALSp<ALFloatMatrix> Y_P = mNet->getOutput();
+        ALSp<ALFloatMatrix> Y_P = mNet->forward(X_C);
         ALFloatMatrix::copy(Y, Y_P.get());
     }
     const ALFloatMatrix* CNNPredictor::vGetPossiableValues() const

@@ -9,7 +9,7 @@ public:
     virtual ALFloatMatrix* vInitOutput(int batchSize) const = 0;
     virtual bool vCheckInput(const ALFloatMatrix* input) const = 0;
     virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const = 0;
-    virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* before, const ALFloatMatrix* parameters, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const = 0;
+    virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const = 0;
 
     virtual ~ ILayer(){}
     

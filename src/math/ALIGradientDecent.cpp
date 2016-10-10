@@ -8,7 +8,7 @@ ALIGradientDecent* ALIGradientDecent::create(TYPE t)
         case FULL:
             return new GradientDecent;
         case SGD:
-            return new StochasticGradientDecent;
+            return new StochasticGradientDecent(50);
         default:
             ALASSERT(false);
             break;

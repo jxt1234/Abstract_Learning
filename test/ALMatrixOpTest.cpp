@@ -105,7 +105,7 @@ class ALMatrixOpTest:public GPTest
             ALAutoUnRef __srcDiff((ALFloatMatrix*)srcDiff.pOrigin);
             ALFloatMatrix::zero((ALFloatMatrix*)srcDiff.pOrigin);
             
-            op->vDeterFilter(dstDiff, src, srcDiff, kernel, kernelDiff, 1);
+            op->vDeterFilter(dstDiff, dst, src, srcDiff, kernel, kernelDiff, 1);
             
             {
                 std::ofstream output("output/ALMatrixOpTest_kernelDiff.txt");

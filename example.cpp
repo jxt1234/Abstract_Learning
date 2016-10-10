@@ -1,93 +1,63 @@
 #include "ALHead.h"
 #include <iostream>
 #include <fstream>
-#include "loader/ALStandardLoader.h"
 #include "math/ALFloatMatrix.h"
-#include "learn/ALGMMClassify.h"
-#include "learn/ALDecisionTree.h"
-#include "learn/ALPCABasic.h"
-#include "loader/ALStandardLoader.h"
-#include "math/ALStatistics.h"
-#include "compose/ALRandomForestMatrix.h"
-#include "learn/ALMatrixNormalizer.h"
 #include "learn/ALLearnFactory.h"
+#include "learn/ALCNNLearner.h"
 #include <math.h>
 using namespace std;
 
+static ALSp<ALFloatMatrix> _readMatrix(const char* fileName)
+{
+    ALSp<ALStream> input = ALStreamFactory::readFromFile(fileName);
+    return ALFloatMatrix::load(input.get());
+}
+
 int test_main(int argc, char* argv[])
 {
-    ALASSERT(argc>=2);
-    std::string dataName = argv[1];
-    ALSp<ALFloatMatrix> X;
-    ALSp<ALFloatMatrix> Y;
-    {
-        ALSp<ALFloatDataChain> inputs = ALStandardLoader::load(dataName.c_str());
-        ALStandardLoader::divide(inputs.get(), X, Y, 0);
-    }
-    bool normalize = false;
-    ALSp<ALIMatrixTransformer> normalizer;
-    if (normalize)
-    {
-        FUNC_PRINT(X->width());
-        normalizer = new ALMatrixNormalizer(X.get());
-        X = normalizer->vTransform(X.get());
-        ofstream output("temp.txt");
-        FUNC_PRINT(X->width());
-        ALFloatMatrix::print(X.get(), output);
-    }
+    ALSp<ALFloatMatrix> X_Train = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/train_x.txt");
+    ALSp<ALFloatMatrix> Y_Train = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/train_y.txt");
+    ALSp<ALFloatMatrix> X_Test = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/test_x.txt");
+    ALSp<ALFloatMatrix> Y_Test = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/test_y.txt");
     
-    //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25, true);
-    //ALSp<ALISuperviseLearner> learner = new ALGMMClassify;
-    ALSp<ALISuperviseLearner> learner = new ALDecisionTree;
-    FUNC_PRINT_ALL(ALLearnFactory::crossValidateForClassify(learner.get(), X.get(), Y.get()), f);
-    ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X.get(), Y.get());
-    ALSp<ALFloatMatrix> YP = ALFloatMatrix::create(1, Y->height());
-    ALSp<ALFloatMatrix> YYP = ALFloatMatrix::create(3, Y->height());
-    predictor->vPredict(X.get(), YP.get());
-    std::ofstream modelfile(dataName+".modle_with_offset");
-    predictor->vPrint(modelfile);
-    auto h = Y->height();
-    auto sum = 0.0;
+    ALFloatMatrix::linearDirect(X_Train.get(), 1.0/255.0, 0.0);
+    ALFloatMatrix::linearDirect(X_Test.get(), 1.0/255.0, 0.0);
+    
+    ALSp<ALFloatMatrix> Y_P = ALFloatMatrix::create(Y_Test->width(), Y_Test->height());
+    
+    ALIMatrix4DOp::Matrix4D inputDes;
+    inputDes.iDepth = 1;
+    inputDes.iWidth = 28;
+    inputDes.iHeight = 28;
+    inputDes.iExpand = 0;
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes);
+    ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
+    
+    ALSp<ALFloatMatrix> Y_P_Detail = ALFloatMatrix::create(predictor->vGetPossiableValues()->width(), Y_Test->height());
+    predictor->vPredictProbability(X_Test.get(), Y_P_Detail.get());
+    {
+        std::ofstream outputP("output/ALCNNLearnerTestProp.txt");
+        ALFloatMatrix::print(Y_P_Detail.get(), outputP);
+    }
+
+    
+    predictor->vPredict(X_Test.get(), Y_P.get());
+    auto h = Y_Test->height();
+    int correct = 0;
     for (int i=0; i<h; ++i)
     {
-        auto yyp = YYP->vGetAddr(i);
-        auto yp = YP->vGetAddr(i);
-        auto y = Y->vGetAddr(i);
-        yyp[0] = yp[0];
-        yyp[1] = y[0];
-        yyp[2] = y[0] - yp[0];
-        if (ZERO(yyp[2]))
+        auto y = Y_Test->vGetAddr(i)[0];
+        auto yp = Y_P->vGetAddr(i)[0];
+        if (ZERO(y-yp))
         {
-            sum++;
+            correct++;
         }
     }
     
-    ALSp<ALFloatMatrix> statiscMatrix = ALStatistics::statistics(YYP.get());
-    ALSp<ALWStream> fstatistics = ALStreamFactory::writeForFile((dataName+"_result_offset.txt").c_str());
-    ALFloatMatrix::save(statiscMatrix.get(), fstatistics.get());
-    
-    ALSp<ALWStream> f = ALStreamFactory::writeForFile((dataName+"_result_offset_detail.txt").c_str());
-    ALFloatMatrix::save(YYP.get(), f.get());
-    std::cout << dataName << ": Correct = " << sum/h<<"\n";
-    
-    if (argc>2)
-    {
-        std::string predictDataName = argv[2];
-        ALSp<ALStream> inputs = ALStreamFactory::readFromFile(predictDataName.c_str());
-        ALSp<ALFloatMatrix> XP = ALFloatMatrix::load(inputs.get());
-        inputs = NULL;
-        if (normalize)
-        {
-            FUNC_PRINT(XP->width());
-            XP = normalizer->vTransform(XP.get());
-            FUNC_PRINT(XP->width());
-        }
-        ALSp<ALFloatMatrix> YPP = ALFloatMatrix::create(1, XP->height());
-        predictor->vPredict(XP.get(), YPP.get());
-        ALSp<ALWStream> f = ALStreamFactory::writeForFile((predictDataName+"_predict.txt").c_str());
-        ALFloatMatrix::save(YPP.get(), f.get());
-    }
-    
+    ALSp<ALFloatMatrix> YYP = ALFloatMatrix::unionHorizontal(Y_P.get(), Y_Test.get());
+    std::ofstream output("output/ALCNNLearnerTest.txt");
+    ALFloatMatrix::print(YYP.get(), output);
+    std::cout << "correct: "<<correct<<"/"<<h<<std::endl;
     return 1;
 }
 

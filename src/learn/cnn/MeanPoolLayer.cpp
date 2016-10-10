@@ -18,6 +18,7 @@ namespace ALCNN {
         mOutput.iExpand = 0;
         mOutput.iWidth = width/stride;
         mOutput.iHeight = height/stride;
+        mStride = stride;
     }
     MeanPoolLayer::~ MeanPoolLayer()
     {
@@ -63,7 +64,7 @@ namespace ALCNN {
                         {
                             for (int y=0; y<mStride; ++y)
                             {
-                                sum += srcLines[x][y];
+                                sum += srcLines[x][y+mStride*j];
                             }
                         }
                         dst[j] = sum / (ALFLOAT)(mStride*mStride);
@@ -72,19 +73,19 @@ namespace ALCNN {
             }
         }
     }
-    void MeanPoolLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* before, const ALFloatMatrix* parameters, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void MeanPoolLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
         ALASSERT(NULL!=after_diff);
-        ALASSERT(NULL!=before);
-        ALASSERT(before->height() == after_diff->height());
-        ALASSERT(before->width() == mInput.getTotalWidth());
+        ALASSERT(NULL!=after);
+        ALASSERT(after->height() == after_diff->height());
+        ALASSERT(before_diff->width() == mInput.getTotalWidth());
         ALASSERT(after_diff->width() == mOutput.getTotalWidth());
         auto batchSize = after_diff->height();
         for (int z=0; z<batchSize; ++z)
         {
             for (int p=0; p<mInput.iDepth; ++p)
             {
-                ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
+                ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before_diff->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
                 ALSp<ALFloatMatrix> output = ALFloatMatrix::createRefMatrix(after_diff->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight, mOutput.iWidth, mOutput.iHeight);
                 ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
                 auto h = mOutput.iHeight;
@@ -98,12 +99,12 @@ namespace ALCNN {
                     }
                     for (int j=0; j<w; ++j)
                     {
-                        ALFLOAT ave = dst[j];
+                        ALFLOAT ave = dst[j] / (ALFLOAT)(mStride*mStride);
                         for (int x=0; x<mStride; ++x)
                         {
                             for (int y=0; y<mStride; ++y)
                             {
-                                srcLines[x][y] = ave;
+                                srcLines[x][y+mStride*j] = ave;
                             }
                         }
                     }
