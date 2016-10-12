@@ -43,7 +43,7 @@ LINKS: ./libAbstract_learning.so
 TARGET:matrix_tools.out
 DEPENDS:libAbstract_learning.a
 DIRS:
-SRCS:tools/matrix_tools.cpp
+SRCS:cpptools/matrix_tools.cpp
 LINKS: ./libAbstract_learning.a
 
 ##########

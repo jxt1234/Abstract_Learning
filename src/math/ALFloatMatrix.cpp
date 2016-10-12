@@ -759,8 +759,9 @@ void ALFloatMatrix::quickSave(const ALFloatMatrix* m, ALWStream* f)
 {
     ALASSERT(NULL!=m);
     ALASSERT(NULL!=f);
-    size_t w = m->width();
-    size_t h = m->height();
+    ALASSERT(sizeof(ALFLOAT) == sizeof(double));
+    uint32_t w = (uint32_t)m->width();
+    uint32_t h = (uint32_t)m->height();
     f->write(w);
     f->write(h);
     for (size_t i=0; i<m->height(); ++i)
@@ -772,8 +773,9 @@ void ALFloatMatrix::quickSave(const ALFloatMatrix* m, ALWStream* f)
 ALFloatMatrix* ALFloatMatrix::quickLoad(ALStream* f)
 {
     ALASSERT(NULL!=f);
-    auto w = f->read<size_t>();
-    auto h = f->read<size_t>();
+    ALASSERT(sizeof(ALFLOAT) == sizeof(double));
+    auto w = f->read<uint32_t>();
+    auto h = f->read<uint32_t>();
     if (f->vIsEnd())
     {
         return NULL;

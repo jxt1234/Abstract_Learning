@@ -46,7 +46,7 @@ namespace ALCNN {
         }
         loss/=YP->height();
         mCurrentLoss = loss;
-        if (true)
+        if (false)
         {
             FUNC_PRINT_ALL(mCurrentLoss, f);
         }

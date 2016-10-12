@@ -6,7 +6,7 @@
 class ALCNNLearner : public ALISuperviseLearner
 {
 public:
-    ALCNNLearner(const ALIMatrix4DOp::Matrix4D& inputDescribe);
+    ALCNNLearner(const ALIMatrix4DOp::Matrix4D& inputDescribe, unsigned int iteration=10000);
     virtual ~ ALCNNLearner();
     
     virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const;
@@ -14,6 +14,7 @@ public:
 private:
     ALSp<ALIGradientDecent> mGDMethod;
     ALIMatrix4DOp::Matrix4D mInputDescribe;
+    unsigned int mIteration;
 };
 
 #endif
