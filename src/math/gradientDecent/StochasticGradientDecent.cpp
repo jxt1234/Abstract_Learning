@@ -1,6 +1,7 @@
 #include "StochasticGradientDecent.h"
 void StochasticGradientDecent::vOptimize(ALFloatMatrix* coefficient, const ALFloatMatrix* X, const DerivativeFunction* delta, double alpha, int iteration) const
 {
+    ALASSERT(alpha>0);
     ALASSERT(NULL!=coefficient);
     ALASSERT(NULL!=X);
     ALASSERT(NULL!=delta);

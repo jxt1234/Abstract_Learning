@@ -1,4 +1,5 @@
 #include "MeanPoolLayer.h"
+#include <fstream>
 
 namespace ALCNN {
     MeanPoolLayer::MeanPoolLayer(int stride, int width, int height, int depth)
@@ -41,13 +42,13 @@ namespace ALCNN {
         ALASSERT(before->width() == mInput.getTotalWidth());
         ALASSERT(after->width() == mOutput.getTotalWidth());
         auto batchSize = after->height();
+        ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
         for (int z=0; z<batchSize; ++z)
         {
             for (int p=0; p<mInput.iDepth; ++p)
             {
                 ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
                 ALSp<ALFloatMatrix> output = ALFloatMatrix::createRefMatrix(after->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight, mOutput.iWidth, mOutput.iHeight);
-                ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
                 auto h = mOutput.iHeight;
                 auto w = mOutput.iWidth;
                 for (int i=0; i<h; ++i)
@@ -70,6 +71,13 @@ namespace ALCNN {
                         dst[j] = sum / (ALFLOAT)(mStride*mStride);
                     }
                 }
+                if (false)
+                {
+                    std::ofstream inputf("/Users/jiangxiaotang/Documents/Abstract_Learning/.input");
+                    ALFloatMatrix::print(input.get(), inputf);
+                    std::ofstream outputf("/Users/jiangxiaotang/Documents/Abstract_Learning/.output");
+                    ALFloatMatrix::print(output.get(), outputf);
+                }
             }
         }
     }
@@ -81,13 +89,13 @@ namespace ALCNN {
         ALASSERT(before_diff->width() == mInput.getTotalWidth());
         ALASSERT(after_diff->width() == mOutput.getTotalWidth());
         auto batchSize = after_diff->height();
+        ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
         for (int z=0; z<batchSize; ++z)
         {
             for (int p=0; p<mInput.iDepth; ++p)
             {
                 ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before_diff->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
                 ALSp<ALFloatMatrix> output = ALFloatMatrix::createRefMatrix(after_diff->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight, mOutput.iWidth, mOutput.iHeight);
-                ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
                 auto h = mOutput.iHeight;
                 auto w = mOutput.iWidth;
                 for (int i=0; i<h; ++i)
@@ -109,6 +117,14 @@ namespace ALCNN {
                         }
                     }
                 }
+                if (false)
+                {
+                    std::ofstream inputf("/Users/jiangxiaotang/Documents/Abstract_Learning/.input");
+                    ALFloatMatrix::print(input.get(), inputf);
+                    std::ofstream outputf("/Users/jiangxiaotang/Documents/Abstract_Learning/.output");
+                    ALFloatMatrix::print(output.get(), outputf);
+                }
+
             }
         }
     }

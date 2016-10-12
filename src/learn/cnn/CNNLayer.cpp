@@ -82,7 +82,7 @@ namespace ALCNN {
 
         ALIMatrix4DOp::Matrix4D kernel_diff = mKernelInfo;
         kernel_diff.pOrigin = parameters_diff;
-        
+
         mMatrixOp->vDeterFilter(output_diff, output, input, input_diff, kernel, kernel_diff, mStride);
     }
 }

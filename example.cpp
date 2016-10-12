@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "math/ALFloatMatrix.h"
+#include "compose/ALRandomForestMatrix.h"
 #include "learn/ALLearnFactory.h"
 #include "learn/ALCNNLearner.h"
 #include <math.h>
@@ -15,10 +16,10 @@ static ALSp<ALFloatMatrix> _readMatrix(const char* fileName)
 
 int test_main(int argc, char* argv[])
 {
-    ALSp<ALFloatMatrix> X_Train = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/train_x.txt");
-    ALSp<ALFloatMatrix> Y_Train = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/train_y.txt");
-    ALSp<ALFloatMatrix> X_Test = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/test_x.txt");
-    ALSp<ALFloatMatrix> Y_Test = _readMatrix("/Users/jiangxiaotang/Documents/Abstract_Learning/data/t10k/test_y.txt");
+    ALSp<ALFloatMatrix> X_Train = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/train_x.txt");
+    ALSp<ALFloatMatrix> Y_Train = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/train_y.txt");
+    ALSp<ALFloatMatrix> X_Test = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/test_x.txt");
+    ALSp<ALFloatMatrix> Y_Test = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/test_y.txt");
     
     ALFloatMatrix::linearDirect(X_Train.get(), 1.0/255.0, 0.0);
     ALFloatMatrix::linearDirect(X_Test.get(), 1.0/255.0, 0.0);
@@ -31,6 +32,7 @@ int test_main(int argc, char* argv[])
     inputDes.iHeight = 28;
     inputDes.iExpand = 0;
     ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes);
+    //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     
     ALSp<ALFloatMatrix> Y_P_Detail = ALFloatMatrix::create(predictor->vGetPossiableValues()->width(), Y_Test->height());

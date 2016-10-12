@@ -14,6 +14,8 @@ namespace ALCNN {
         ALSp<LayerWrap> mFirst;
         ALSp<LayerWrap> mLast;
         int mOutputSize;
+        ALFLOAT mDecay;
+        mutable ALFLOAT mCurrentLoss;
     };
 }
 #endif

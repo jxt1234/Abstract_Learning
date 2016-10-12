@@ -37,17 +37,9 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALSp<LayerWrap> lastLayer;
     if (false)
     {
-        auto currentWidth = inputDescripe.iWidth;
-        auto kernelSize = inputDescripe.iWidth;
-        auto currentDepth = inputDescripe.iDepth;
-        auto filterNumber = (int)prop->width();
-        firstLayer = new LayerWrap(new CNNLayer(currentWidth, currentDepth, kernelSize, filterNumber, 1));
-        
-        
-        lastLayer = new LayerWrap(new SoftMaxLayer((int)prop->width()));
-        
-        firstLayer->connectOutput(lastLayer);
-        lastLayer->connectInput(firstLayer.get());
+        int filterNumber = (int)prop->width();
+        firstLayer = new LayerWrap(new SoftMaxLayer(inputDescripe.getTotalWidth(), filterNumber));
+        lastLayer = firstLayer;
     }
     else
     {
@@ -68,7 +60,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         currentWidth = currentWidth/2;
         //currentLayer->setForwardDebug(&dump2);
 
-        
+
         //Second CNN
         kernelSize = 5;
         filterNumber = 12;
@@ -88,19 +80,9 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         currentLayer = nextLayer;
         currentWidth = currentWidth/2;
         //currentLayer->setForwardDebug(&dump4);
-
         
         /*Last Layer*/
-        kernelSize = currentWidth;
-        filterNumber = (int)prop->width();
-        nextLayer = new LayerWrap(new CNNLayer(currentWidth, currentDepth, kernelSize, filterNumber, 1));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        //currentLayer->setForwardDebug(&dump5);
-
-        lastLayer = new LayerWrap(new SoftMaxLayer((int)prop->width()));
-        
+        lastLayer = new LayerWrap(new SoftMaxLayer((currentWidth*currentWidth*currentDepth), (int)prop->width()));
         currentLayer->connectOutput(lastLayer);
         lastLayer->connectInput(currentLayer.get());
     }

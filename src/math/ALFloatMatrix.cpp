@@ -121,7 +121,7 @@ ALFloatMatrix* ALFloatMatrix::productT(const ALFloatMatrix* A, const ALFloatMatr
     auto w = BT->height();
     auto h = A->height();
     auto l = A->width();
-    ALFloatMatrix* C = new ALBaseFloatMatrix(w, h);
+    ALFloatMatrix* C = ALFloatMatrix::create(w, h);
     productBasicT(C->vGetAddr(), C->width(), A->vGetAddr(), A->width(), BT->vGetAddr(), BT->width(), w, h, l);
     return C;
 }

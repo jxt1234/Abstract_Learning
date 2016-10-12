@@ -113,11 +113,15 @@ namespace ALCNN {
     {
         ALASSERT(error->height() == mOutput->height());
         ALASSERT(mInput.get()!=NULL);
-        ALSp<ALFloatMatrix> inputError = ALFloatMatrix::create(mInput->width(), mInput->height());
-        mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get());
         if (NULL!=mBefore)
         {
+            ALSp<ALFloatMatrix> inputError = ALFloatMatrix::create(mInput->width(), mInput->height());
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get());
             mBefore->backward(inputError);
+        }
+        else
+        {
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), NULL, mParameterDiff.get());
         }
     }
 
