@@ -5,7 +5,7 @@
 class StochasticGradientDecent :public ALIGradientDecent
 {
 public:
-    StochasticGradientDecent(int batchSize = 5) {mBatchSize = batchSize;}
+    StochasticGradientDecent(int batchSize = 5) :mDegeneration(batchSize) {mBatchSize = batchSize;}
     virtual ~ StochasticGradientDecent() {}
     
     virtual void vOptimize(ALFloatMatrix* coefficient, const ALFloatMatrix* X, const DerivativeFunction* delta, double alpha, int iteration) const override;

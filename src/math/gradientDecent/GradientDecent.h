@@ -5,9 +5,11 @@
 class GradientDecent :public ALIGradientDecent
 {
 public:
-    GradientDecent() {}
+    GradientDecent(int batchSize=50):mBatchSize(batchSize){}
     virtual ~ GradientDecent() {}
     
     virtual void vOptimize(ALFloatMatrix* coefficient, const ALFloatMatrix* X, const DerivativeFunction* delta, double alpha, int iteration) const override;
+private:
+    int mBatchSize;
 };
 #endif

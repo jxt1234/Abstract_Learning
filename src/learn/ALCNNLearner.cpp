@@ -9,7 +9,7 @@ using namespace ALCNN;
 
 ALCNNLearner::ALCNNLearner(const ALIMatrix4DOp::Matrix4D& inputDescripe, unsigned int iteration)
 {
-    mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD);
+    mGDMethod = ALIGradientDecent::create(ALIGradientDecent::FULL);
     ALASSERT(inputDescripe.iHeight == inputDescripe.iWidth);
     mInputDescribe = inputDescripe;
     mIteration = iteration;
@@ -117,7 +117,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     auto c = coefficient->vGetAddr();
     for (int i=0; i<parameterSize; ++i)
     {
-        c[i] = 0.1*ALRandom::rate();
+        c[i] = 0.1*ALRandom::rate()-0.05;
     }
     mGDMethod->vOptimize(coefficient.get(), Merge.get(), det.get(), 0.85, mIteration);
     firstLayer->setParameters(coefficient.get(), 0);

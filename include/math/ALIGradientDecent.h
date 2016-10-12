@@ -32,7 +32,7 @@ public:
         SGD
     } TYPE;
     
-    static ALIGradientDecent* create(TYPE t = FULL);
+    static ALIGradientDecent* create(TYPE t = FULL, int batchSize = 50);
 protected:
     ALIGradientDecent(){}
 };
