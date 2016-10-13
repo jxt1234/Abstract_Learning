@@ -24,5 +24,8 @@ class ALClock
 };
 //#define ALAUTOTIME ALClock __alclock(__func__, __LINE__)
 #define ALAUTOTIME
+
+#define ALLEARNAUTOTIME
+//#define ALLEARNAUTOTIME ALClock __alclock(__FILE__, __LINE__)
 #define ALFORCEAUTOTIME ALClock __alclock(__func__, __LINE__)
 #endif

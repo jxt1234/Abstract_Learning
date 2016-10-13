@@ -48,7 +48,12 @@ namespace ALCNN {
         mCurrentLoss = loss;
         if (false)
         {
-            FUNC_PRINT_ALL(mCurrentLoss, f);
+            static int gNumber = 0;
+            gNumber++;
+            if (gNumber % 50==0)
+            {
+                FUNC_PRINT_ALL(mCurrentLoss, f);
+            }
         }
         
         mLast->backward(YDiff);

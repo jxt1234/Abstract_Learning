@@ -31,7 +31,7 @@ int test_main(int argc, char* argv[])
     inputDes.iWidth = 28;
     inputDes.iHeight = 28;
     inputDes.iExpand = 0;
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes);
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes, 1000000);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     

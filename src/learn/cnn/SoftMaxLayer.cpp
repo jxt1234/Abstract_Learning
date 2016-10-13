@@ -41,6 +41,7 @@ namespace ALCNN {
     }
     void SoftMaxLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
     {
+        ALLEARNAUTOTIME;
         ALASSERT(NULL!=before);
         ALASSERT(NULL!=after);
         ALASSERT(NULL!=parameters);
@@ -91,6 +92,7 @@ namespace ALCNN {
     }
     void SoftMaxLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
+        ALLEARNAUTOTIME;
         ALASSERT(NULL!=after);
         ALASSERT(NULL!=after_diff);
         ALASSERT(after->width() == after_diff->width());

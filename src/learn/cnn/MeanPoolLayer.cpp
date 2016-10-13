@@ -36,6 +36,7 @@ namespace ALCNN {
     }
     void MeanPoolLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
     {
+        ALLEARNAUTOTIME;
         ALASSERT(NULL!=after);
         ALASSERT(NULL!=before);
         ALASSERT(before->height() == after->height());
@@ -83,6 +84,7 @@ namespace ALCNN {
     }
     void MeanPoolLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
+        ALLEARNAUTOTIME;
         ALASSERT(NULL!=after_diff);
         ALASSERT(NULL!=after);
         ALASSERT(after->height() == after_diff->height());

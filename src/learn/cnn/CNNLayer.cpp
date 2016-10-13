@@ -52,6 +52,7 @@ namespace ALCNN {
     }
     void CNNLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
     {
+        ALLEARNAUTOTIME;
         ALIMatrix4DOp::Matrix4D output = mOutputInfo;
         output.pOrigin = after;
         
@@ -65,6 +66,7 @@ namespace ALCNN {
     }
     void CNNLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
+        ALLEARNAUTOTIME;
         ALIMatrix4DOp::Matrix4D output_diff = mOutputInfo;
         output_diff.pOrigin = after_diff;
         
