@@ -31,8 +31,8 @@ int test_main(int argc, char* argv[])
     inputDes.iWidth = 28;
     inputDes.iHeight = 28;
     inputDes.iExpand = 0;
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes, 1000000);
-    //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(25);
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes, 100000);
+    //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     
     ALSp<ALFloatMatrix> Y_P_Detail = ALFloatMatrix::create(predictor->vGetPossiableValues()->width(), Y_Test->height());

@@ -4,6 +4,8 @@
 #include "cnn/MeanPoolLayer.h"
 #include "cnn/CNNLayer.h"
 #include "cnn/SoftMaxLayer.h"
+#include "cnn/ReluLayer.hpp"
+#include "cnn/MaxPoolLayer.hpp"
 #include <fstream>
 using namespace ALCNN;
 
@@ -36,6 +38,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALSp<LayerWrap> firstLayer;
     ALSp<LayerWrap> currentLayer;
     ALSp<LayerWrap> lastLayer;
+    ALSp<LayerWrap> nextLayer;
     if (false)
     {
         int filterNumber = (int)prop->width();
@@ -53,8 +56,14 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         auto currentDepth = filterNumber;
         //currentLayer->setForwardDebug(&dump1);
         
+//        //Relu
+//        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
+//        currentLayer->connectOutput(nextLayer);
+//        nextLayer->connectInput(currentLayer.get());
+//        currentLayer = nextLayer;
+        
         //Pool
-        ALSp<LayerWrap> nextLayer = new LayerWrap(new MeanPoolLayer(2, currentWidth, currentWidth, currentDepth));
+        nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
         currentLayer->connectOutput(nextLayer);
         nextLayer->connectInput(currentLayer.get());
         currentLayer = nextLayer;
@@ -73,9 +82,14 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         currentWidth = currentWidth - kernelSize + 1;
         //currentLayer->setForwardDebug(&dump3);
 
+//        //Relu
+//        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
+//        currentLayer->connectOutput(nextLayer);
+//        nextLayer->connectInput(currentLayer.get());
+//        currentLayer = nextLayer;
         
         //Second Pool
-        nextLayer = new LayerWrap(new MeanPoolLayer(2, currentWidth, currentWidth, currentDepth));
+        nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
         currentLayer->connectOutput(nextLayer);
         nextLayer->connectInput(currentLayer.get());
         currentLayer = nextLayer;
@@ -117,7 +131,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     auto c = coefficient->vGetAddr();
     for (int i=0; i<parameterSize; ++i)
     {
-        c[i] = 0.1*ALRandom::rate()-0.05;
+        c[i] = 0.1*ALRandom::rate();
     }
     mGDMethod->vOptimize(coefficient.get(), Merge.get(), det.get(), 0.95, mIteration);
     firstLayer->setParameters(coefficient.get(), 0);

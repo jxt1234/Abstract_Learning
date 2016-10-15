@@ -6,7 +6,7 @@ namespace ALCNN {
         mFirst = first;
         mLast = last;
         mOutputSize = outputSize;
-        mDecay = 0.000;//TODO
+        mDecay = 0.001;//TODO
     }
     CNNDerivativeFunction::~CNNDerivativeFunction()
     {
@@ -46,7 +46,7 @@ namespace ALCNN {
         }
         loss/=YP->height();
         mCurrentLoss = loss;
-        if (false)
+        if (true)
         {
             static int gNumber = 0;
             gNumber++;
