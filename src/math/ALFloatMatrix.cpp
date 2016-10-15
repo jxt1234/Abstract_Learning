@@ -120,11 +120,24 @@ ALFloatMatrix* ALFloatMatrix::productT(const ALFloatMatrix* A, const ALFloatMatr
     ALASSERT(A->width() == BT->width());
     auto w = BT->height();
     auto h = A->height();
-    auto l = A->width();
     ALFloatMatrix* C = ALFloatMatrix::create(w, h);
-    productBasicT(C->vGetAddr(), C->width(), A->vGetAddr(), A->width(), BT->vGetAddr(), BT->width(), w, h, l);
+    productT(C, A, BT);
     return C;
 }
+
+void ALFloatMatrix::productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* BT)
+{
+    ALAUTOTIME;
+    ALASSERT(NULL!=A && NULL!=BT);
+    ALASSERT(A->width() == BT->width());
+    ALASSERT(C->width() == BT->height());
+    ALASSERT(C->height() == A->height());
+    auto w = BT->height();
+    auto h = A->height();
+    auto l = A->width();
+    productBasicT(C->vGetAddr(), C->width(), A->vGetAddr(), A->width(), BT->vGetAddr(), BT->width(), w, h, l);
+}
+
 ALFloatMatrix* ALFloatMatrix::productSS(const ALFloatMatrix* A, const ALFloatMatrix* B)
 {
     ALAUTOTIME;
@@ -158,18 +171,30 @@ ALFloatMatrix* ALFloatMatrix::product(const ALFloatMatrix* A, const ALFloatMatri
     ALASSERT(A->width() == B->height());
     auto w = B->width();
     auto h = A->height();
-    auto l = A->width();
 
     ALFloatMatrix* C = new ALBaseFloatMatrix(w, h);
+    product(C, A, B);
+    return C;
+}
+void ALFloatMatrix::product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
+{
+    ALAUTOTIME;
+    ALASSERT(NULL!=A && NULL!=B);
+    ALASSERT(A->width() == B->height());
+    ALASSERT(C->width() == B->width());
+    ALASSERT(C->height() == A->height());
     auto rA = A->width();
     auto rB = B->width();
     auto rC = C->width();
     ALFLOAT* a = A->vGetAddr();
     ALFLOAT* b = B->vGetAddr();
     ALFLOAT* c = C->vGetAddr();
+    auto w = B->width();
+    auto h = A->height();
+    auto l = A->width();
     productBasic(c, rC, a, rA, b, rB, w, h, l);
-    return C;
 }
+
 ALFloatMatrix* ALFloatMatrix::HAH(const ALFloatMatrix* A, const ALFloatMatrix* H)
 {
     ALASSERT(A->width() == A->height());
@@ -628,6 +653,8 @@ void ALFloatMatrix::print(const ALFloatMatrix* A, std::ostream& os)
         os << "\n";
     }
 }
+
+
 ALFloatMatrix* ALFloatMatrix::createIdentity(size_t n)
 {
     ALASSERT(n>0);

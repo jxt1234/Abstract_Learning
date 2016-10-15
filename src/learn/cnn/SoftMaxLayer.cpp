@@ -103,7 +103,7 @@ namespace ALCNN {
         /*Compute Parameter Diff*/
         auto w = parameters->width();
         auto h = parameters->height();
-        ALFLOAT det = 1.0/batchSize;
+        ALFLOAT det = 1.0;
         
         ALSp<ALFloatMatrix> X = enlarge(before);
         

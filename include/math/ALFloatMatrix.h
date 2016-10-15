@@ -20,7 +20,10 @@ public:
     static ALFloatMatrix* product(const ALFloatMatrix* A, const ALFloatMatrix* B);
     static ALFloatMatrix* productSS(const ALFloatMatrix* A, const ALFloatMatrix* B);//For AT=A and BT=B
     static ALFloatMatrix* productT(const ALFloatMatrix* A, const ALFloatMatrix* BT);
-    
+
+    static void product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
+    static void productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* BT);
+
     /*H = HT, n is the number of E, return
      [E,  * A *[E,
      H]         H]*/

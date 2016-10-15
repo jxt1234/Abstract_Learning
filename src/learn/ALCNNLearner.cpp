@@ -6,6 +6,7 @@
 #include "cnn/SoftMaxLayer.h"
 #include "cnn/ReluLayer.hpp"
 #include "cnn/MaxPoolLayer.hpp"
+#include "cnn/InnerProductLayer.hpp"
 #include <fstream>
 using namespace ALCNN;
 
@@ -39,10 +40,12 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALSp<LayerWrap> currentLayer;
     ALSp<LayerWrap> lastLayer;
     ALSp<LayerWrap> nextLayer;
-    if (false)
+    if (true)
     {
         int filterNumber = (int)prop->width();
-        firstLayer = new LayerWrap(new SoftMaxLayer(inputDescripe.getTotalWidth(), filterNumber));
+        //firstLayer = new LayerWrap(new SoftMaxLayer(inputDescripe.getTotalWidth(), filterNumber));
+        firstLayer = new LayerWrap(new InnerProductLayer(inputDescripe.getTotalWidth(), filterNumber));
+//        firstLayer = new LayerWrap(new CNNLayer(inputDescripe.iWidth, inputDescripe.iDepth, inputDescripe.iWidth, filterNumber, 1));
         lastLayer = firstLayer;
     }
     else
@@ -56,11 +59,11 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         auto currentDepth = filterNumber;
         //currentLayer->setForwardDebug(&dump1);
         
-//        //Relu
-//        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
-//        currentLayer->connectOutput(nextLayer);
-//        nextLayer->connectInput(currentLayer.get());
-//        currentLayer = nextLayer;
+        //Relu
+        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
+        currentLayer->connectOutput(nextLayer);
+        nextLayer->connectInput(currentLayer.get());
+        currentLayer = nextLayer;
         
         //Pool
         nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
@@ -82,11 +85,11 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         currentWidth = currentWidth - kernelSize + 1;
         //currentLayer->setForwardDebug(&dump3);
 
-//        //Relu
-//        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
-//        currentLayer->connectOutput(nextLayer);
-//        nextLayer->connectInput(currentLayer.get());
-//        currentLayer = nextLayer;
+        //Relu
+        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
+        currentLayer->connectOutput(nextLayer);
+        nextLayer->connectInput(currentLayer.get());
+        currentLayer = nextLayer;
         
         //Second Pool
         nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
@@ -97,9 +100,19 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
         //currentLayer->setForwardDebug(&dump4);
         
         /*Last Layer*/
-        lastLayer = new LayerWrap(new SoftMaxLayer((currentWidth*currentWidth*currentDepth), (int)prop->width()));
-        currentLayer->connectOutput(lastLayer);
-        lastLayer->connectInput(currentLayer.get());
+        nextLayer = new LayerWrap(new SoftMaxLayer((currentWidth*currentWidth*currentDepth), (int)prop->width()));
+        currentLayer->connectOutput(nextLayer);
+        nextLayer->connectInput(currentLayer.get());
+        currentLayer = nextLayer;
+        
+//        kernelSize = currentWidth;
+//        filterNumber = prop->width();
+//        nextLayer = new LayerWrap(new CNNLayer(currentWidth, currentDepth, kernelSize, filterNumber, 1));
+//        currentLayer->connectOutput(nextLayer);
+//        nextLayer->connectInput(currentLayer.get());
+//        currentLayer = nextLayer;
+        
+        lastLayer = currentLayer;
     }
     ALSp<ALIGradientDecent::DerivativeFunction> det = new CNNDerivativeFunction(firstLayer, lastLayer, (int)prop->width());
     
@@ -131,7 +144,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     auto c = coefficient->vGetAddr();
     for (int i=0; i<parameterSize; ++i)
     {
-        c[i] = 0.1*ALRandom::rate();
+        c[i] = 0.1*ALRandom::rate()-0.05;
     }
     mGDMethod->vOptimize(coefficient.get(), Merge.get(), det.get(), 0.95, mIteration);
     firstLayer->setParameters(coefficient.get(), 0);
