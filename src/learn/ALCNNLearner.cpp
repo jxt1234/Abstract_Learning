@@ -148,7 +148,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     {
         c[i] = 0.1*ALRandom::rate()-0.05;
     }
-    mGDMethod->vOptimize(coefficient.get(), Merge.get(), mDetFunction.get(), 0.95, mIteration);
+    mGDMethod->vOptimize(coefficient.get(), Merge.get(), mDetFunction.get(), 0.35, mIteration);
     mLayerPredict->pFirstLayer->setParameters(coefficient.get(), 0);
     
     return new CNNPredictor(mLayerPredict->pFirstLayer, prop);

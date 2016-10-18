@@ -11,7 +11,7 @@
 #include "utils/ALRandom.h"
 #include "utils/ALAutoFile.h"
 #include "utils/ALStream.h"
-//#define ALSPEEDFIRST
+#define ALSPEEDFIRST
 
 #ifdef ALSPEEDFIRST
 #define ALOPENCL_MAC

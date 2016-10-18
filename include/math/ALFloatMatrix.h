@@ -20,6 +20,9 @@ public:
     static ALFloatMatrix* product(const ALFloatMatrix* A, const ALFloatMatrix* B);
     static ALFloatMatrix* productSS(const ALFloatMatrix* A, const ALFloatMatrix* B);//For AT=A and BT=B
     static ALFloatMatrix* productT(const ALFloatMatrix* A, const ALFloatMatrix* BT);
+    
+    /*If element is NAN, set as c*/
+    static void checkAndSet(ALFloatMatrix* X, ALFLOAT c);
 
     static void product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     static void productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* BT);

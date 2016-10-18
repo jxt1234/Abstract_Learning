@@ -1064,3 +1064,21 @@ ALFloatMatrix* ALFloatMatrix::getTypes(const ALFloatMatrix* YP, const ALFloatMat
     }
     return result;
 }
+
+void ALFloatMatrix::checkAndSet(ALFloatMatrix* X, ALFLOAT c)
+{
+    ALASSERT(NULL!=X);
+    auto w = X->width();
+    auto h = X->height();
+    for (int i=0; i<h; ++i)
+    {
+        auto x = X->vGetAddr(i);
+        for (int j=0; j<w; ++j)
+        {
+            if (isnan(x[j]))
+            {
+                x[j] = c;
+            }
+        }
+    }
+}

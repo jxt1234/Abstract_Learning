@@ -43,7 +43,7 @@ int test_main(int argc, char* argv[])
     inputDes.iExpand = 0;
     auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/res/cnn/lenet.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 100000);
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 10000);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     
