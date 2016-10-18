@@ -7,7 +7,7 @@
 #include "learn/ALCNNLearner.h"
 #include <math.h>
 #include <sstream>
-#include "cJSON.h"
+#include "cJSON/cJSON.h"
 using namespace std;
 
 static ALSp<ALFloatMatrix> _readMatrix(const char* fileName)

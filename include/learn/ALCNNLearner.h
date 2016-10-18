@@ -3,7 +3,7 @@
 #include "ALLearnFactory.h"
 #include "math/ALIGradientDecent.h"
 #include "math/ALIMatrix4DOp.h"
-#include "cJSON.h"
+#include "cJSON/cJSON.h"
 
 
 class ALCNNLearner : public ALISuperviseLearner

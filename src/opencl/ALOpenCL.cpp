@@ -18,7 +18,7 @@ static std::mutex gInstanceMutex;
 ALOpenCL::ALOpenCL()
 {
     // create a GPU context
-    int type = CL_DEVICE_TYPE_CPU;
+    int type = CL_DEVICE_TYPE_GPU;
     mContext = clCreateContextFromType(NULL, type, NULL, NULL, NULL);
     ALASSERT(NULL!=mContext);
     if(mContext == 0) {

@@ -13,7 +13,7 @@ TARGET:libAbstract_learning.so
 DEPENDS:
 DIRS:src third
 SRCS:
-LINKS: -lpthread 
+LINKS: -lpthread -framework opencl
 
 ##########
 
@@ -44,7 +44,7 @@ TARGET:matrix_tools.out
 DEPENDS:libAbstract_learning.a
 DIRS:
 SRCS:cpptools/matrix_tools.cpp
-LINKS: ./libAbstract_learning.a
+LINKS: ./libAbstract_learning.so
 
 ##########
 
@@ -52,7 +52,7 @@ TARGET:make_model_simple3d.out
 DEPENDS:libAbstract_learning.so
 DIRS:
 SRCS:make_model_simple3d.cpp
-LINKS: ./libAbstract_learning.a 
+LINKS: ./libAbstract_learning.so
 
 ##########
 

@@ -14,6 +14,7 @@ namespace ALCNN {
 
     ALFloatMatrix* CNNDerivativeFunction::vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* Merge) const
     {
+        ALFORCEAUTOTIME;
         mFirst->resetBatchSize((int)Merge->height());
         ALSp<ALFloatMatrix> XV = ALFloatMatrix::createCropVirtualMatrix(Merge, mOutputSize, 0, Merge->width()-1, Merge->height()-1);
         ALSp<ALFloatMatrix> YV = ALFloatMatrix::createCropVirtualMatrix(Merge, 0, 0, mOutputSize-1, Merge->height()-1);
@@ -24,7 +25,11 @@ namespace ALCNN {
         ALFloatMatrix::copy(Y.get(), YV.get());
         mFirst->setParameters(coefficient, 0);
 
-        auto YP = mFirst->forward(X);
+        ALSp<ALFloatMatrix> YP;
+        {
+            //ALFORCEAUTOTIME;
+            YP = mFirst->forward(X);
+        }
 
         ALASSERT(YP->width() == Y->width());
         ALASSERT(YP->height() == Y->height());
@@ -49,17 +54,22 @@ namespace ALCNN {
         if (true)
         {
             static int gNumber = 0;
-            gNumber++;
+            //gNumber++;
             if (gNumber % 50==0)
             {
                 FUNC_PRINT_ALL(mCurrentLoss, f);
             }
         }
-        
-        mLast->backward(YDiff);
+        {
+            //ALFORCEAUTOTIME;
+            mLast->backward(YDiff);
+        }
         ALFloatMatrix* resultDiff = ALFloatMatrix::create(coefficient->width(), coefficient->height());
-        mFirst->readParametersDiff(resultDiff, 0);
-        ALFloatMatrix::linear(resultDiff, resultDiff, 1.0f/Merge->height(), coefficient, mDecay);
+        {
+            //ALFORCEAUTOTIME;
+            mFirst->readParametersDiff(resultDiff, 0);
+            ALFloatMatrix::linear(resultDiff, resultDiff, 1.0f/Merge->height(), coefficient, mDecay);
+        }
         if (false)
         {
             std::ofstream outputX("/Users/jiangxiaotang/Documents/Abstract_Learning/.XX.txt");
