@@ -7,6 +7,7 @@
 //
 
 #include "InnerProductLayer.hpp"
+#include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
     //TODO Add basis
     ALFloatMatrix* InnerProductLayer::vInitParameters() const
@@ -37,8 +38,12 @@ namespace ALCNN {
         
         if (NULL!=before_diff)
         {
-            ALFloatMatrix::product(before_diff, parameters, after_diff);
+            ALFloatMatrix::product(before_diff, after_diff, parameters);
         }
     }
-   
+    static auto gCreateFunction = [](const LayerParameters& p) {
+        return new InnerProductLayer(p.uInputSize, p.uOutputSize);
+    };
+    
+    static LayerFactoryRegister __reg(gCreateFunction, "InnerProduct");
 }

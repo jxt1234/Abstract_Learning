@@ -3,18 +3,26 @@
 #include "ALLearnFactory.h"
 #include "math/ALIGradientDecent.h"
 #include "math/ALIMatrix4DOp.h"
+#include "cJSON.h"
+
+
 class ALCNNLearner : public ALISuperviseLearner
 {
 public:
-    ALCNNLearner(const ALIMatrix4DOp::Matrix4D& inputDescribe, unsigned int iteration=10000);
+    class LayerStruct;
+    
+    ALCNNLearner(const cJSON* description, unsigned int iteration=10000);
     virtual ~ ALCNNLearner();
     
     virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const;
 
 private:
     ALSp<ALIGradientDecent> mGDMethod;
-    ALIMatrix4DOp::Matrix4D mInputDescribe;
+    ALSp<ALIGradientDecent::DerivativeFunction> mDetFunction;
     unsigned int mIteration;
+    unsigned int mBatchSize;
+    unsigned int mInputSize;
+    LayerStruct* mLayerPredict;
 };
 
 #endif

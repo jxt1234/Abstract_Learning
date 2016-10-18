@@ -2,6 +2,7 @@
 #include <math.h>
 #include "math/ALStatistics.h"
 #include <fstream>
+#include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
     SoftMaxLayer::SoftMaxLayer(int inputSize, int outputSize)
     {
@@ -154,5 +155,10 @@ namespace ALCNN {
             ALFloatMatrix::print(before_diff, output);
         }
     }
+    static auto gCreateFunction = [](const LayerParameters& p) {
+        return new SoftMaxLayer(p.uInputSize, p.uOutputSize);
+    };
+    
+    static LayerFactoryRegister __reg(gCreateFunction, "SoftMax");
 }
 

@@ -129,7 +129,7 @@ void ALBasicMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& ds
         ALFloatMatrix::zero(srcDiff.getMutable());
     }
     ALSp<ALFloatMatrix> kernelDataT = ALFloatMatrix::transpose(kernelData.pOrigin);
-    ALFLOAT rate = 1.0/src.getTotalWidth();
+    ALFLOAT rate = 1.0;
     for (int z=0; z<batchSize; ++z)
     {
         auto outputDiffBatch = dstDiff.pOrigin->vGetAddr(z);

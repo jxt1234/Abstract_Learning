@@ -50,7 +50,7 @@ namespace ALCNN {
         {
             static int gNumber = 0;
             gNumber++;
-            //if (gNumber % 50==0)
+            if (gNumber % 50==0)
             {
                 FUNC_PRINT_ALL(mCurrentLoss, f);
             }
@@ -60,7 +60,7 @@ namespace ALCNN {
         ALFloatMatrix* resultDiff = ALFloatMatrix::create(coefficient->width(), coefficient->height());
         mFirst->readParametersDiff(resultDiff, 0);
         ALFloatMatrix::linear(resultDiff, resultDiff, 1.0f/Merge->height(), coefficient, mDecay);
-        if (true)
+        if (false)
         {
             std::ofstream outputX("/Users/jiangxiaotang/Documents/Abstract_Learning/.XX.txt");
             ALFloatMatrix::print(X.get(), outputX);

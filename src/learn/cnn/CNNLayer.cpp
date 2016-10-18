@@ -1,4 +1,5 @@
 #include "CNNLayer.h"
+#include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
     CNNLayer::CNNLayer(int inputSize, int inputChannel, int kernelSize, int kernelNumber, int stride)
     {
@@ -87,4 +88,11 @@ namespace ALCNN {
 
         mMatrixOp->vDeterFilter(output_diff, output, input, input_diff, kernel, kernel_diff, mStride);
     }
+    
+    static auto gCreateFunction = [](const LayerParameters& p) {
+        return new CNNLayer(p.mMatrixInfo.iWidth, p.mMatrixInfo.iDepth, p.get("kernelSize"), p.get("kernelNumber"), p.get("stride"));
+    };
+    
+    static LayerFactoryRegister __reg(gCreateFunction, "Convolution");
+
 }

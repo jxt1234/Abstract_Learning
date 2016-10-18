@@ -1,5 +1,6 @@
 #include "MeanPoolLayer.h"
 #include <fstream>
+#include "LayerFactoryRegistor.hpp"
 
 namespace ALCNN {
     MeanPoolLayer::MeanPoolLayer(int stride, int width, int height, int depth)
@@ -115,4 +116,10 @@ namespace ALCNN {
             }
         }
     }
+    static auto gCreateFunction = [](const LayerParameters& p) {
+        return new MeanPoolLayer(p.get("stride"), p.mMatrixInfo.iWidth, p.mMatrixInfo.iHeight, p.mMatrixInfo.iDepth);
+    };
+    
+    static LayerFactoryRegister __reg(gCreateFunction, "MeanPool");
+
 }

@@ -7,6 +7,7 @@
 //
 
 #include "ReluLayer.hpp"
+#include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
     ALFloatMatrix* ReluLayer::vInitParameters() const
     {
@@ -68,4 +69,10 @@ namespace ALCNN {
             }
         }
     }
+    
+    static auto gCreateFunction = [](const LayerParameters& p) {
+        return new ReluLayer(p.uInputSize);
+    };
+
+    static LayerFactoryRegister __reg(gCreateFunction, "ReLU");
 }

@@ -1,0 +1,58 @@
+{
+    "name": "LeNet",
+    "train-batch":64,
+    "layers":[
+        {
+            "type": "Convolution",
+            "input": 784,
+            "output":11520,
+            "input_3D":[28, 28, 1],
+            "kernelSize":5,
+            "stride":1,
+            "kernelNumber":20
+        },
+        {
+            "type":"MaxPool",
+            "input":11520,
+            "output":2880,
+            "input_3D":[24,24, 20],
+            "stride":2
+        },
+        {
+            "type": "Convolution",
+            "input": 2880,
+            "output":3200,
+            "input_3D":[12,12,20],
+            "kernelSize":5,
+            "stride":1,
+            "kernelNumber":50
+        },
+        {
+            "type":"MaxPool",
+            "input":3200,
+            "output":800,
+            "input_3D":[8,8,50],
+            "stride":2
+        },
+        {
+            "type": "InnerProduct",
+            "input":800,
+            "output":500
+        },
+        {
+            "type": "ReLU",
+            "input":500,
+            "output":500
+        },
+        {
+            "type": "InnerProduct",
+            "input":500,
+            "output":10
+        },
+        {
+            "type":"SoftMax",
+            "input":10,
+            "output":10
+        }
+    ]
+}

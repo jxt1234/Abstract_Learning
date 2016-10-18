@@ -6,12 +6,22 @@
 #include "learn/ALLearnFactory.h"
 #include "learn/ALCNNLearner.h"
 #include <math.h>
+#include <sstream>
+#include "cJSON.h"
 using namespace std;
 
 static ALSp<ALFloatMatrix> _readMatrix(const char* fileName)
 {
     ALSp<ALStream> input = ALStreamFactory::readFromFile(fileName);
     return ALFloatMatrix::load(input.get());
+}
+
+static std::string readAll(const char* file)
+{
+    std::ostringstream output;
+    std::ifstream input(file);
+    output << input.rdbuf();
+    return output.str();
 }
 
 int test_main(int argc, char* argv[])
@@ -31,7 +41,9 @@ int test_main(int argc, char* argv[])
     inputDes.iWidth = 28;
     inputDes.iHeight = 28;
     inputDes.iExpand = 0;
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(inputDes, 100000);
+    auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/res/cnn/lenet.json");
+    auto jsonObject = cJSON_Parse(jsonString.c_str());
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 100000);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     

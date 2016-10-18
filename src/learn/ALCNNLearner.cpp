@@ -8,113 +8,115 @@
 #include "cnn/MaxPoolLayer.hpp"
 #include "cnn/InnerProductLayer.hpp"
 #include <fstream>
+#include <string.h>
+#include "cnn/LayerFactoryRegistor.hpp"
 using namespace ALCNN;
 
-ALCNNLearner::ALCNNLearner(const ALIMatrix4DOp::Matrix4D& inputDescripe, unsigned int iteration)
+struct ALCNNLearner::LayerStruct
 {
-    mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD, 100);
-    ALASSERT(inputDescripe.iHeight == inputDescripe.iWidth);
-    mInputDescribe = inputDescripe;
-    mIteration = iteration;
-}
-ALCNNLearner::~ ALCNNLearner()
+    ALSp<LayerWrap> pFirstLayer;
+};
+
+static void _readLayerParameters(cJSON* layer, LayerParameters& p, std::string& type)
 {
-    
+    ALASSERT(NULL!=layer);
+    p.mIntValues.clear();
+    for (auto c = layer->child; NULL!=c; c=c->next)
+    {
+        auto name = c->string;
+        if (!strcmp(name, "type"))
+        {
+            type = c->valuestring;
+            continue;
+        }
+        if (!strcmp(name, "input"))
+        {
+            p.uInputSize = c->valueint;
+            continue;
+        }
+        if (!strcmp(name, "output"))
+        {
+            p.uOutputSize = c->valueint;
+            continue;
+        }
+        if (!strcmp(name, "input_3D"))
+        {
+            auto ac = c->child;
+            ALASSERT(NULL!=ac);
+            p.mMatrixInfo.iWidth = ac->valueint;
+            ac = ac->next;
+            ALASSERT(NULL!=ac);
+            p.mMatrixInfo.iHeight = ac->valueint;
+            ac = ac->next;
+            ALASSERT(NULL!=ac);
+            p.mMatrixInfo.iDepth = ac->valueint;
+            continue;
+        }
+        p.mIntValues.insert(std::make_pair(name, c->valueint));
+    }
 }
 
-ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const
+ALCNNLearner::ALCNNLearner(const cJSON* description, unsigned int iteration)
 {
-    ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
-    ALSp<ALFloatMatrix> prop = ALFloatMatrix::genTypes(YT.get());
-    
-    /*For Debug*/
-//    std::ofstream dump1("/Users/jiangxiaotang/Documents/Abstract_Learning/1");
-//    std::ofstream dump2("/Users/jiangxiaotang/Documents/Abstract_Learning/2");
-//    std::ofstream dump3("/Users/jiangxiaotang/Documents/Abstract_Learning/3");
-//    std::ofstream dump4("/Users/jiangxiaotang/Documents/Abstract_Learning/4");
-//    std::ofstream dump5("/Users/jiangxiaotang/Documents/Abstract_Learning/5");
-    
-    auto& inputDescripe = mInputDescribe;
-    /*Construct Layer*/
+    ALASSERT(NULL!=description);
+    cJSON* layer = NULL;
+    for (auto c = description->child; NULL!=c; c=c->next)
+    {
+        if (strcmp(c->string, "train-batch") == 0)
+        {
+            mBatchSize = c->valueint;
+        }
+        else if (strcmp(c->string, "layers")==0)
+        {
+            layer = c->child;
+        }
+    }
+    ALASSERT(NULL!=layer);
     ALSp<LayerWrap> firstLayer;
     ALSp<LayerWrap> currentLayer;
     ALSp<LayerWrap> lastLayer;
     ALSp<LayerWrap> nextLayer;
-    if (true)
+    
+    LayerParameters parameters;
+    std::string type = "";
+    /*Construct first layer*/
+    _readLayerParameters(layer, parameters, type);
+    firstLayer = new LayerWrap(LayerFactory::get()->create(type.c_str(), parameters));
+    currentLayer = firstLayer;
+    
+    mInputSize = parameters.uInputSize;
+    
+    for (layer=layer->next;layer!=NULL; layer=layer->next)
     {
-        int filterNumber = (int)prop->width();
-        //firstLayer = new LayerWrap(new SoftMaxLayer(inputDescripe.getTotalWidth(), filterNumber));
-        firstLayer = new LayerWrap(new InnerProductLayer(inputDescripe.getTotalWidth(), filterNumber));
-//        firstLayer = new LayerWrap(new CNNLayer(inputDescripe.iWidth, inputDescripe.iDepth, inputDescripe.iWidth, filterNumber, 1));
-        lastLayer = firstLayer;
+        _readLayerParameters(layer, parameters, type);
+        nextLayer = new LayerWrap(LayerFactory::get()->create(type.c_str(), parameters));
+        currentLayer->connectOutput(nextLayer);
+        nextLayer->connectInput(currentLayer.get());
+        currentLayer = nextLayer;
     }
-    else
-    {
-        //First CNN
-        int kernelSize = 5;
-        int filterNumber = 6;
-        firstLayer = new LayerWrap(new CNNLayer(inputDescripe.iWidth, inputDescripe.iDepth, kernelSize, filterNumber, 1));
-        currentLayer = firstLayer;
-        auto currentWidth = (inputDescripe.iWidth-kernelSize)+1;
-        auto currentDepth = filterNumber;
-        //currentLayer->setForwardDebug(&dump1);
-        
-        //Relu
-        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        
-        //Pool
-        nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        currentWidth = currentWidth/2;
-        //currentLayer->setForwardDebug(&dump2);
+    lastLayer = currentLayer;
+    
+    mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD, mBatchSize);
+    
+    mDetFunction = new CNNDerivativeFunction(firstLayer, lastLayer, parameters.uOutputSize);
+    mIteration = iteration;
+    
+    mLayerPredict = new LayerStruct;
+    mLayerPredict->pFirstLayer = firstLayer;
+}
+ALCNNLearner::~ ALCNNLearner()
+{
+    delete mLayerPredict;
+}
 
-
-        //Second CNN
-        kernelSize = 5;
-        filterNumber = 12;
-        nextLayer = new LayerWrap(new CNNLayer(currentWidth, currentDepth, kernelSize, filterNumber, 1));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        currentDepth = filterNumber;
-        currentWidth = currentWidth - kernelSize + 1;
-        //currentLayer->setForwardDebug(&dump3);
-
-        //Relu
-        nextLayer = new LayerWrap(new ReluLayer(currentWidth*currentWidth*currentDepth));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        
-        //Second Pool
-        nextLayer = new LayerWrap(new MaxPoolLayer(2, currentWidth, currentWidth, currentDepth));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        currentWidth = currentWidth/2;
-        //currentLayer->setForwardDebug(&dump4);
-        
-        /*Last Layer*/
-        nextLayer = new LayerWrap(new SoftMaxLayer((currentWidth*currentWidth*currentDepth), (int)prop->width()));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-        
-//        kernelSize = currentWidth;
-//        filterNumber = prop->width();
-//        nextLayer = new LayerWrap(new CNNLayer(currentWidth, currentDepth, kernelSize, filterNumber, 1));
-//        currentLayer->connectOutput(nextLayer);
-//        nextLayer->connectInput(currentLayer.get());
-//        currentLayer = nextLayer;
-        
-        lastLayer = currentLayer;
-    }
-    ALSp<ALIGradientDecent::DerivativeFunction> det = new CNNDerivativeFunction(firstLayer, lastLayer, (int)prop->width());
+ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const
+{
+    ALASSERT(NULL!=X);
+    ALASSERT(NULL!=Y);
+    ALASSERT(Y->height() == X->height());
+    ALASSERT(X->width() == mInputSize);
+    ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
+    ALSp<ALFloatMatrix> prop = ALFloatMatrix::genTypes(YT.get());
     
     /*Prepare Data*/
     ALSp<ALFloatMatrix> Y_Expand = ALFloatMatrix::create(prop->width(), Y->height());
@@ -138,7 +140,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(Y_Expand.get(), X);
     
     /*Optimize parameters*/
-    auto parameterSize = firstLayer->getParameterSize();
+    auto parameterSize = mLayerPredict->pFirstLayer->getParameterSize();
     ALSp<ALFloatMatrix> coefficient = ALFloatMatrix::create(parameterSize, 1);
     /*Init parameters randomly*/
     auto c = coefficient->vGetAddr();
@@ -146,8 +148,8 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     {
         c[i] = 0.1*ALRandom::rate()-0.05;
     }
-    mGDMethod->vOptimize(coefficient.get(), Merge.get(), det.get(), 0.95, mIteration);
-    firstLayer->setParameters(coefficient.get(), 0);
+    mGDMethod->vOptimize(coefficient.get(), Merge.get(), mDetFunction.get(), 0.95, mIteration);
+    mLayerPredict->pFirstLayer->setParameters(coefficient.get(), 0);
     
-    return new CNNPredictor(firstLayer, prop);
+    return new CNNPredictor(mLayerPredict->pFirstLayer, prop);
 }
