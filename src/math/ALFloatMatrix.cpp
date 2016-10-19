@@ -786,7 +786,6 @@ void ALFloatMatrix::quickSave(const ALFloatMatrix* m, ALWStream* f)
 {
     ALASSERT(NULL!=m);
     ALASSERT(NULL!=f);
-    ALASSERT(sizeof(ALFLOAT) == sizeof(double));
     uint32_t w = (uint32_t)m->width();
     uint32_t h = (uint32_t)m->height();
     f->write(w);
@@ -800,7 +799,6 @@ void ALFloatMatrix::quickSave(const ALFloatMatrix* m, ALWStream* f)
 ALFloatMatrix* ALFloatMatrix::quickLoad(ALStream* f)
 {
     ALASSERT(NULL!=f);
-    ALASSERT(sizeof(ALFLOAT) == sizeof(double));
     auto w = f->read<uint32_t>();
     auto h = f->read<uint32_t>();
     if (f->vIsEnd())
@@ -1081,4 +1079,29 @@ void ALFloatMatrix::checkAndSet(ALFloatMatrix* X, ALFLOAT c)
             }
         }
     }
+}
+
+bool ALFloatMatrix::theSame(const ALFloatMatrix* X, const ALFloatMatrix* Y, ALFLOAT error)
+{
+    ALASSERT(NULL!=X);
+    ALASSERT(NULL!=Y);
+    ALASSERT(X->width() == Y->width());
+    ALASSERT(X->height() == Y->height());
+    ALASSERT(error>=0);
+    auto w = X->width();
+    auto h = Y->height();
+    for (int i=0; i<h; ++i)
+    {
+        auto x = X->vGetAddr(i);
+        auto y = Y->vGetAddr(i);
+        for (int j=0; j<w; ++j)
+        {
+            auto diff = x[j]-y[j];
+            if (diff > error || diff <-error)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }

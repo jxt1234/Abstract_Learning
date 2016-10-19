@@ -108,6 +108,15 @@ class ALMatrixTest:public GPTest
                 ALSp<ALFloatMatrix> qSM = ALFloatMatrix::quickLoad(f.get());
                 ALFloatMatrix::print(qSM.get(), out);
             }
+            out << "Check the same\n";
+            Y = ALFloatMatrix::create(X->width(), X->height());
+            ALFloatMatrix::copy(Y.get(), X.get());
+            bool theSame = ALFloatMatrix::theSame(X.get(), Y.get());
+            ALASSERT(theSame);
+            auto y = Y->vGetAddr(X->height()/2);
+            y[0] = y[0]-1.0f;
+            theSame = ALFloatMatrix::theSame(X.get(), Y.get(), 0.1);
+            ALASSERT(!theSame);
         }
         ALMatrixTest(){}
         virtual ~ALMatrixTest(){}

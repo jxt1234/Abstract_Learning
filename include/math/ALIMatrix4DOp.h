@@ -32,6 +32,6 @@ public:
         SSE
     } TYPE;
     
-    static ALIMatrix4DOp* create(TYPE t = BASIC);
+    static ALIMatrix4DOp* create(TYPE t = OPENCL);
 };
 #endif

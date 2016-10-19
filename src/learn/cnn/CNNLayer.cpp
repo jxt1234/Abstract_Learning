@@ -28,6 +28,7 @@ namespace ALCNN {
         mStride = stride;
         
         mMatrixOp = ALIMatrix4DOp::create();
+        //mMatrixOp = ALIMatrix4DOp::create(ALIMatrix4DOp::BASIC);
     }
     CNNLayer::~ CNNLayer()
     {

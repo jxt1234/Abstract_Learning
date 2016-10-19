@@ -1,9 +1,21 @@
 #include "math/ALIMatrix4DOp.h"
 #include "ALBasicMatrix4DOp.h"
+#include "ALOpenCLMatrix4DOp.hpp"
 ALIMatrix4DOp* ALIMatrix4DOp::create(TYPE t)
 {
     //TODO
-    return new ALBasicMatrix4DOp;
+    ALIMatrix4DOp* result = NULL;
+    switch (t) {
+        case BASIC:
+            result = new ALBasicMatrix4DOp;
+            break;
+        case OPENCL:
+            result = new ALOpenCLMatrix4DOp;
+            break;
+        default:
+            break;
+    }
+    return result;
 }
 
 bool ALIMatrix4DOp::Matrix4D::valid() const

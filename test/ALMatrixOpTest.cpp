@@ -6,7 +6,8 @@ class ALMatrixOpTest:public GPTest
     public:
         virtual void run()
         {
-            ALSp<ALIMatrix4DOp> op = ALIMatrix4DOp::create();
+            ALSp<ALIMatrix4DOp> op = ALIMatrix4DOp::create(ALIMatrix4DOp::OPENCL);
+            ALSp<ALIMatrix4DOp> op2 = ALIMatrix4DOp::create(ALIMatrix4DOp::BASIC);
             ALIMatrix4DOp::Matrix4D src;
             src.iWidth = 12;
             src.iHeight = 12;
@@ -55,21 +56,36 @@ class ALMatrixOpTest:public GPTest
             dst.pOrigin = ALFloatMatrix::create(dst.getTotalWidth(), batchSize);
             ALAutoUnRef __dst((ALFloatMatrix*)dst.pOrigin);
 
-
-            op->vFilter(dst, src, kernel, 1);
-            
+            ALIMatrix4DOp::Matrix4D dst2;
+            dst2.iWidth = src.iWidth-kernel.iWidth+1;
+            dst2.iHeight = src.iHeight-kernel.iHeight+1;
+            dst2.iDepth = filterSize;
+            dst2.iExpand = 0;
+            dst2.pOrigin = ALFloatMatrix::create(dst2.getTotalWidth(), batchSize);
+            ALAutoUnRef __dst2((ALFloatMatrix*)dst2.pOrigin);
             {
                 std::ofstream output("output/ALMatrixOpTest_src.txt");
                 ALFloatMatrix::print(src.pOrigin, output);
             }
             {
-                std::ofstream output("output/ALMatrixOpTest_dst.txt");
-                ALFloatMatrix::print(dst.pOrigin, output);
-            }
-            {
                 std::ofstream output("output/ALMatrixOpTest_kernel.txt");
                 ALFloatMatrix::print(kernel.pOrigin, output);
             }
+
+            op->vFilter(dst, src, kernel, 1);
+            {
+                std::ofstream output("output/ALMatrixOpTest_dst.txt");
+                ALFloatMatrix::print(dst.pOrigin, output);
+            }
+
+            op2->vFilter(dst2, src, kernel, 1);
+            {
+                std::ofstream output("output/ALMatrixOpTest_dst2.txt");
+                ALFloatMatrix::print(dst2.pOrigin, output);
+            }
+            
+            ALASSERT(ALFloatMatrix::theSame(dst.pOrigin, dst2.pOrigin));
+            
             
             
             ALIMatrix4DOp::Matrix4D dstDiff;
