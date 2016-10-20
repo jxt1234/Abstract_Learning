@@ -95,9 +95,8 @@ public:
 protected:
     ALFloatMatrix(size_t w, size_t h):mWidth(w), mHeight(h){}
     virtual ~ALFloatMatrix(){}
-    size_t mHeight;
-private:
     size_t mWidth;
+    size_t mHeight;
 };
 
 #endif
