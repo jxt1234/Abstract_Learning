@@ -4,7 +4,6 @@
 #include <iostream>
 #include "ALHead.h"
 #include "utils/ALRefCount.h"
-#include "ALFloatDefine.h"
 
 class ALFloatData:public ALRefCount
 {

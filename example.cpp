@@ -26,10 +26,10 @@ static std::string readAll(const char* file)
 
 int test_main(int argc, char* argv[])
 {
-    ALSp<ALFloatMatrix> X_Train = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/train_x.txt");
-    ALSp<ALFloatMatrix> Y_Train = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/train_y.txt");
-    ALSp<ALFloatMatrix> X_Test = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/test_x.txt");
-    ALSp<ALFloatMatrix> Y_Test = _readMatrix("/Users/jiangxiaotang/Documents/data/t10k/test_y.txt");
+    ALSp<ALFloatMatrix> X_Train = _readMatrix("../data/t10k/train_x.txt");
+    ALSp<ALFloatMatrix> Y_Train = _readMatrix("../data/t10k/train_y.txt");
+    ALSp<ALFloatMatrix> X_Test = _readMatrix("../data/t10k/test_x.txt");
+    ALSp<ALFloatMatrix> Y_Test = _readMatrix("../data/t10k/test_y.txt");
     
     ALFloatMatrix::linearDirect(X_Train.get(), 1.0/255.0, 0.0);
     ALFloatMatrix::linearDirect(X_Test.get(), 1.0/255.0, 0.0);
@@ -41,9 +41,9 @@ int test_main(int argc, char* argv[])
     inputDes.iWidth = 28;
     inputDes.iHeight = 28;
     inputDes.iExpand = 0;
-    auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/res/cnn/lenet.json");
+    auto jsonString = readAll("res/cnn/lenet.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 10000);
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 20000);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     
