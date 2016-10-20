@@ -1073,7 +1073,8 @@ void ALFloatMatrix::checkAndSet(ALFloatMatrix* X, ALFLOAT c)
         auto x = X->vGetAddr(i);
         for (int j=0; j<w; ++j)
         {
-            if (isnan(x[j]))
+            auto xj = x[j];
+            if (!(xj>=0)&&(!(xj<0)))
             {
                 x[j] = c;
             }

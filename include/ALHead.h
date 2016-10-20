@@ -11,12 +11,13 @@
 #include "utils/ALRandom.h"
 #include "utils/ALAutoFile.h"
 #include "utils/ALStream.h"
-#define ALSPEEDFIRST
 
+#define ZERO(x) (0.0001>(x) && -0.0001 < (x))
+#define NOTNAN(x) ((x)>0 || (x)<=0)
 #ifdef ALSPEEDFIRST
-#define ALOPENCL_MAC
+typedef float ALFLOAT;
+#else
+typedef double ALFLOAT;
 #endif
-
-#include "core/ALFloatDefine.h"
 
 #endif

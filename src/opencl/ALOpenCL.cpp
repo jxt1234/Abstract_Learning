@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <thread>
+#include <mutex>
 #include <string.h>
 #include "ALHead.h"
 #ifdef ALOPENCL_MAC

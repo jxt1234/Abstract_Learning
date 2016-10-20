@@ -7,7 +7,6 @@
 using namespace std;
 static int test_main()
 {
-    ALAUTOSTORAGE(v, ALFLOAT, 100);
     ALStandardLoader s;
     ALSp<ALFloatDataChain> c = s.load("bao2.txt");
     ALSp<ALFloatMatrix> X =  ALFloatMatrix::create(c->width(), c->size());
