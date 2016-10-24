@@ -29,7 +29,7 @@ public:
         auto h = X->height();
         ALASSERT(Y->width()>0);
         ALASSERT(h == Y->height());
-        for (int i=0; i<h; ++i)
+        for (size_t i=0; i<h; ++i)
         {
             auto y = Y->vGetAddr(i);
             y[0] = 0.0;
