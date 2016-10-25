@@ -4,6 +4,7 @@
 extern IStatusType* gALFloatMatrix;
 extern IStatusType* gALClassifierSet;
 extern IStatusType* gALDividerParameter;
+extern IStatusType* gALGradientMethod;
 extern IStatusType* gdouble;
 extern IStatusType* gALDecisionTreeParameter;
 extern IStatusType* gALIUnSuperLearner;

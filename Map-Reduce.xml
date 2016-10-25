@@ -2,4 +2,16 @@
     <ALPackageC45Tree_GPpackage>
         MAP((x0), C45Tree(x0), [a0]->[a0])
     </ALPackageC45Tree_GPpackage>
+    <ALPackageGDCompute_GPpackage>
+        MAP((x0,x1,x2), GDCompute(x0,x1,x2), [a0,b0,c0]->[a0])
+    </ALPackageGDCompute_GPpackage>
+    <ALPackageMatrixPlus_GPpackage>
+        REDUCE((x0), MatrixPlus(x0, y0), [a0]->[1])
+    </ALPackageMatrixPlus_GPpackage>
+    <ALPackageParameterInit_GPpackage>
+        MAP((x0), ParameterInit(x0), [a0]->[a0])
+    </ALPackageParameterInit_GPpackage>
+    <ALPackageGDMatrixPrepare_GPpackage>
+        MAP((x0,x1,x2), GDMatrixPrepare(x0,x1,x2), [a0,b0,c0]->[a0], a0==b0)
+    </ALPackageGDMatrixPrepare_GPpackage>
 </libAbstract_learning>

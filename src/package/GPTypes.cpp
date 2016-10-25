@@ -6,6 +6,8 @@ IStatusType* gALFloatMatrix = new ALFloatMatrix_GPType();
 IStatusType* gALClassifierSet = new ALClassifierSet_GPType();
 #include "ALDividerParameter_GPType.h"
 IStatusType* gALDividerParameter = new ALDividerParameter_GPType();
+#include "ALGradientMethod_GPType.h"
+IStatusType* gALGradientMethod = new ALGradientMethod_GPType();
 IStatusType* gdouble = new GPDoubleType();
 #include "ALDecisionTreeParameter_GPType.h"
 IStatusType* gALDecisionTreeParameter = new ALDecisionTreeParameter_GPType();
@@ -46,6 +48,10 @@ return gALClassifierSet;
 if (name == "ALDividerParameter")
 {
 return gALDividerParameter;
+}
+if (name == "ALGradientMethod")
+{
+return gALGradientMethod;
 }
 if (name == "double")
 {

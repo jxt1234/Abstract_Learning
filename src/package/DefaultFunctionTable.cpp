@@ -115,6 +115,22 @@ if (name == "ALPackageMatrixCrop_GPpackage")
 {
 return (void*)ALPackageMatrixCrop_GPpackage;
 }
+if (name == "ALPackageGDCompute_GPpackage")
+{
+return (void*)ALPackageGDCompute_GPpackage;
+}
+if (name == "ALPackageMatrixPlus_GPpackage")
+{
+return (void*)ALPackageMatrixPlus_GPpackage;
+}
+if (name == "ALPackageGDMatrixPrepare_GPpackage")
+{
+return (void*)ALPackageGDMatrixPrepare_GPpackage;
+}
+if (name == "ALPackageParameterInit_GPpackage")
+{
+return (void*)ALPackageParameterInit_GPpackage;
+}
 if (name == "libAbstract_learning_GP_IStatusType_Create")
 {
 return (void*)libAbstract_learning_GP_IStatusType_Create;

@@ -223,4 +223,36 @@
 <inputNeedComplete>False False False </inputNeedComplete>
 </ALPackageMatrixCrop_GPpackage>
 
+<ALPackageGDCompute_GPpackage>
+<shortName>GDCompute</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALGradientMethod ALFloatMatrix </input>
+<inputNeedComplete>False False False </inputNeedComplete>
+</ALPackageGDCompute_GPpackage>
+
+<ALPackageMatrixPlus_GPpackage>
+<shortName>MatrixPlus</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageMatrixPlus_GPpackage>
+
+<ALPackageGDMatrixPrepare_GPpackage>
+<shortName>GDMatrixPrepare</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALFloatMatrix ALGradientMethod </input>
+<inputNeedComplete>False False False </inputNeedComplete>
+</ALPackageGDMatrixPrepare_GPpackage>
+
+<ALPackageParameterInit_GPpackage>
+<shortName>ParameterInit</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALGradientMethod </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageParameterInit_GPpackage>
+
 </libAbstract_learning>

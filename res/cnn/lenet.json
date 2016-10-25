@@ -1,6 +1,7 @@
 {
     "name": "LeNet",
     "train-batch":64,
+    "iteration":10000,
     "layers":[
         {
             "type": "Convolution",

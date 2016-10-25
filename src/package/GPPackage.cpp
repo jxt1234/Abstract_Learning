@@ -326,3 +326,53 @@ ALFloatMatrix* result = ALPackageMatrixCrop(X0, X1, X2);
 out->push(result,gALFloatMatrix);
 return out;
 }
+GPContents* ALPackageGDCompute_GPpackage(GPContents* inputs)
+{
+assert(3 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gALGradientMethod->name());
+assert(inputs->getType(2)->name() == gALFloatMatrix->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALGradientMethod* X1 = (ALGradientMethod*)inputs->get(1);
+ALFloatMatrix* X2 = (ALFloatMatrix*)inputs->get(2);
+ALFloatMatrix* result = ALPackageGDCompute(X0, X1, X2);
+out->push(result,gALFloatMatrix);
+return out;
+}
+GPContents* ALPackageMatrixPlus_GPpackage(GPContents* inputs)
+{
+assert(2 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gALFloatMatrix->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALFloatMatrix* X1 = (ALFloatMatrix*)inputs->get(1);
+ALFloatMatrix* result = ALPackageMatrixPlus(X0, X1);
+out->push(result,gALFloatMatrix);
+return out;
+}
+GPContents* ALPackageGDMatrixPrepare_GPpackage(GPContents* inputs)
+{
+assert(3 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gALFloatMatrix->name());
+assert(inputs->getType(2)->name() == gALGradientMethod->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALFloatMatrix* X1 = (ALFloatMatrix*)inputs->get(1);
+ALGradientMethod* X2 = (ALGradientMethod*)inputs->get(2);
+ALFloatMatrix* result = ALPackageGDMatrixPrepare(X0, X1, X2);
+out->push(result,gALFloatMatrix);
+return out;
+}
+GPContents* ALPackageParameterInit_GPpackage(GPContents* inputs)
+{
+assert(1 == inputs->size());
+assert(inputs->getType(0)->name() == gALGradientMethod->name());
+GPContents* out =  new GPContents;
+ALGradientMethod* X0 = (ALGradientMethod*)inputs->get(0);
+ALFloatMatrix* result = ALPackageParameterInit(X0);
+out->push(result,gALFloatMatrix);
+return out;
+}

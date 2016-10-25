@@ -33,17 +33,19 @@ int test_main(int argc, char* argv[])
     
     ALFloatMatrix::linearDirect(X_Train.get(), 1.0/255.0, 0.0);
     ALFloatMatrix::linearDirect(X_Test.get(), 1.0/255.0, 0.0);
+    if (0)
+    {
+        std::ofstream outputP("../data/t10k/train_x_normal.txt");
+        ALFloatMatrix::print(X_Train.get(), outputP);
+        std::ofstream outputP2("../data/t10k/test_x_normal.txt");
+        ALFloatMatrix::print(X_Test.get(), outputP2);
+    }
     
     ALSp<ALFloatMatrix> Y_P = ALFloatMatrix::create(Y_Test->width(), Y_Test->height());
     
-    ALIMatrix4DOp::Matrix4D inputDes;
-    inputDes.iDepth = 1;
-    inputDes.iWidth = 28;
-    inputDes.iHeight = 28;
-    inputDes.iExpand = 0;
     auto jsonString = readAll("res/cnn/lenet.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject, 20000);
+    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
     ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
     
@@ -78,9 +80,6 @@ int test_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     ALAUTOTIME;
-    //char* _argv[] = {"", "/Users/jiangxiaotang/machine_exam/handset/train.txt"};
-    char* _argv[] = {"", "/Users/jiangxiaotang/third/caffe/train.txt"};
-    test_main(2, _argv);
-    //test_main(argc, argv);
+    test_main(argc, argv);
     return 1;
 }

@@ -17,6 +17,9 @@ public:
          The output should be deleted after used
          */
         virtual ALFloatMatrix* vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* X) const = 0;
+
+        /*Init the coefficient randomly, if coefficient is NULL, just return the size of coefficient needed*/
+        virtual size_t vInitParameters(ALFloatMatrix* coefficient) const = 0;
         
         virtual ~ DerivativeFunction() {}
     protected:
@@ -35,5 +38,20 @@ public:
     static ALIGradientDecent* create(TYPE t = FULL, int batchSize = 50);
 protected:
     ALIGradientDecent(){}
+};
+struct ALGradientMethod
+{
+    int iteration;
+    ALSp<ALIGradientDecent> gd;
+    ALSp<ALIGradientDecent::DerivativeFunction> det;
+    double alpha;
+    typedef enum
+    {
+        CLASSIFY,
+        PREDICT
+    }TYPE;
+    TYPE type = CLASSIFY;
+    int typeNumber = 2;
+    void* other = NULL;
 };
 #endif

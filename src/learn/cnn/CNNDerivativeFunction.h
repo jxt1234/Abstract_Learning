@@ -7,6 +7,7 @@ namespace ALCNN {
     {
     public:
         virtual ALFloatMatrix* vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* Merge) const override;
+        virtual size_t vInitParameters(ALFloatMatrix* coefficient) const override;
         
         CNNDerivativeFunction(ALSp<LayerWrap> first, ALSp<LayerWrap> last, int outputSize);
         virtual ~ CNNDerivativeFunction();

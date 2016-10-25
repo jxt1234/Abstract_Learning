@@ -32,7 +32,7 @@ class ALCNNClassifyTest:public GPTest
             inputDes.iWidth = 28;
             inputDes.iHeight = 28;
             inputDes.iExpand = 0;
-            ALSp<ALISuperviseLearner> learner = new ALCNNLearner(NULL, 1000);
+            ALSp<ALISuperviseLearner> learner = new ALCNNLearner(NULL);
             ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
             
             ALSp<ALFloatMatrix> Y_P_Detail = ALFloatMatrix::create(predictor->vGetPossiableValues()->width(), Y_Test->height());

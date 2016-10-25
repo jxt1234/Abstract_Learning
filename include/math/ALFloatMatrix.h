@@ -91,6 +91,9 @@ public:
     /*Return YT*/
     static ALFloatMatrix* getTypes(const ALFloatMatrix* YP, const ALFloatMatrix* prop);
 
+    /*Turn classify sign to vector*/
+    static void typeExpand(ALFloatMatrix* Y_Expand/*Output*/, const ALFloatMatrix* YT/*Input*/);
+
     
 protected:
     ALFloatMatrix(size_t w, size_t h):mWidth(w), mHeight(h){}

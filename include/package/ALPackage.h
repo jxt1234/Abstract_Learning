@@ -9,6 +9,8 @@
 #include "core/ALLabeldMethodFactory.h"
 #include "learn/ALSVMLearner.h"
 
+class ALGradientMethod;
+
 class ALDividerParameter:public ALRefCount
 {
 public:
@@ -76,5 +78,9 @@ typedef ALIMatrixPredictor ALClassifier;
 /*GP FUNCTION*/ALClassifierCreator* ALPackageCreateDecisionTree(ALDecisionTreeParameter* p/*S*/);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixMerge(ALFloatMatrix* A, ALFloatMatrix* B, double aleft, double aright, double bleft, double bright);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixCrop(ALFloatMatrix* A, double aleft, double aright);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageGDCompute(ALFloatMatrix* X, ALGradientMethod* decent, ALFloatMatrix* P);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixPlus(ALFloatMatrix* X1, ALFloatMatrix* X2);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageGDMatrixPrepare(ALFloatMatrix* X, ALFloatMatrix* Y, ALGradientMethod* grad);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageParameterInit(ALGradientMethod* decent);
 
 #endif

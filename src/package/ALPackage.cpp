@@ -7,6 +7,9 @@
 #include "compose/ALComposeClassifier.h"
 #include "learn/ALCGPRegressor.h"
 #include "learn/ALNaiveBayesianLearner.h"
+#include "math/ALIGradientDecent.h"
+#include "cJSON/cJSON.h"
+#include "learn/ALCNNLearner.h"
 
 ALFloatPredictor* ALPackageLearn(ALIChainLearner* l, ALLabeldData* c)
 {
@@ -276,4 +279,39 @@ ALClassifierSet* ALPackageMergeClassifierSet(ALClassifierSet* A, ALClassifierSet
 ALClassifier* ALPackageComposeClassifierSet(ALClassifierSet* A)
 {
     return new ALComposeClassifier(A);
+}
+
+ALFloatMatrix* ALPackageGDCompute(ALFloatMatrix* X, ALGradientMethod* decent, ALFloatMatrix* P)
+{
+    ALFloatMatrix* PD = ALFloatMatrix::create(P->width(), P->height());
+    ALFloatMatrix::copy(PD, P);
+    //TODO
+    ALSp<ALCNNLearner> learner = new ALCNNLearner((cJSON*)decent->other);
+    ALGradientMethod* newGd = learner->getGDMethod();
+    newGd->gd->vOptimize(PD, X, newGd->det.get(), decent->alpha, decent->iteration);
+    ALFloatMatrix::linear(PD, PD, 1.0, P, -1.0);
+    delete newGd;
+    return PD;
+}
+ALFloatMatrix* ALPackageMatrixPlus(ALFloatMatrix* X1, ALFloatMatrix* X2)
+{
+    ALASSERT(X1->width() == X2->width());
+    ALASSERT(X1->height() == X2->height());
+    auto res = ALFloatMatrix::create(X1->width(), X1->height());
+    ALFloatMatrix::linear(res, X1, 1.0, X2, 1.0);
+    return res;
+}
+ALFloatMatrix* ALPackageParameterInit(ALGradientMethod* decent)
+{
+    auto size = decent->det->vInitParameters(NULL);
+    ALFloatMatrix* c = ALFloatMatrix::create(size, 1);
+    decent->det->vInitParameters(c);
+    return c;
+}
+ALFloatMatrix* ALPackageGDMatrixPrepare(ALFloatMatrix* X, ALFloatMatrix* Y, ALGradientMethod* grad)
+{
+    ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
+    ALSp<ALFloatMatrix> Y_E = ALFloatMatrix::create(grad->typeNumber, YT->width());
+    ALFloatMatrix::typeExpand(Y_E.get(), YT.get());
+    return ALFloatMatrix::unionHorizontal(Y_E.get(), X);
 }

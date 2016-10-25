@@ -56,10 +56,11 @@ static void _readLayerParameters(cJSON* layer, LayerParameters& p, std::string& 
     }
 }
 
-ALCNNLearner::ALCNNLearner(const cJSON* description, unsigned int iteration)
+ALCNNLearner::ALCNNLearner(const cJSON* description)
 {
     ALASSERT(NULL!=description);
     cJSON* layer = NULL;
+    mIteration = 1000;
     for (auto c = description->child; NULL!=c; c=c->next)
     {
         if (strcmp(c->string, "train-batch") == 0)
@@ -69,6 +70,10 @@ ALCNNLearner::ALCNNLearner(const cJSON* description, unsigned int iteration)
         else if (strcmp(c->string, "layers")==0)
         {
             layer = c->child;
+        }
+        else if (strcmp(c->string, "iteration")==0)
+        {
+            mIteration = c->valueint;
         }
     }
     ALASSERT(NULL!=layer);
@@ -95,12 +100,14 @@ ALCNNLearner::ALCNNLearner(const cJSON* description, unsigned int iteration)
         currentLayer = nextLayer;
     }
     lastLayer = currentLayer;
-    
     mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD, mBatchSize);
-    
     mDetFunction = new CNNDerivativeFunction(firstLayer, lastLayer, parameters.uOutputSize);
-    mIteration = iteration;
-    
+    mProp = ALFloatMatrix::create(parameters.uOutputSize, 1);
+    auto p = mProp->vGetAddr();
+    for (size_t i=0; i<parameters.uOutputSize; ++i)
+    {
+        p[i] = i;
+    }
     mLayerPredict = new LayerStruct;
     mLayerPredict->pFirstLayer = firstLayer;
 }
@@ -116,40 +123,31 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALASSERT(Y->height() == X->height());
     ALASSERT(X->width() == mInputSize);
     ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
-    ALSp<ALFloatMatrix> prop = ALFloatMatrix::genTypes(YT.get());
+    ALSp<ALFloatMatrix> prop = mProp;
     
     /*Prepare Data*/
     ALSp<ALFloatMatrix> Y_Expand = ALFloatMatrix::create(prop->width(), Y->height());
-    ALFloatMatrix::zero(Y_Expand.get());
-    auto yh = Y->height();
-    auto yp = prop->vGetAddr();
-    auto yw = prop->width();
-    for (int i=0; i<yh; ++i)
-    {
-        auto y = Y->vGetAddr(i);
-        auto ye = Y_Expand->vGetAddr(i);
-        for (int k=0; k<yw; ++k)
-        {
-            if (ZERO(yp[k]-y[0]))
-            {
-                ye[k] = 1.0f;
-                break;
-            }
-        }
-    }
+    ALFloatMatrix::typeExpand(Y_Expand.get(), YT.get());
     ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(Y_Expand.get(), X);
     
     /*Optimize parameters*/
     auto parameterSize = mLayerPredict->pFirstLayer->getParameterSize();
     ALSp<ALFloatMatrix> coefficient = ALFloatMatrix::create(parameterSize, 1);
     /*Init parameters randomly*/
-    auto c = coefficient->vGetAddr();
-    for (int i=0; i<parameterSize; ++i)
-    {
-        c[i] = 0.1*ALRandom::rate()-0.05;
-    }
+    mDetFunction->vInitParameters(coefficient.get());
     mGDMethod->vOptimize(coefficient.get(), Merge.get(), mDetFunction.get(), 0.35, mIteration);
     mLayerPredict->pFirstLayer->setParameters(coefficient.get(), 0);
     
     return new CNNPredictor(mLayerPredict->pFirstLayer, prop);
+}
+ALGradientMethod* ALCNNLearner::getGDMethod() const
+{
+    ALGradientMethod* result = new ALGradientMethod;
+    result->gd = mGDMethod;
+    result->det = mDetFunction;
+    result->alpha = 0.35;
+    result->iteration = mIteration;
+    result->type = ALGradientMethod::CLASSIFY;
+    result->typeNumber = mProp->width();
+    return result;
 }

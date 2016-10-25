@@ -848,7 +848,7 @@ void ALFloatMatrix::save(const ALFloatMatrix* m, ALWStream* f)
 ALFloatMatrix* ALFloatMatrix::load(ALStream* f)
 {
     const size_t matrix_hunit = 100;
-    const size_t buffersize = 4096;
+    const size_t buffersize = 32768;
     char buffer[buffersize];
     ALSp<ALStreamReader> reader = new ALStreamReader(f);
     ALASSERT(!reader->end());
@@ -1105,4 +1105,21 @@ bool ALFloatMatrix::theSame(const ALFloatMatrix* X, const ALFloatMatrix* Y, ALFL
         }
     }
     return true;
+}
+
+void ALFloatMatrix::typeExpand(ALFloatMatrix* Y_Expand/*Output*/, const ALFloatMatrix* YT/*Input*/)
+{
+    ALASSERT(NULL!=YT);
+    ALASSERT(NULL!=Y_Expand);
+    ALASSERT(1 == YT->height());
+    ALASSERT(Y_Expand->height() == YT->width());
+    auto h = Y_Expand->height();
+    auto y = YT->vGetAddr();
+    ALFloatMatrix::zero(Y_Expand);
+    for (size_t i=0; i<h; ++i)
+    {
+        auto y_e = Y_Expand->vGetAddr(i);
+        size_t pos = y[i];
+        y_e[pos] = 1.0;
+    }
 }

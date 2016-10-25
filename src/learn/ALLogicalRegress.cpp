@@ -16,15 +16,26 @@ static ALFLOAT computeThetha(const ALFLOAT* x, const ALFLOAT* _w, size_t w)
 class LogGradientComputer : public ALIGradientDecent::DerivativeFunction
 {
 public:
-    LogGradientComputer(){}
+    LogGradientComputer(size_t size):mSize(size){}
     virtual ~ LogGradientComputer(){}
     
+    virtual size_t vInitParameters(ALFloatMatrix* coefficient) const override
+    {
+        if (NULL!=coefficient)
+        {
+            ALASSERT(coefficient->width() == mSize);
+            ALFloatMatrix::zero(coefficient);
+        }
+        return mSize;
+    }
+
     /*X is merged as [Y, X]*/
     virtual ALFloatMatrix* vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* X) const override
     {
         ALASSERT(NULL!=coefficient);
         ALASSERT(NULL!=X);
         ALASSERT(coefficient->height() == 1);
+        ALASSERT(coefficient->width() == mSize);
         ALASSERT(X->width() == coefficient->width()+1);
         auto weight = coefficient->vGetAddr();
         auto h = X->height();
@@ -51,6 +62,8 @@ public:
         
         return detC;
     }
+private:
+    size_t mSize;
 };
 
 ALLogicalRegress::ALLogicalRegress(int iter, ALFLOAT alpha)
@@ -105,11 +118,10 @@ ALSp<ALFloatMatrix> ALLogicalRegress::learn(const ALFloatMatrix* X, const ALFloa
     ALASSERT(maxiter>=1);
     ALASSERT(X->height() == Y->height());
     auto w = X->width();
-    /*TODO let user adust the alpha*/
     ALSp<ALFloatMatrix> W = ALFloatMatrix::create(w, 1);
     ALFloatMatrix::zero(W.get());
     ALSp<ALIGradientDecent> gd = ALIGradientDecent::create(ALIGradientDecent::SGD);
-    LogGradientComputer delta;
+    LogGradientComputer delta(w);
     ALSp<ALFloatMatrix> merge = ALFloatMatrix::unionHorizontal(Y,X);
     gd->vOptimize(W.get(), merge.get(), &delta, alpha, (int)maxiter);
     return W;
