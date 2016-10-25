@@ -352,6 +352,18 @@ ALFloatMatrix* result = ALPackageMatrixPlus(X0, X1);
 out->push(result,gALFloatMatrix);
 return out;
 }
+GPContents* ALPackageMatrixPlusM_GPpackage(GPContents* inputs)
+{
+assert(2 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gALFloatMatrix->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALFloatMatrix* X1 = (ALFloatMatrix*)inputs->get(1);
+ALFloatMatrix* result = ALPackageMatrixPlusM(X0, X1);
+out->push(result,gALFloatMatrix);
+return out;
+}
 GPContents* ALPackageGDMatrixPrepare_GPpackage(GPContents* inputs)
 {
 assert(3 == inputs->size());

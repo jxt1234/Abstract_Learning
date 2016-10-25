@@ -80,6 +80,7 @@ typedef ALIMatrixPredictor ALClassifier;
 /*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixCrop(ALFloatMatrix* A, double aleft, double aright);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageGDCompute(ALFloatMatrix* X, ALGradientMethod* decent, ALFloatMatrix* P);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixPlus(ALFloatMatrix* X1, ALFloatMatrix* X2);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixPlusM(ALFloatMatrix* X1, ALFloatMatrix* X2);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageGDMatrixPrepare(ALFloatMatrix* X, ALFloatMatrix* Y, ALGradientMethod* grad);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageParameterInit(ALGradientMethod* decent);
 

@@ -123,6 +123,10 @@ if (name == "ALPackageMatrixPlus_GPpackage")
 {
 return (void*)ALPackageMatrixPlus_GPpackage;
 }
+if (name == "ALPackageMatrixPlusM_GPpackage")
+{
+return (void*)ALPackageMatrixPlusM_GPpackage;
+}
 if (name == "ALPackageGDMatrixPrepare_GPpackage")
 {
 return (void*)ALPackageGDMatrixPrepare_GPpackage;

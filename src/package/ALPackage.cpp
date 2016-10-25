@@ -315,3 +315,11 @@ ALFloatMatrix* ALPackageGDMatrixPrepare(ALFloatMatrix* X, ALFloatMatrix* Y, ALGr
     ALFloatMatrix::typeExpand(Y_E.get(), YT.get());
     return ALFloatMatrix::unionHorizontal(Y_E.get(), X);
 }
+ALFloatMatrix* ALPackageMatrixPlusM(ALFloatMatrix* X1, ALFloatMatrix* X2)
+{
+    ALASSERT(X1->width() == X2->width());
+    ALASSERT(X1->height() == X2->height());
+    auto res = ALFloatMatrix::create(X1->width(), X1->height());
+    ALFloatMatrix::linear(res, X1, 1.0, X2, 0.166667);
+    return res;
+}

@@ -239,6 +239,14 @@
 <inputNeedComplete>False False </inputNeedComplete>
 </ALPackageMatrixPlus_GPpackage>
 
+<ALPackageMatrixPlusM_GPpackage>
+<shortName>MatrixPlusM</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageMatrixPlusM_GPpackage>
+
 <ALPackageGDMatrixPrepare_GPpackage>
 <shortName>GDMatrixPrepare</shortName>
 <output>ALFloatMatrix</output>

@@ -32,3 +32,6 @@ endif()
 target_link_libraries(example.out Abstract_learning)
 target_link_libraries(test.out Abstract_learning)
 target_link_libraries(matrix_tool.out Abstract_learning)
+
+add_executable(gp_test.out ./gp_test.cpp)
+target_link_libraries(gp_test.out Renascence)
