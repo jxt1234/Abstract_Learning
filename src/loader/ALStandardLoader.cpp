@@ -73,14 +73,13 @@ ALFloatDataChain* ALStandardLoader::load(ALStream* input)
         ALASSERT(0);//FIXME
         return NULL;
     }
-    const int buffersize = 32768;
-    ALAUTOSTORAGE(buffer, char, buffersize);
+    ALDynamicBuffer dyBuffer(4096);//TODO
     ALSp<ALStreamReader> reader = new ALStreamReader(input);
-    auto len = reader->readline(buffer, buffersize-1);
-    auto num = measureNumbers(buffer, len);
+    auto len = reader->readline(&dyBuffer);
+    auto num = measureNumbers(dyBuffer.content(), len);
     ALASSERT(num>0);
     ALFloatData* back = new ALFloatData(num);
-    loadNumbers(back->get(), num, buffer, len);
+    loadNumbers(back->get(), num, dyBuffer.content(), len);
     ALFloatDataChain* res = new ALFloatDataChain(num);
     res->add(back);
     back->decRef();
@@ -90,8 +89,8 @@ ALFloatDataChain* ALStandardLoader::load(ALStream* input)
         res->add(next);
         next->decRef();
         back->addNext(next);
-        len = reader->readline(buffer, buffersize-1);
-        loadNumbers(next->get(), num, buffer, len);
+        len = reader->readline(&dyBuffer);
+        loadNumbers(next->get(), num, dyBuffer.content(), len);
         back = next;
     }
     return res;

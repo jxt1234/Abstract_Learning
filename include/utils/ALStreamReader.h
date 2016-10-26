@@ -2,14 +2,14 @@
 #define INCLUDE_UTILS_ALSTREAMREADER_H
 #include "ALHead.h"
 #include "ALStream.h"
+#include "ALDynamicBuffer.h"
 #include <string>
 class ALStreamReader:public ALRefCount
 {
 public:
     ALStreamReader(ALStream* stream, size_t buffersize = 4096);
     virtual ~ALStreamReader();
-    /*dst must has the lenght larger that maxSize+1, 1 for \0*/
-    size_t readline(char* dst, size_t maxSize);
+    size_t readline(ALDynamicBuffer* buffer);
     bool end() const;
 private:
     void _refreshCache();

@@ -10,12 +10,12 @@ class ALStreamReaderTest:public GPTest
         {
             ALSp<ALStream> input = ALStreamFactory::readFromFile("bao.txt");
             ALSp<ALStreamReader> reader = new ALStreamReader(input.get());
-            char buffer[4096];
+            ALDynamicBuffer dyBuffer(4096);
             ofstream out("output/ALStreamReaderTest.txt");
             while (!reader->end())
             {
-                reader->readline(buffer, 4095);
-                out << buffer;
+                reader->readline(&dyBuffer);
+                out << dyBuffer.content();
             }
         }
         ALStreamReaderTest(){}

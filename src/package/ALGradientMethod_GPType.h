@@ -1,3 +1,5 @@
+#ifndef PACKAGE_ALGRADIENTMETHOD_GPTYPE_H
+#define PACKAGE_ALGRADIENTMETHOD_GPTYPE_H
 #include "cJSON/cJSON.h"
 #include "learn/ALCNNLearner.h"
 class ALGradientMethod_GPType:public IStatusType
@@ -42,3 +44,4 @@ return mapnumber;
 virtual bool vCheckCompleted(void* content) const {return NULL!=content;}
 virtual void* vMerge(void* dst, void* src) const {return NULL;}
 };
+#endif

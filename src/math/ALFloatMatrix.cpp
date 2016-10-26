@@ -848,23 +848,22 @@ void ALFloatMatrix::save(const ALFloatMatrix* m, ALWStream* f)
 ALFloatMatrix* ALFloatMatrix::load(ALStream* f)
 {
     const size_t matrix_hunit = 100;
-    const size_t buffersize = 32768;
-    char buffer[buffersize];
     ALSp<ALStreamReader> reader = new ALStreamReader(f);
     ALASSERT(!reader->end());
     /*First line, Compute Units*/
-    size_t len = reader->readline(buffer, buffersize-1);
-    size_t num = ALStandardLoader::measureNumbers(buffer, len);
+    ALDynamicBuffer dyBuffer(4096);//TODO
+    size_t len = reader->readline(&dyBuffer);
+    size_t num = ALStandardLoader::measureNumbers(dyBuffer.content(), len);
     
     /*Load first matrix begin*/
     ALFloatMatrix* first = new ALBaseFloatMatrix(num, matrix_hunit);
     //Copy First Line
-    ALStandardLoader::loadNumbers(first->vGetAddr(0), num, buffer, len);
+    ALStandardLoader::loadNumbers(first->vGetAddr(0), num, dyBuffer.content(), len);
     size_t cur = 1;
     while (!reader->end() && cur < matrix_hunit)
     {
-        len = reader->readline(buffer, buffersize-1);
-        ALStandardLoader::loadNumbers(first->vGetAddr(cur++), num, buffer, len);
+        len = reader->readline(&dyBuffer);
+        ALStandardLoader::loadNumbers(first->vGetAddr(cur++), num, dyBuffer.content(), len);
     }
     /*Load first matrix end*/
     
@@ -882,8 +881,8 @@ ALFloatMatrix* ALFloatMatrix::load(ALStream* f)
         ALSp<ALFloatMatrix> unit = new ALBaseFloatMatrix(num, matrix_hunit);
         while (!reader->end() && cur < matrix_hunit)
         {
-            len = reader->readline(buffer, buffersize-1);
-            ALStandardLoader::loadNumbers(unit->vGetAddr(cur++), num, buffer, len);
+            len = reader->readline(&dyBuffer);
+            ALStandardLoader::loadNumbers(unit->vGetAddr(cur++), num, dyBuffer.content(), len);
         }
         unit->mHeight = cur;
 

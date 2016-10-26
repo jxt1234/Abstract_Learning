@@ -28,30 +28,24 @@ void ALStreamReader::_refreshCache()
     mRemain = mStream->vRead(mBuffer, mSize*sizeof(char));
     mOffset = 0;
 }
-size_t ALStreamReader::readline(char* dst, size_t maxSize)
+size_t ALStreamReader::readline(ALDynamicBuffer* dBuffer)
 {
-    ALASSERT(NULL!=dst);
-    ALASSERT(0<maxSize);
+    ALASSERT(NULL!=dBuffer);
     size_t len = 0;
     bool complete = false;
     bool nobuffer = false;
+    dBuffer->reset();
     while (!end() && !complete && !nobuffer)
     {
         auto buffer = mBuffer+mOffset;
-        auto dst_current = dst + len;
         size_t n = mRemain;
-        if (maxSize < len+mRemain)
-        {
-            n = maxSize-len;
-            nobuffer = true;
-        }
         for (size_t i=0; i<n; ++i)
         {
             if ('\n' == buffer[i])
             {
-                auto s = i+1;
                 /*Copy \n as well*/
-                ::memcpy(dst_current, buffer, s*sizeof(char));
+                auto s = i+1;
+                dBuffer->load(buffer, s);
                 complete = true;
                 len += s;
                 mOffset += s;
@@ -61,7 +55,7 @@ size_t ALStreamReader::readline(char* dst, size_t maxSize)
         }
         if (!complete)
         {
-            ::memcpy(dst_current, buffer, n*sizeof(char));
+            dBuffer->load(buffer, n);
             len+=n;
             mRemain = 0;
         }
@@ -70,7 +64,9 @@ size_t ALStreamReader::readline(char* dst, size_t maxSize)
             _refreshCache();
         }
     }
-    dst[len] = '\0';
+    char last = '\0';
+    dBuffer->load(&last, 1);
+    //dst[len] = '\0';
     //FUNC_PRINT_ALL(dst, s);
     return len;
 }
