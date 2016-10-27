@@ -14,8 +14,10 @@ public:
     ALCNNLearner(const cJSON* description);
     virtual ~ ALCNNLearner();
     
-    virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const;
+    virtual ALIMatrixPredictor* vLearn(const ALFloatMatrix* X, const ALFloatMatrix* Y) const override;
     ALGradientMethod* getGDMethod() const;
+
+    ALIMatrixPredictor* load(const ALFloatMatrix* P);
 
 private:
     ALSp<ALIGradientDecent> mGDMethod;

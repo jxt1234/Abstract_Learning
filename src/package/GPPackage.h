@@ -35,5 +35,7 @@ GPContents* ALPackageMatrixPlus_GPpackage(GPContents* inputs);
 GPContents* ALPackageMatrixPlusM_GPpackage(GPContents* inputs);
 GPContents* ALPackageGDMatrixPrepare_GPpackage(GPContents* inputs);
 GPContents* ALPackageParameterInit_GPpackage(GPContents* inputs);
+GPContents* ALPackageGDPredictorLoad_GPpackage(GPContents* inputs);
+GPContents* ALPackageMatrixLinear_GPpackage(GPContents* inputs);
 }
 #endif

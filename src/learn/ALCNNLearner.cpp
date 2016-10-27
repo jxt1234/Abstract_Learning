@@ -145,9 +145,16 @@ ALGradientMethod* ALCNNLearner::getGDMethod() const
     ALGradientMethod* result = new ALGradientMethod;
     result->gd = mGDMethod;
     result->det = mDetFunction;
-    result->alpha = 0.35;
+    result->alpha = 0.85;
     result->iteration = mIteration;
     result->type = ALGradientMethod::CLASSIFY;
     result->typeNumber = mProp->width();
     return result;
+}
+ALIMatrixPredictor* ALCNNLearner::load(const ALFloatMatrix* P)
+{
+    ALASSERT(NULL!=P);
+    ALASSERT(1==P->height());
+    mLayerPredict->pFirstLayer->setParameters(P, 0);
+    return new CNNPredictor(mLayerPredict->pFirstLayer, mProp);
 }

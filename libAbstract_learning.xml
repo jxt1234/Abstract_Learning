@@ -263,4 +263,20 @@
 <inputNeedComplete>False </inputNeedComplete>
 </ALPackageParameterInit_GPpackage>
 
+<ALPackageGDPredictorLoad_GPpackage>
+<shortName>GDPredictorLoad</shortName>
+<output>ALClassifier</output>
+<status></status>
+<input>ALGradientMethod ALFloatMatrix </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageGDPredictorLoad_GPpackage>
+
+<ALPackageMatrixLinear_GPpackage>
+<shortName>MatrixLinear</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix double double </input>
+<inputNeedComplete>False False False </inputNeedComplete>
+</ALPackageMatrixLinear_GPpackage>
+
 </libAbstract_learning>

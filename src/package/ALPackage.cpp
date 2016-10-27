@@ -320,6 +320,21 @@ ALFloatMatrix* ALPackageMatrixPlusM(ALFloatMatrix* X1, ALFloatMatrix* X2)
     ALASSERT(X1->width() == X2->width());
     ALASSERT(X1->height() == X2->height());
     auto res = ALFloatMatrix::create(X1->width(), X1->height());
+    //FIXME
     ALFloatMatrix::linear(res, X1, 1.0, X2, 0.166667);
     return res;
+}
+
+ALClassifier* ALPackageGDPredictorLoad(ALGradientMethod* decent, ALFloatMatrix*  P)
+{
+    //TODO
+    ALSp<ALCNNLearner> learner = new ALCNNLearner((cJSON*)decent->other);
+    return learner->load(P);
+}
+ALFloatMatrix* ALPackageMatrixLinear(ALFloatMatrix* X, double a, double b)
+{
+    ALFloatMatrix* XC = ALFloatMatrix::create(X->width(), X->height());
+    ALFloatMatrix::copy(XC, X);
+    ALFloatMatrix::linearDirect(XC, a, b);
+    return XC;
 }

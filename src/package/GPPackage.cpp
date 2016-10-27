@@ -388,3 +388,29 @@ ALFloatMatrix* result = ALPackageParameterInit(X0);
 out->push(result,gALFloatMatrix);
 return out;
 }
+GPContents* ALPackageGDPredictorLoad_GPpackage(GPContents* inputs)
+{
+assert(2 == inputs->size());
+assert(inputs->getType(0)->name() == gALGradientMethod->name());
+assert(inputs->getType(1)->name() == gALFloatMatrix->name());
+GPContents* out =  new GPContents;
+ALGradientMethod* X0 = (ALGradientMethod*)inputs->get(0);
+ALFloatMatrix* X1 = (ALFloatMatrix*)inputs->get(1);
+ALClassifier* result = ALPackageGDPredictorLoad(X0, X1);
+out->push(result,gALClassifier);
+return out;
+}
+GPContents* ALPackageMatrixLinear_GPpackage(GPContents* inputs)
+{
+assert(3 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gdouble->name());
+assert(inputs->getType(2)->name() == gdouble->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+double X1 = *(double*)inputs->get(1);
+double X2 = *(double*)inputs->get(2);
+ALFloatMatrix* result = ALPackageMatrixLinear(X0, X1, X2);
+out->push(result,gALFloatMatrix);
+return out;
+}
