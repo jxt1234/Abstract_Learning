@@ -13,6 +13,7 @@
 
 static cl_mem _uploadMatrix(cl_context context, cl_command_queue queue, const ALFloatMatrix* M)
 {
+    //ALFORCEAUTOTIME;
     ALASSERT(NULL!=M);
     ALASSERT(sizeof(ALFLOAT) == sizeof(float));
     auto w = M->width();
@@ -342,7 +343,7 @@ void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& d
 
         return true;
     };
-    cl.queueWork(krun);    
+    cl.queueWork(krun);
 }
 
 #endif
