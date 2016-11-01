@@ -145,7 +145,7 @@ ALGradientMethod* ALCNNLearner::getGDMethod() const
     ALGradientMethod* result = new ALGradientMethod;
     result->gd = mGDMethod;
     result->det = mDetFunction;
-    result->alpha = 0.85;
+    result->alpha = 0.35;
     result->iteration = mIteration;
     result->type = ALGradientMethod::CLASSIFY;
     result->typeNumber = mProp->width();
