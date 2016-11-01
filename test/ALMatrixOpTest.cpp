@@ -121,16 +121,37 @@ class ALMatrixOpTest:public GPTest
             ALAutoUnRef __srcDiff((ALFloatMatrix*)srcDiff.pOrigin);
             ALFloatMatrix::zero((ALFloatMatrix*)srcDiff.pOrigin);
             
+            ALIMatrix4DOp::Matrix4D kernelDiff2 = kernel;
+            kernelDiff2.pOrigin = ALFloatMatrix::create(kernelDiff2.getTotalWidth(), kernel.pOrigin->height());
+            ALAutoUnRef __kernelDiff2((ALFloatMatrix*)kernelDiff2.pOrigin);
+            ALFloatMatrix::zero((ALFloatMatrix*)kernelDiff2.pOrigin);
+            
+            
+            ALIMatrix4DOp::Matrix4D srcDiff2 = src;
+            srcDiff2.pOrigin = ALFloatMatrix::create(srcDiff.getTotalWidth(), srcDiff.pOrigin->height());
+            ALAutoUnRef __srcDiff2((ALFloatMatrix*)srcDiff2.pOrigin);
+            ALFloatMatrix::zero((ALFloatMatrix*)srcDiff2.pOrigin);
+            
+            
             op->vDeterFilter(dstDiff, dst, src, srcDiff, kernel, kernelDiff, 1);
+            op2->vDeterFilter(dstDiff, dst, src, srcDiff2, kernel, kernelDiff2, 1);
+            
             
             {
                 std::ofstream output("output/ALMatrixOpTest_kernelDiff.txt");
                 ALFloatMatrix::print(kernelDiff.pOrigin, output);
+                std::ofstream output2("output/ALMatrixOpTest_kernelDiff2.txt");
+                ALFloatMatrix::print(kernelDiff2.pOrigin, output2);
             }
             {
                 std::ofstream output("output/ALMatrixOpTest_srcDiff.txt");
                 ALFloatMatrix::print(srcDiff.pOrigin, output);
+                std::ofstream output2("output/ALMatrixOpTest_srcDiff2.txt");
+                ALFloatMatrix::print(srcDiff2.pOrigin, output2);
             }
+            ALASSERT(ALFloatMatrix::theSame(srcDiff2.pOrigin, srcDiff.pOrigin));
+            ALASSERT(ALFloatMatrix::theSame(kernelDiff2.pOrigin, kernelDiff.pOrigin));
+
 
         }
         ALMatrixOpTest(){}

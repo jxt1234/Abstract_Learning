@@ -16,6 +16,7 @@ public:
         int getTotalWidth() const;
         
         ALFloatMatrix* getMutable() {return (ALFloatMatrix*)pOrigin;}
+        
     };
     
     
