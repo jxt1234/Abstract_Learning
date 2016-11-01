@@ -17,7 +17,7 @@ namespace ALCNN {
     }
     ALFloatMatrix* SoftMaxLayer::vInitParameters() const
     {
-        return NULL;
+        return ALFloatMatrix::create(mInputSize, 1);
     }
     
     ALFloatMatrix* SoftMaxLayer::vInitOutput(int batchSize) const
@@ -40,6 +40,15 @@ namespace ALCNN {
         ALFloatMatrix::copy(dot.get(), before);
         auto w = dot->width();
         auto h = dot->height();
+        auto p = parameters->vGetAddr();
+        for (int i=0; i<h; ++i)
+        {
+            auto _dot = dot->vGetAddr(i);
+            for (int j=0; j<w; ++j)
+            {
+                _dot[j] += p[j];
+            }
+        }
         
         /*Pretreat dot, for compute precision, like caffe*/
         for (int i=0; i<h; ++i)
@@ -78,17 +87,17 @@ namespace ALCNN {
     }
     void SoftMaxLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
+        ALASSERT(before_diff!=NULL);//TODO
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=after);
         ALASSERT(NULL!=after_diff);
         ALASSERT(after->width() == after_diff->width());
         ALASSERT(after->height() == after_diff->height());
+        ALFloatMatrix::zero(parameters_diff);
         auto batchSize = after->height();
+        auto p_diff = parameters_diff->vGetAddr();
+        
         /*Compute input diff*/
-        if (NULL == before_diff)
-        {
-            return;
-        }
         auto w = before->width();
         for (int z = 0; z<batchSize; ++z)
         {
@@ -97,7 +106,9 @@ namespace ALCNN {
             auto x = before_diff->vGetAddr(z);
             for (int i=0; i<w; ++i)
             {
-                x[i] = (y[i]-y[i]*y[i])*ydet[i];
+                auto det = (y[i]-y[i]*y[i])*ydet[i];
+                x[i] = det;
+                p_diff[i]+=det;
             }
         }
         if (0)
