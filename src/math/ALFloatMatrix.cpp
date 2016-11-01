@@ -13,6 +13,9 @@
 #ifdef ALOPENCL_MAC
 #include "opencl/ALOpenCL.h"
 #endif
+#ifdef ALBLAS
+#include "cblas.h"
+#endif
 
 #ifdef ALOPENCL_MAC
 static const char* gProductSource = KERNEL(
@@ -278,6 +281,13 @@ void ALFloatMatrix::productBasicT(ALFLOAT* c, size_t c_stride, const ALFLOAT* a,
         return;
     }
 #endif
+#ifdef ALBLAS
+    const CBLAS_ORDER Order=CblasRowMajor;
+    const CBLAS_TRANSPOSE TransA=CblasNoTrans;
+    const CBLAS_TRANSPOSE TransB=CblasTrans;
+    cblas_sgemm(Order, TransA, TransB, h, w, l, 1, a, a_stride, b, b_stride, 0.0, c, c_stride);
+    return;
+#endif
     for (auto i=0; i<h; ++i)
     {
         for (auto j=0; j<w; ++j)
@@ -296,6 +306,13 @@ void ALFloatMatrix::productBasicT(ALFLOAT* c, size_t c_stride, const ALFLOAT* a,
 }
 void ALFloatMatrix::productBasic(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, size_t a_stride, const ALFLOAT* b, size_t b_stride, size_t w, size_t h, size_t l)
 {
+#ifdef ALBLAS
+    const CBLAS_ORDER Order=CblasRowMajor;
+    const CBLAS_TRANSPOSE TransA=CblasNoTrans;
+    const CBLAS_TRANSPOSE TransB=CblasNoTrans;
+    cblas_sgemm(Order, TransA, TransB, h, w, l, 1, a, a_stride, b, b_stride, 0.0, c, c_stride);
+    return;
+#endif
 #ifdef ALOPENCL_MAC
     if (w > 10 && h>10)
     {
@@ -526,13 +543,13 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
     ALASSERT(A->width() > 0 && A->height() > 0);
     auto w = A->width();
     auto h = A->height();
-#ifdef ALOPENCL_MAC
     auto resw = w;
     if (transpose)
     {
         resw = h;
     }
     ALFloatMatrix* result = new ALBaseFloatMatrix(resw, resw);
+#ifdef ALOPENCL_MAC
     auto run = [=](cl_context context, cl_command_queue queue){
         ALFLOAT* a = A->vGetAddr();
         cl_int errorcode;
@@ -596,7 +613,7 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
     cl.prepare(&gSSTPrepare);
     cl.queueWork(run);
     return result;
-#else
+#endif
     ALFLOAT* a = A->vGetAddr();
     ALFLOAT* b = a;
     auto rA = A->width();
@@ -614,10 +631,24 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
         w = h;
         h = temp;
     }
-    ALFloatMatrix* result = new ALBaseFloatMatrix(w, w);
     auto rC = result->width();
     ALFLOAT* c = result->vGetAddr();
 
+#ifdef ALBLAS
+    auto a_stride = rA;
+    auto c_stride = rC;
+    if (transpose)
+    {
+        //SST
+        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans, rC, rC, A->width(), 1.0, a, a_stride, a, a_stride, 0.0, c, c_stride);
+    }
+    else
+    {
+        //STS
+        cblas_sgemm(CblasRowMajor, CblasTrans, CblasNoTrans, rC, rC, A->height(), 1.0, a, a_stride, a, a_stride, 0.0, c, c_stride);
+    }
+    return result;
+#endif
     /*Compute the Matrix, it's symmetrical*/
     for (int i=0; i<w; ++i)
     {
@@ -637,7 +668,6 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
         }
     }
     return result;
-#endif
 }
 
 void ALFloatMatrix::print(const ALFloatMatrix* A, std::ostream& os)
