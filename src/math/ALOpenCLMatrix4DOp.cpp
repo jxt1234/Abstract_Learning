@@ -280,7 +280,6 @@ void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& d
             auto errorcode = clEnqueueNDRangeKernel(queue, gKernelFilterError, 2, NULL, size, NULL, 0, NULL, NULL);
             ALASSERT(errorcode == CL_SUCCESS);
         }
-        _downloadMatrix(queue, kernel_diff_gpu, kernelDataDiff.getMutable());
         
         if (NULL != srcDiff.pOrigin)
         {
@@ -296,7 +295,8 @@ void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& d
             ALASSERT(errorcode == CL_SUCCESS);
             _downloadMatrix(queue, input_diff_gpu, srcDiff.getMutable());
         }
-        
+        _downloadMatrix(queue, kernel_diff_gpu, kernelDataDiff.getMutable());
+
         return true;
     };
     cl.queueWork(krun);

@@ -2,25 +2,18 @@
 #define INCLUDE_UTILS_ALCLOCK_H
 #include <time.h>
 #include <string>
+#include <sys/time.h>
+#include "ALDebug.h"
 class ALClock
 {
-    public:
-        ALClock(const char* name, int line)
-        {
-            mName = name;
-            mLine = line;
-            mSta = clock();
-        }
-        ~ALClock()
-        {
-            clock_t fin = clock();
-            long interval = fin - mSta;
-            printf("For %s, %d Time is %lums+%luus\n", mName.c_str(), mLine, interval/1000, interval%1000);
-        }
-    private:
-        std::string mName;
-        int mLine;
-        clock_t mSta;
+public:
+    ALClock(const char* name, int line);
+    ~ALClock();
+private:
+    timeval mSta;
+    timeval mFin;
+    std::string mName;
+    int mLine;
 };
 //#define ALAUTOTIME ALClock __alclock(__func__, __LINE__)
 #define ALAUTOTIME
