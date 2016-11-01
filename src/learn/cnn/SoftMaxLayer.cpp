@@ -83,7 +83,6 @@ namespace ALCNN {
         ALASSERT(NULL!=after_diff);
         ALASSERT(after->width() == after_diff->width());
         ALASSERT(after->height() == after_diff->height());
-        
         auto batchSize = after->height();
         /*Compute input diff*/
         if (NULL == before_diff)

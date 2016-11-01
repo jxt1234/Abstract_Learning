@@ -114,14 +114,12 @@ void ALBasicMatrix4DOp::vFilter(Matrix4D& output, const Matrix4D& src, const Mat
 void ALBasicMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& dst, const Matrix4D& src, Matrix4D& srcDiff, const Matrix4D& kernelData, Matrix4D& kernelDataDiff, int stride) const
 {
     ALASSERT(dstDiff.valid());
-    ALASSERT(dst.valid());
     ALASSERT(kernelData.valid());
     ALASSERT(kernelDataDiff.valid());
     ALASSERT(kernelDataDiff.getTotalWidth() == kernelData.getTotalWidth());
     ALASSERT(stride>=1);
     ALASSERT(kernelData.iExpand == 1);
-    ALASSERT(dst.iExpand == 0);
-    auto batchSize = dst.pOrigin->height();
+    auto batchSize = dstDiff.pOrigin->height();
     
     ALFloatMatrix::zero(kernelDataDiff.getMutable());
     if (NULL!=srcDiff.pOrigin)
