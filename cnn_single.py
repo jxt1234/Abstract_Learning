@@ -3,12 +3,17 @@ import Renascence
 def main():
     producer = Renascence.init(["./libAbstract_learning.xml"])
     gd = producer.load('ALGradientMethod', './res/cnn/lenet.json')
+    #gd = producer.load('ALGradientMethod', './res/cnn/softmax.json')
+
     trainMerge = producer.load('ALFloatMatrix', '../../machine_exam/handset/train.txt');
     trainX = producer.build('MatrixLinear(MatrixCrop(x0, x1, x2), x3, x4)').run(producer.merge(trainMerge, 1.0, -1.0, 1.0/255.0, 0.0))
+    trainX.save('output/handset.trainX.txt')
     trainY = producer.build('MatrixCrop(x0, x1, x2)').run(producer.merge(trainMerge, 0.0, 0.0))
+    trainY.save('output/handset.trainY.txt')
     p = producer.build('ParameterInit(x0)').run(gd)
     print trainX,trainY,gd,p
     mergeM = producer.build('GDMatrixPrepare(x0, x1, x2)').run(producer.merge(trainX, trainY, gd))
+    mergeM.save('output/handset.m')
 
     p = producer.build('GDCompute(x0, x1, x2)').run(producer.merge(mergeM, gd, p))
     p.save('output/handset.p')

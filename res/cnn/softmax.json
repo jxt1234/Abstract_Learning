@@ -1,0 +1,17 @@
+{
+    "name": "LeNet",
+    "train-batch":64,
+    "iteration":10000,
+    "layers":[
+        {
+            "type": "InnerProduct",
+            "input":784,
+            "output":10
+        },
+        {
+            "type":"SoftMax",
+            "input":10,
+            "output":10
+        }
+    ]
+}
