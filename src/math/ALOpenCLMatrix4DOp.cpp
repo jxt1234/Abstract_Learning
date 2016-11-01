@@ -18,6 +18,7 @@ static cl_mem _uploadMatrix(cl_context context, cl_command_queue queue, const AL
     auto w = M->width();
     auto h = M->height();
     auto sizea = sizeof(float)*w*h;
+    //ALClock __clock("Upload", sizea);
     cl_int errorcode;
     auto flag = CL_MEM_READ_ONLY;
     cl_mem ma = clCreateBuffer(context, flag, sizea, NULL, &errorcode);
@@ -40,6 +41,7 @@ static cl_mem _allocForWrite(cl_context context, cl_command_queue queue, size_t 
 
 static void _downloadMatrix(cl_command_queue queue, cl_mem mem, ALFloatMatrix* dst)
 {
+    //ALFORCEAUTOTIME;
     auto sizec = dst->width()*dst->height()*sizeof(float);
     clEnqueueReadBuffer(queue, mem, true, 0, sizec, dst->vGetAddr()/*FIXME*/, 0, NULL, NULL);
 }
@@ -61,7 +63,7 @@ static const char* gFilterSource = KERNEL(
                                               for (oi=0; oi<od; ++oi)
                                               {
                                                   kernel_base = kernelM+kbatchsize*oi;
-                                                  sum = 0.0;
+                                                  sum = kernel_base[kbatchsize-1];
                                                   for (i=0;i<kd;++i)
                                                   {
                                                       for (j=0;j<kh; ++j)
@@ -72,7 +74,7 @@ static const char* gFilterSource = KERNEL(
                                                           }
                                                       }
                                                   }
-                                                  sum += kernel_base[kbatchsize-1];
+                                                  
                                                   *(output_base + ow*oh*oi) = sum;
                                               }
                                           }
@@ -122,6 +124,7 @@ static void _setKernel(cl_kernel kernel, cl_mem input_gpu, cl_mem kernel_gpu, cl
 
 void ALOpenCLMatrix4DOp::vFilter(Matrix4D& dst, const Matrix4D& src, const Matrix4D& kernelData, int stride) const
 {
+    //ALFORCEAUTOTIME;
     ALASSERT(stride == 1);
     static cl_kernel gKernel = NULL;
     static ALOpenCL::PrepareWork gPrepare = {
@@ -173,11 +176,19 @@ static const char* gDeterKernelErrorSource = KERNEL(
                                                             for (int k=0; k<n_batch; ++k)
                                                             {
                                                                 __global float* output_diff_base = output_diff + z*ow*oh + k*outputBatchSize;
-                                                                for (i=0; i<oh; ++i)
+                                                                for (j=0; j<oh; ++j)
                                                                 {
-                                                                    for (j=0; j<ow; ++j)
+                                                                    __global float* _a = output_diff_base+j*ow;
+                                                                    float4 bb = float4(1.0);
+                                                                    for (i=0; i<ow/4; i=i+1)
                                                                     {
-                                                                        sum += output_diff_base[i*ow+j];
+                                                                        float4 aa = vload4(i, _a);
+                                                                        sum += dot(aa, bb);
+                                                                    }
+                                                                    i = i*4;
+                                                                    for (; i<ow; ++i)
+                                                                    {
+                                                                        sum+= _a[i];
                                                                     }
                                                                 }
                                                             }
@@ -186,8 +197,8 @@ static const char* gDeterKernelErrorSource = KERNEL(
                                                         }
                                                         {
                                                             int ki = x % kw;
-                                                            int kj = ((x - ki) / kw) % kh;
-                                                            int kk = (x - ki - kj*kw)/kh/kw;
+                                                            int kj = ((x - ki)/kw)%kh;
+                                                            int kk = (x -ki-kj*kw)/kh/kw;
                                                             float sum = 0.0;
                                                             for (int k=0; k<n_batch; ++k)
                                                             {
@@ -195,9 +206,18 @@ static const char* gDeterKernelErrorSource = KERNEL(
                                                                 __global float* input_base = input + k*inputBatchSize + kk*iw*ih;
                                                                 for (j=0; j<oh; ++j)
                                                                 {
-                                                                    for (i=0; i<ow; ++i)
+                                                                    __global float* _a = output_diff_base + j*ow;
+                                                                    __global float* _b = input_base + (j+kj)*iw + ki;
+                                                                    for (i=0; i<ow/4; i=i+1)
                                                                     {
-                                                                        sum += output_diff_base[j*ow+i]*input_base[(j+kj)*iw+(i+ki)];
+                                                                        float4 aa = vload4(i, _a);
+                                                                        float4 bb = vload4(i, _b);
+                                                                        sum += dot(aa, bb);
+                                                                    }
+                                                                    i = i*4;
+                                                                    for (; i<ow; ++i)
+                                                                    {
+                                                                        sum+= _a[i] * _b[i];
                                                                     }
                                                                 }
                                                             }
@@ -217,7 +237,7 @@ static const char* gDeterInputErrorSource = KERNEL(
                                                        int outputBatchSize = ow*oh*od;
                                                        __global float* input_base_diff = input_diff + inputBatchSize*z + x + y*iw;
                                                        __global float* kernel_base;
-                                                       __global float* output_base = output_diff + outputBatchSize*z + x + y*ow;
+                                                       __global float* output_base = output_diff + outputBatchSize*z + (x+kw) + (y+kh)*ow;
                                                        for (ii=0; ii<kd; ++ii)
                                                        {
                                                            sum = 0.0;
@@ -226,16 +246,8 @@ static const char* gDeterInputErrorSource = KERNEL(
                                                                kernel_base = kernelData+kbatchsize*i+ii*kw*kh;
                                                                for (j=0;j<kh; ++j)
                                                                {
-                                                                   if (y<j || (y-j)>=oh)
-                                                                   {
-                                                                       continue;
-                                                                   }
                                                                    for (k=0;k<kw;++k)
                                                                    {
-                                                                       if (x<k || (x-k)>=ow)
-                                                                       {
-                                                                           continue;
-                                                                       }
                                                                        sum += output_base[-k-j*ow+i*ow*oh]*kernel_base[k+j*kw];
                                                                    }
                                                                }
@@ -245,8 +257,35 @@ static const char* gDeterInputErrorSource = KERNEL(
                                                    });
 
 
+static ALFloatMatrix* _enlarge(const ALIMatrix4DOp::Matrix4D& src, const ALIMatrix4DOp::Matrix4D& kernel)
+{
+    int ow = src.iWidth + 2*kernel.iWidth;
+    int oh = src.iHeight + 2*kernel.iHeight;
+    ALFloatMatrix* enlarge = ALFloatMatrix::create(ow*oh*src.iDepth, src.pOrigin->height());
+    ALFloatMatrix::zero(enlarge);
+    auto h = src.pOrigin->height();
+    for (size_t z=0; z<h; ++z)
+    {
+        auto origin = src.pOrigin->vGetAddr(z);
+        auto target = enlarge->vGetAddr(z);
+        for (size_t i=0; i<src.iDepth; ++i)
+        {
+            for (size_t j=0; j<src.iHeight; ++j)
+            {
+                auto _src = origin + j*src.iWidth + i*src.iWidth*src.iHeight;
+                auto _dst = target + (j+kernel.iHeight)*ow + i*oh*ow + kernel.iWidth;
+                ::memcpy(_dst, _src, sizeof(ALFLOAT)*src.iWidth);
+            }
+        }
+    }
+    
+    return enlarge;
+}
+
+
 void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& dst, const Matrix4D& src,  Matrix4D& srcDiff, const Matrix4D& kernelData, Matrix4D& kernelDataDiff, int stride) const
 {
+    //ALFORCEAUTOTIME;
     ALASSERT(stride == 1);
     static cl_kernel gKernelInputError = NULL;
     static cl_kernel gKernelFilterError = NULL;
@@ -280,14 +319,19 @@ void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& d
             auto errorcode = clEnqueueNDRangeKernel(queue, gKernelFilterError, 2, NULL, size, NULL, 0, NULL, NULL);
             ALASSERT(errorcode == CL_SUCCESS);
         }
-        
+        _downloadMatrix(queue, kernel_diff_gpu, kernelDataDiff.getMutable());
         if (NULL != srcDiff.pOrigin)
         {
             auto input_diff_gpu = _allocForWrite(context, queue, srcDiff.pOrigin->width(), srcDiff.pOrigin->height());
             auto kernel_gpu = _uploadMatrix(context, queue, kernelData.pOrigin);
-            ALDefer([&](){clReleaseMemObject(input_diff_gpu);clReleaseMemObject(kernel_gpu);});
+            ALSp<ALFloatMatrix> dstDiffEnlarge = _enlarge(dstDiff, kernelData);
+            auto output_diff_gpu = _uploadMatrix(context, queue, dstDiffEnlarge.get());
+            ALDefer([&](){clReleaseMemObject(input_diff_gpu);clReleaseMemObject(kernel_gpu);clReleaseMemObject(output_diff_gpu);});
+            ALIMatrix4DOp::Matrix4D enlargeDstDiff = dstDiff;
+            enlargeDstDiff.iWidth = dstDiff.iWidth+2*kernelData.iWidth;
+            enlargeDstDiff.iHeight = dstDiff.iHeight+2*kernelData.iHeight;
             
-            _setKernel(gKernelInputError, input_diff_gpu, kernel_gpu, output_gpu, srcDiff, dstDiff, kernelData);
+            _setKernel(gKernelInputError, input_diff_gpu, kernel_gpu, output_diff_gpu, srcDiff, enlargeDstDiff, kernelData);
             size_t size[] = {
                 (size_t)srcDiff.iWidth, (size_t)srcDiff.iHeight, srcDiff.pOrigin->height()
             };
@@ -295,13 +339,10 @@ void ALOpenCLMatrix4DOp::vDeterFilter(const Matrix4D& dstDiff, const Matrix4D& d
             ALASSERT(errorcode == CL_SUCCESS);
             _downloadMatrix(queue, input_diff_gpu, srcDiff.getMutable());
         }
-        _downloadMatrix(queue, kernel_diff_gpu, kernelDataDiff.getMutable());
 
         return true;
     };
-    cl.queueWork(krun);
-    
-    //ALBasicMatrix4DOp::vDeterFilter(dstDiff, dst, src, srcDiff, kernelData, kernelDataDiff, stride);
+    cl.queueWork(krun);    
 }
 
 #endif

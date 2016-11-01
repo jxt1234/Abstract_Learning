@@ -84,7 +84,7 @@ class ALMatrixOpTest:public GPTest
                 ALFloatMatrix::print(dst2.pOrigin, output);
             }
             
-            ALASSERT(ALFloatMatrix::theSame(dst.pOrigin, dst2.pOrigin));
+            ALASSERT(ALFloatMatrix::theSame(dst.pOrigin, dst2.pOrigin, 0.01));
             
             
             
