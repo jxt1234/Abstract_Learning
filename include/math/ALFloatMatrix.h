@@ -26,6 +26,8 @@ public:
 
     static void product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     static void productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* BT);
+    static void productTA(ALFloatMatrix* C, const ALFloatMatrix* AT, const ALFloatMatrix* B);
+
     
     static bool theSame(const ALFloatMatrix* X, const ALFloatMatrix* Y, ALFLOAT error=0.001);
 

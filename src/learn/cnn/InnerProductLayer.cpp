@@ -12,7 +12,7 @@ namespace ALCNN {
     //TODO Add basis
     ALFloatMatrix* InnerProductLayer::vInitParameters() const
     {
-        return ALFloatMatrix::create(mInputSize, mOutputSize);
+        return ALFloatMatrix::create(mOutputSize, mInputSize);
     }
     
     ALFloatMatrix* InnerProductLayer::vInitOutput(int batchSize) const
@@ -28,17 +28,17 @@ namespace ALCNN {
     void InnerProductLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
     {
         ALLEARNAUTOTIME;
-        ALFloatMatrix::productT(after, before, parameters);
+        ALFloatMatrix::product(after, before, parameters);
     }
     void InnerProductLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
     {
         ALLEARNAUTOTIME;
-        ALSp<ALFloatMatrix> after_diff_T = ALFloatMatrix::transpose(after_diff);
-        ALFloatMatrix::product(parameters_diff, after_diff_T.get(), before);
+        //ALSp<ALFloatMatrix> after_diff_T = ALFloatMatrix::transpose(after_diff);
+        ALFloatMatrix::productTA(parameters_diff, before, after_diff);
         
         if (NULL!=before_diff)
         {
-            ALFloatMatrix::product(before_diff, after_diff, parameters);
+            ALFloatMatrix::productT(before_diff, after_diff, parameters);
         }
     }
     static auto gCreateFunction = [](const LayerParameters& p) {

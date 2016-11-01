@@ -141,6 +141,41 @@ void ALFloatMatrix::productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALF
     productBasicT(C->vGetAddr(), C->width(), A->vGetAddr(), A->width(), BT->vGetAddr(), BT->width(), w, h, l);
 }
 
+void ALFloatMatrix::productTA(ALFloatMatrix* C, const ALFloatMatrix* AT, const ALFloatMatrix* B)
+{
+    ALASSERT(NULL!=AT && NULL!=B);
+    ALASSERT(AT->height() == B->height());
+    ALASSERT(C->width() == B->width());
+    ALASSERT(C->height() == AT->width());
+    auto w = C->width();
+    auto h = C->height();
+    auto l = AT->height();
+    auto c = C->vGetAddr();
+    auto a = AT->vGetAddr();
+    auto b = B->vGetAddr();
+#ifdef ALBLAS
+    cblas_sgemm(CblasRowMajor, CblasTrans, CblasNoTrans, h, w, l, 1.0, a, h, b, w, 0.0, c, w);
+    return;
+#endif
+    for (auto i=0; i<h; ++i)
+    {
+        for (auto j=0; j<w; ++j)
+        {
+            auto _c = c + w*i + j;
+            auto _a = a + i;
+            auto _b = b + j;
+            ALFLOAT sum = 0.0;
+            for (auto k=0; k<l; ++k)
+            {
+                sum += (_b[k*w]*_a[k*h]);
+            }
+            *_c = sum;
+        }
+    }
+
+}
+
+
 ALFloatMatrix* ALFloatMatrix::productSS(const ALFloatMatrix* A, const ALFloatMatrix* B)
 {
     ALAUTOTIME;
@@ -316,7 +351,6 @@ void ALFloatMatrix::productBasic(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, 
 #ifdef ALOPENCL_MAC
     if (w > 10 && h>10)
     {
-        
         auto run = [=](cl_context context, cl_command_queue queue)
         {
             cl_int errorcode;
