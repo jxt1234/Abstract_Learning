@@ -29,7 +29,7 @@ ALPCABasic::ALPCABasic(const ALFloatMatrix* XT, ALFLOAT rate)
     }
     select = select + 1;
     /*Transpose the vector inorder to improve speed*/
-    mTransform = ALFloatMatrix::create(n, select);
+    mTransform = ALFloatMatrix::transpose(vector.get());
     for (int i=0; i<n; ++i)
     {
         for (int j=0; j<select; ++j)
