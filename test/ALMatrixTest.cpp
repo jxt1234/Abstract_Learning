@@ -16,6 +16,7 @@ class ALMatrixTest:public GPTest
             ALSp<ALFloatMatrix> XM = ALFloatMatrix::create(w, h);
             ALSp<ALFloatMatrix> VEC = ALFloatMatrix::create(w, 1);
             ALSp<ALFloatMatrix> XFunc = ALFloatMatrix::create(w, h);
+            ALSp<ALFloatMatrix> XFunc_dot_X = ALFloatMatrix::create(w, h);
             for (int i=0; i<h; ++i)
             {
                 ALFLOAT* x = X->vGetAddr(i);
@@ -42,6 +43,7 @@ class ALMatrixTest:public GPTest
                 }
             };
             ALFloatMatrix::runLineFunction(XFunc.get(), X.get(), function);
+            ALFloatMatrix::productDot(XFunc_dot_X.get(), X.get(), XFunc.get());
             
             
             ofstream out("output/ALMatrixTest.txt");
@@ -53,6 +55,8 @@ class ALMatrixTest:public GPTest
             ALFloatMatrix::print(X_2ADDV_3.get(), out);
             out << "sin(X):\n";
             ALFloatMatrix::print(XFunc.get(), out);
+            out << "Xsin(X):\n";
+            ALFloatMatrix::print(XFunc_dot_X.get(), out);
             
             out << "Virtual Matrix\n";
             {

@@ -1,0 +1,38 @@
+{
+    "name": "LeNet",
+    "train-batch":64,
+    "iteration":500,
+    "layers":[
+        {
+            "type": "Convolution",
+            "input": 784,
+            "output":1152,
+            "input_3D":[28, 28, 1],
+            "kernelSize":5,
+            "stride":1,
+            "kernelNumber":2
+        },
+        {
+            "type":"MaxPool",
+            "input":1152,
+            "output":288,
+            "input_3D":[24,24,2],
+            "stride":2
+        },
+        {
+            "type": "InnerProduct",
+            "input":288,
+            "output":10
+        },
+        {
+            "type": "ReLU",
+            "input":10,
+            "output":10
+        },
+        {
+            "type":"SoftMax",
+            "input":10,
+            "output":10
+        }
+    ]
+}
