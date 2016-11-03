@@ -1,6 +1,6 @@
 #include "ALRefMatrix.h"
 
-ALRefMatrix::ALRefMatrix(ALFLOAT* base, size_t w, size_t h):ALFloatMatrix(w, h)
+ALRefMatrix::ALRefMatrix(ALFLOAT* base, size_t w, size_t h):ALFloatMatrix(w, h, w)
 {
     mBase = base;
 }

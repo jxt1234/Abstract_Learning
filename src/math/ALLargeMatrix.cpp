@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "ALLargeMatrix.h"
 
-ALLargeMatrix::ALLargeMatrix(ALSp<ALFloatMatrix> m):ALFloatMatrix(m->width(), m->height())
+ALLargeMatrix::ALLargeMatrix(ALSp<ALFloatMatrix> m):ALFloatMatrix(m->width(), m->height(), 0)
 {
     mMatrixs.push_back(m);
     mOffsets.push_back(m->height());

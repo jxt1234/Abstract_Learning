@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <iostream>
+#include <math.h>
 using namespace std;
 class ALMatrixTest:public GPTest
 {
@@ -13,23 +14,46 @@ class ALMatrixTest:public GPTest
             int w = 7, h=4;
             ALSp<ALFloatMatrix> X = ALFloatMatrix::create(w,h);
             ALSp<ALFloatMatrix> XM = ALFloatMatrix::create(w, h);
-            ALFLOAT* x = X->vGetAddr();
-            auto rX = X->width();
-            ALFLOAT* xm = XM->vGetAddr();
-            auto rXM = XM->width();
+            ALSp<ALFloatMatrix> VEC = ALFloatMatrix::create(w, 1);
+            ALSp<ALFloatMatrix> XFunc = ALFloatMatrix::create(w, h);
             for (int i=0; i<h; ++i)
             {
+                ALFLOAT* x = X->vGetAddr(i);
+                ALFLOAT* xm = XM->vGetAddr(i);
                 for (int j=0; j<w; ++j)
                 {
-                    *(x+rX*i+j) = rand()%1000/103.1;
-                    *(xm+rXM*i+j) = rand()%1000/103.34;
+                    *(x+j) = rand()%1000/103.1;
+                    *(xm+j) = rand()%1000/103.34;
                 }
             }
-            
+            auto VEC_v = VEC->vGetAddr();
+            for (int i=0; i<w; ++i)
+            {
+                VEC_v[i] = rand()%1000/300.24;
+            }
+            ALSp<ALFloatMatrix> X_2ADDV_3 = ALFloatMatrix::create(w, h);
+            ALFloatMatrix::linearVector(X_2ADDV_3.get(), X.get(), 2.0, VEC.get(), 3.0);
             ALSp<ALFloatMatrix> Y = ALFloatMatrix::transpose(X.get());
+            
+            auto function = [](ALFLOAT* dst, ALFLOAT* src, size_t w){
+                for (size_t i=0; i<w; ++i)
+                {
+                    dst[i] = ::sin(src[i]);
+                }
+            };
+            ALFloatMatrix::runLineFunction(XFunc.get(), X.get(), function);
+            
+            
             ofstream out("output/ALMatrixTest.txt");
             out << "X:\n";
             ALFloatMatrix::print(X.get(), out);
+            out << "VEC:\n";
+            ALFloatMatrix::print(VEC.get(), out);
+            out << "X_2ADDV_3:\n";
+            ALFloatMatrix::print(X_2ADDV_3.get(), out);
+            out << "sin(X):\n";
+            ALFloatMatrix::print(XFunc.get(), out);
+            
             out << "Virtual Matrix\n";
             {
                 int l = w/4;
@@ -70,7 +94,7 @@ class ALMatrixTest:public GPTest
             ALFloatMatrix::print(X.get(), out);
 
             X = ALFloatMatrix::create(10, 1);
-            x = X->vGetAddr();
+            auto x = X->vGetAddr();
             for (int i=0; i<10; ++i)
             {
                 x[i] = i*10+1;

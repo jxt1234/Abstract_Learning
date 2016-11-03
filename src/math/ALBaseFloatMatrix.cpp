@@ -1,6 +1,6 @@
 #include "ALBaseFloatMatrix.h"
 int ALBaseFloatMatrix::gNum = 0;
-ALBaseFloatMatrix::ALBaseFloatMatrix(size_t w, size_t h):ALFloatMatrix(w, h)
+ALBaseFloatMatrix::ALBaseFloatMatrix(size_t w, size_t h):ALFloatMatrix(w, h, w)
 {
     ALASSERT(w>0 && h>0);
     size_t size = w*h;

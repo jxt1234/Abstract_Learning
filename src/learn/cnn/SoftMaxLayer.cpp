@@ -131,8 +131,6 @@ namespace ALCNN {
         ALASSERT(before->width() == parameters->width()-1);
         ALASSERT(after_diff->width() == parameters->height());
         ALFloatMatrix::zero(before_diff);
-        
-        
         ALSp<ALFloatMatrix> YThetaDot = ALFloatMatrix::product(after, parameters);
         for (int z = 0; z<batchSize; ++z)
         {

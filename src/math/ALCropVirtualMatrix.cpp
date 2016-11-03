@@ -7,7 +7,7 @@
 //
 
 #include "ALCropVirtualMatrix.h"
-ALCropVirtualMatrix::ALCropVirtualMatrix(const ALFloatMatrix* basic, size_t l, size_t t, size_t r, size_t b):ALFloatMatrix(r-l+1, b-t+1)
+ALCropVirtualMatrix::ALCropVirtualMatrix(const ALFloatMatrix* basic, size_t l, size_t t, size_t r, size_t b):ALFloatMatrix(r-l+1, b-t+1, basic->stride())
 {
     mL = l;
     mT = t;

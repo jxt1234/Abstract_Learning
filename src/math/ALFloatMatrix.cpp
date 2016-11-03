@@ -138,7 +138,7 @@ void ALFloatMatrix::productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALF
     auto w = BT->height();
     auto h = A->height();
     auto l = A->width();
-    productBasicT(C->vGetAddr(), C->width(), A->vGetAddr(), A->width(), BT->vGetAddr(), BT->width(), w, h, l);
+    productBasicT(C->vGetAddr(), C->stride(), A->vGetAddr(), A->stride(), BT->vGetAddr(), BT->stride(), w, h, l);
 }
 
 void ALFloatMatrix::productTA(ALFloatMatrix* C, const ALFloatMatrix* AT, const ALFloatMatrix* B)
@@ -221,9 +221,9 @@ void ALFloatMatrix::product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFl
     ALASSERT(A->width() == B->height());
     ALASSERT(C->width() == B->width());
     ALASSERT(C->height() == A->height());
-    auto rA = A->width();
-    auto rB = B->width();
-    auto rC = C->width();
+    auto rA = A->stride();
+    auto rB = B->stride();
+    auto rC = C->stride();
     ALFLOAT* a = A->vGetAddr();
     ALFLOAT* b = B->vGetAddr();
     ALFLOAT* c = C->vGetAddr();
@@ -268,6 +268,9 @@ ALFloatMatrix* ALFloatMatrix::HAH(const ALFloatMatrix* A, const ALFloatMatrix* H
 }
 void ALFloatMatrix::productBasicT(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, size_t a_stride, const ALFLOAT* b, size_t b_stride, size_t w, size_t h, size_t l)
 {
+    ALASSERT(a_stride!=0);
+    ALASSERT(b_stride!=0);
+    ALASSERT(c_stride!=0);
 #ifdef ALOPENCL_MAC
     if (w > 10 && h>10)
     {
@@ -341,6 +344,9 @@ void ALFloatMatrix::productBasicT(ALFLOAT* c, size_t c_stride, const ALFLOAT* a,
 }
 void ALFloatMatrix::productBasic(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, size_t a_stride, const ALFLOAT* b, size_t b_stride, size_t w, size_t h, size_t l)
 {
+    ALASSERT(c_stride!=0);
+    ALASSERT(b_stride!=0);
+    ALASSERT(a_stride!=0);
 #ifdef ALBLAS
     const CBLAS_ORDER Order=CblasRowMajor;
     const CBLAS_TRANSPOSE TransA=CblasNoTrans;
@@ -534,6 +540,7 @@ ALFLOAT ALFloatMatrix::inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst)
 
 ALFloatMatrix* ALFloatMatrix::transpose(const ALFloatMatrix* A)
 {
+    ALAUTOTIME;
     ALASSERT(NULL!=A);
     ALASSERT(A->width() > 0 && A->height() > 0);
     auto w = A->width();
@@ -1185,4 +1192,63 @@ void ALFloatMatrix::typeExpand(ALFloatMatrix* Y_Expand/*Output*/, const ALFloatM
         size_t pos = y[i];
         y_e[pos] = 1.0;
     }
+}
+
+void ALFloatMatrix::linearVector(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b)
+{
+    ALASSERT(C->width() == A->width());
+    ALASSERT(C->width() == B->width());
+    ALASSERT(B->height() == 1);
+    ALASSERT(C->height() == A->height());
+    auto bv = B->vGetAddr();
+    auto w = C->width();
+    auto h = A->height();
+    for (size_t i=0; i<h; ++i)
+    {
+        auto dst = C->vGetAddr(i);
+        auto av = A->vGetAddr(i);
+        for (size_t j=0; j<w; ++j)
+        {
+            dst[j] = av[j]*a + bv[j]*b;
+        }
+    }
+}
+
+void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
+{
+    ALASSERT(NULL!=src);
+    ALASSERT(NULL!=dst);
+    ALASSERT(dst->height() == src->height());
+    ALASSERT(dst->width() == src->width());//TODO
+    auto w = src->width();
+    auto h = src->height();
+    for (size_t y=0; y<h; ++y)
+    {
+        auto _dst = dst->vGetAddr(y);
+        auto _src = src->vGetAddr(y);
+        function(_dst, _src, w);
+    }
+}
+void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
+{
+    ALASSERT(NULL!=C);
+    ALASSERT(NULL!=B);
+    ALASSERT(NULL!=A);
+    ALASSERT(C->width() == A->width());
+    ALASSERT(C->width() == B->width());
+    ALASSERT(C->height() == A->height());
+    ALASSERT(C->height() == B->height());
+    auto w = A->width();
+    auto h = A->height();
+    for (size_t y=0; y<h; ++y)
+    {
+        auto c = C->vGetAddr(y);
+        auto b = B->vGetAddr(y);
+        auto a = A->vGetAddr(y);
+        for (size_t x=0; x<w; ++x)
+        {
+            c[x] = b[x]*a[x];
+        }
+    }
+
 }

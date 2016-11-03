@@ -1,6 +1,7 @@
 #ifndef INCLUDE_CORE_ALFLOATMATRIX_H
 #define INCLUDE_CORE_ALFLOATMATRIX_H
 #include "ALHead.h"
+#include <functional>
 #include <ostream>
 /*Must assume the memory is continuous in row*/
 class ALFloatMatrix:public ALRefCount
@@ -8,6 +9,9 @@ class ALFloatMatrix:public ALRefCount
 public:
     inline size_t width() const {return mWidth;}
     inline size_t height() const {return mHeight;}
+    
+    /*stride is 0, means the matrix is not continues*/
+    inline size_t stride() const {return mStride;}
     virtual ALFLOAT* vGetAddr(size_t y=0) const = 0;
     
     /*Functional API, Don't change inputs*/
@@ -17,6 +21,9 @@ public:
     static ALFloatMatrix* createIdentity(size_t n);
     static ALFloatMatrix* createDiag(const ALFloatMatrix* X);
     static ALFloatMatrix* linear(const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b);
+    
+    
+    
     static ALFloatMatrix* product(const ALFloatMatrix* A, const ALFloatMatrix* B);
     static ALFloatMatrix* productSS(const ALFloatMatrix* A, const ALFloatMatrix* B);//For AT=A and BT=B
     static ALFloatMatrix* productT(const ALFloatMatrix* A, const ALFloatMatrix* BT);
@@ -64,6 +71,10 @@ public:
     /*x[i][j] = a*x[i][j]+b*/
     static void linearDirect(ALFloatMatrix* X, ALFLOAT a, ALFLOAT b);
     
+    /*The B is a Vector*/
+    static void linearVector(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b);
+
+    
     static void print(const ALFloatMatrix* A, std::ostream& os/*Output*/);
     static ALFLOAT inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst);
     
@@ -86,6 +97,8 @@ public:
     /*w, h is the size of src */
     static void transposeBasic(const ALFLOAT* src, size_t src_stride, ALFLOAT* dst, size_t dst_stride, size_t w, size_t h);
     
+    /*Run function from src to dst, function args: (dstLine, srcLine, lineWidth)*/
+    static void runLineFunction(ALFloatMatrix* dst, ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function);
     
     /*For Discrete Matrix*/
     static ALFloatMatrix* genTypes(const ALFloatMatrix* Y);
@@ -96,12 +109,15 @@ public:
     /*Turn classify sign to vector*/
     static void typeExpand(ALFloatMatrix* Y_Expand/*Output*/, const ALFloatMatrix* YT/*Input*/);
 
+    /*c(i,j)=a(i,j)*b(i,j)*/
+    static void productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     
 protected:
-    ALFloatMatrix(size_t w, size_t h):mWidth(w), mHeight(h){}
+    ALFloatMatrix(size_t w, size_t h, size_t stride):mWidth(w), mHeight(h), mStride(stride){}
     virtual ~ALFloatMatrix(){}
     size_t mWidth;
     size_t mHeight;
+    size_t mStride;
 };
 
 #endif

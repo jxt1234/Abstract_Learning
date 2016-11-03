@@ -1,6 +1,6 @@
 #include "ALIndexVirtualMatrix.h"
 #include <string.h>
-ALIndexVirtualMatrix::ALIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h, bool copy):ALFloatMatrix(w,h)
+ALIndexVirtualMatrix::ALIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h, bool copy):ALFloatMatrix(w,h, 0)
 {
     ALASSERT(h>0);
     ALASSERT(w>0);

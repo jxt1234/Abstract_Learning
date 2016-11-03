@@ -20,8 +20,7 @@ public:
     
 private:
     ALUCharMatrix(size_t w, size_t h);
-    
-    
+
     unsigned char* mContents;
     unsigned char* mMaxNumbers;
     size_t mWidth;
