@@ -123,7 +123,6 @@ namespace ALCNN {
         ALLEARNAUTOTIME;
         WeightMatrix weight(parameters, mInputWidth, mOutputWidth);
         WeightMatrix weightDiff(parameters_diff, mInputWidth, mOutputWidth);
-        
         if (NULL!=before_diff)
         {
         }

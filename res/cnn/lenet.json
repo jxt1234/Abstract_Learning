@@ -46,13 +46,8 @@
             "output":500
         },
         {
-            "type": "InnerProduct",
-            "input":500,
-            "output":10
-        },
-        {
             "type":"SoftMax",
-            "input":10,
+            "input":500,
             "output":10
         }
     ]
