@@ -6,7 +6,7 @@ class MultiClass:public ALSVM::Reportor
 public:
     MultiClass(const std::map<std::string, std::string>& heads);
     virtual ~MultiClass();
-    virtual void vHandle(ALFloatMatrix* Y, ALFloatMatrix* kvalue, ALFloatMatrix* coe) const;
+    virtual void vHandle(ALFloatMatrix* Y, ALFloatMatrix* kvalue, ALFloatMatrix* coe) const override;
     virtual std::map<std::string, std::string> vPrint() const override;
 private:
     int _planes() const{return mNrClass*(mNrClass-1)/2;}

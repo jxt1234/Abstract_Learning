@@ -1,7 +1,7 @@
 #include "utils/ALDebug.h"
-#include <execinfo.h>
 #include <stdio.h>
 #ifndef BUILD_FOR_ANDROID
+#include <execinfo.h>
 void al_dump_stack()
 {
     void* callstack[128];
@@ -11,5 +11,9 @@ void al_dump_stack()
         printf("%s\n", strs[i]);
     }
     free(strs);
+}
+#else
+void al_dump_stack()
+{
 }
 #endif

@@ -11,8 +11,7 @@ void ALIExpander::expandXY(const ALIExpander* Xe, const ALLabeldData* data, ALSp
     auto l = Xe->vLength();
     /*measure, compute valid datas*/
     {
-        ALSp<ALFloatMatrix> _X = ALFloatMatrix::create(l, 1);
-        ALFLOAT* _x = _X->vGetAddr();
+        ALAUTOSTORAGE(_x, ALFLOAT, l);
         for (auto iter : datalist)
         {
             auto dp = iter.second;
