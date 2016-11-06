@@ -9,11 +9,8 @@ namespace ALCNN {
         MeanPoolLayer(int stride, int width, int height, int depth);
         virtual ~ MeanPoolLayer();
         
-        virtual ALFloatMatrix* vInitParameters() const override {return NULL;}
-        virtual ALFloatMatrix* vInitOutput(int batchSize) const override;
-        virtual bool vCheckInput(const ALFloatMatrix* input) const override;
-        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const override;
-        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const override;
+        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const override;
+        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const override;
     private:
         int mStride;
         ALIMatrix4DOp::Matrix4D mInput;

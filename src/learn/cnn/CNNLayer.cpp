@@ -1,7 +1,18 @@
 #include "CNNLayer.h"
 #include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
-    CNNLayer::CNNLayer(int inputSize, int inputChannel, int kernelSize, int kernelNumber, int stride)
+    static size_t _computeSize(int size, int channel)
+    {
+        return size*size*channel;
+    }
+
+    static size_t _computeOutput(int size, int kernelSize, int kernelNumber, int stride)
+    {
+        int outputSize = (size - kernelSize)/stride + 1;
+        return outputSize*outputSize*kernelNumber;
+    }
+
+    CNNLayer::CNNLayer(int inputSize, int inputChannel, int kernelSize, int kernelNumber, int stride):ILayer(_computeSize(inputSize, inputChannel), _computeOutput(inputSize, kernelSize, kernelNumber, stride), inputChannel*kernelSize*kernelSize+1, kernelNumber, 0, 0)
     {
         ALASSERT(inputSize>=kernelSize);
         ALASSERT(kernelSize>=1);
@@ -34,25 +45,7 @@ namespace ALCNN {
     {
         
     }
-    
-    ALFloatMatrix* CNNLayer::vInitParameters() const
-    {
-        auto w = mKernelInfo.iWidth*mKernelInfo.iHeight*mKernelInfo.iDepth+mKernelInfo.iExpand;
-        auto h = mFilterNumber;
-        return ALFloatMatrix::create(w, h);
-    }
-    
-    ALFloatMatrix* CNNLayer::vInitOutput(int batchSize) const
-    {
-        ALASSERT(batchSize>=1);
-        return ALFloatMatrix::create(mOutputInfo.getTotalWidth(), batchSize);
-    }
-    bool CNNLayer::vCheckInput(const ALFloatMatrix* input) const
-    {
-        ALASSERT(NULL!=input);
-        return input->width() == mInputInfo.getTotalWidth();
-    }
-    void CNNLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
+    void CNNLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALIMatrix4DOp::Matrix4D output = mOutputInfo;
@@ -66,7 +59,7 @@ namespace ALCNN {
         
         mMatrixOp->vFilter(output, input, kernel, mStride);
     }
-    void CNNLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void CNNLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALIMatrix4DOp::Matrix4D output_diff = mOutputInfo;

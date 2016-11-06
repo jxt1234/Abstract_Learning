@@ -22,10 +22,11 @@ namespace ALCNN {
         return mProbability.get();
     }
     
-    CNNPredictor::CNNPredictor(ALSp<LayerWrap> net, ALSp<ALFloatMatrix> prob)
+    CNNPredictor::CNNPredictor(ALSp<LayerWrap> net, ALSp<ALFloatMatrix> prob, ALSp<ALFloatMatrix> parameters)
     {
         mNet = net;
         mProbability = prob;
+        mParameters = parameters;
     }
     CNNPredictor::~ CNNPredictor()
     {

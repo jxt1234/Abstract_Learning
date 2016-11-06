@@ -15,17 +15,12 @@ namespace ALCNN {
     class InnerProductLayer : public ILayer
     {
     public:
-        virtual ALFloatMatrix* vInitParameters() const override;
-        virtual ALFloatMatrix* vInitOutput(int batchSize) const override;
-        virtual bool vCheckInput(const ALFloatMatrix* input) const override;
-        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const override;
-        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const override;
+        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const override;
+        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const override;
         
         virtual ~ InnerProductLayer(){}
-        InnerProductLayer(size_t inputSize, size_t outputSize):mInputSize(inputSize), mOutputSize(outputSize){}
-    private:
-        size_t mInputSize;
-        size_t mOutputSize;
+        //TODO Add basis
+        InnerProductLayer(size_t iw, size_t ow):ILayer(iw, ow, ow, iw, 0, 0){}
     };
     
 }

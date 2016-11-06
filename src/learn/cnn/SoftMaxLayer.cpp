@@ -4,21 +4,14 @@
 #include <fstream>
 #include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
-    SoftMaxLayer::SoftMaxLayer(int inputSize, int outputSize)
+    SoftMaxLayer::SoftMaxLayer(int inputSize, int outputSize):ILayer(inputSize, outputSize, inputSize+1,outputSize, 0, 0)
     {
         ALASSERT(outputSize>=1);
         ALASSERT(inputSize>=1);
-        mOutputSize = outputSize;
-        mInputSize = inputSize;
     }
     SoftMaxLayer::~SoftMaxLayer()
     {
     }
-    ALFloatMatrix* SoftMaxLayer::vInitParameters() const
-    {
-        return ALFloatMatrix::create(mInputSize+1, mOutputSize);
-    }
-    
     static ALFloatMatrix* enlarge(const ALFloatMatrix* origin)
     {
         ALFloatMatrix* newM = ALFloatMatrix::create(origin->width()+1, origin->height());
@@ -32,22 +25,12 @@ namespace ALCNN {
         return newM;
     }
     
-    ALFloatMatrix* SoftMaxLayer::vInitOutput(int batchSize) const
-    {
-        return ALFloatMatrix::create(mOutputSize, batchSize);
-    }
-    bool SoftMaxLayer::vCheckInput(const ALFloatMatrix* input) const
-    {
-        return input->width() == mInputSize;
-    }
-    void SoftMaxLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
+    void SoftMaxLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=before);
         ALASSERT(NULL!=after);
         ALASSERT(NULL!=parameters);
-        ALASSERT(before->width() == mInputSize);
-        ALASSERT(after->width() == mOutputSize);
         ALASSERT(before->height() == after->height());
         ALSp<ALFloatMatrix> X = enlarge(before);
         ALSp<ALFloatMatrix> dot = ALFloatMatrix::productT(X.get(), parameters);
@@ -91,7 +74,7 @@ namespace ALCNN {
             }
         }
     }
-    void SoftMaxLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void SoftMaxLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=after);

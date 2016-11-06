@@ -9,28 +9,12 @@
 #include "InnerProductLayer.hpp"
 #include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
-    //TODO Add basis
-    ALFloatMatrix* InnerProductLayer::vInitParameters() const
-    {
-        return ALFloatMatrix::create(mOutputSize, mInputSize);
-    }
-    
-    ALFloatMatrix* InnerProductLayer::vInitOutput(int batchSize) const
-    {
-        ALASSERT(batchSize>=1);
-        return ALFloatMatrix::create(mOutputSize, batchSize);
-    }
-    bool InnerProductLayer::vCheckInput(const ALFloatMatrix* input) const
-    {
-        ALASSERT(NULL!=input);
-        return input->width() == mInputSize;
-    }
-    void InnerProductLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
+    void InnerProductLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALFloatMatrix::product(after, before, parameters);
     }
-    void InnerProductLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void InnerProductLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         //ALSp<ALFloatMatrix> after_diff_T = ALFloatMatrix::transpose(after_diff);

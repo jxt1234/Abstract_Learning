@@ -136,9 +136,9 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     /*Init parameters randomly*/
     mDetFunction->vInitParameters(coefficient.get());
     mGDMethod->vOptimize(coefficient.get(), Merge.get(), mDetFunction.get(), 0.35, mIteration);
-    mLayerPredict->pFirstLayer->setParameters(coefficient.get(), 0);
+    mLayerPredict->pFirstLayer->mapParameters(coefficient.get(), 0);
     
-    return new CNNPredictor(mLayerPredict->pFirstLayer, prop);
+    return new CNNPredictor(mLayerPredict->pFirstLayer, prop, coefficient);
 }
 ALGradientMethod* ALCNNLearner::getGDMethod() const
 {
@@ -155,6 +155,8 @@ ALIMatrixPredictor* ALCNNLearner::load(const ALFloatMatrix* P)
 {
     ALASSERT(NULL!=P);
     ALASSERT(1==P->height());
-    mLayerPredict->pFirstLayer->setParameters(P, 0);
-    return new CNNPredictor(mLayerPredict->pFirstLayer, mProp);
+    ALSp<ALFloatMatrix> parameters = ALFloatMatrix::create(P->width(), 1);
+    ALFloatMatrix::copy(parameters.get(), P);
+    mLayerPredict->pFirstLayer->mapParameters(parameters.get(), 0);
+    return new CNNPredictor(mLayerPredict->pFirstLayer, mProp, parameters);
 }

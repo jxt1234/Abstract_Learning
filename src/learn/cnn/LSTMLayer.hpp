@@ -15,20 +15,13 @@ namespace ALCNN {
     class LSTMLayer : public ILayer
     {
     public:
-        virtual ALFloatMatrix* vInitParameters() const override;
-        virtual ALFloatMatrix* vInitOutput(int batchSize) const override;
-        virtual bool vCheckInput(const ALFloatMatrix* input) const override;
-        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const override;
-        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const override;
+        virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const override;
+        virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const override;
         
-        LSTMLayer(size_t iw, size_t ow, size_t t):mInputWidth(iw),mOutputWidth(ow),mTime(t){}
+        LSTMLayer(size_t iw, size_t ow, size_t t);
         virtual ~ LSTMLayer(){}
         
     private:
-        size_t _computeParamterSize() const;
-        
-        size_t mInputWidth;
-        size_t mOutputWidth;
         size_t mTime;
     };
 };

@@ -9,11 +9,10 @@ namespace ALCNN {
     public:
         LayerWrap(ALSp<ILayer> layer);
         virtual ~ LayerWrap();
-        int getParameterSize() const;
-        void setParameters(const ALFloatMatrix* p, int offset);
-        void readParametersDiff(const ALFloatMatrix* p, int offset);
+        size_t getParameterSize() const;
+        void mapParameters(const ALFloatMatrix* p, size_t offset);
+        void mapParametersDiff(const ALFloatMatrix* p, size_t offset);
         
-        void resetBatchSize(int batchSize);
         
         void connectInput(LayerWrap* input);
         void connectOutput(ALSp<LayerWrap> output);
@@ -33,8 +32,8 @@ namespace ALCNN {
         
         ALSp<ALFloatMatrix> mParameters;
         ALSp<ALFloatMatrix> mParameterDiff;
-        
         ALSp<ALFloatMatrix> mOutput;
+        
         ALSp<ALFloatMatrix> mInput;
         
         std::ostream* mForwardDump = NULL;

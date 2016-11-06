@@ -3,7 +3,7 @@
 #include "LayerFactoryRegistor.hpp"
 
 namespace ALCNN {
-    MeanPoolLayer::MeanPoolLayer(int stride, int width, int height, int depth)
+    MeanPoolLayer::MeanPoolLayer(int stride, int width, int height, int depth):ILayer(width*height*depth, width*height*depth/stride/stride, 0, 0, 0, 0)
     {
         ALASSERT(stride>=2);
         ALASSERT(width>0);
@@ -26,16 +26,7 @@ namespace ALCNN {
     {
     }
     
-    ALFloatMatrix* MeanPoolLayer::vInitOutput(int batchSize) const
-    {
-        ALASSERT(batchSize>0);
-        return ALFloatMatrix::create(mOutput.getTotalWidth(), batchSize);
-    }
-    bool MeanPoolLayer::vCheckInput(const ALFloatMatrix* input) const
-    {
-        return mInput.getTotalWidth() == input->width();
-    }
-    void MeanPoolLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
+    void MeanPoolLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=after);
@@ -76,7 +67,7 @@ namespace ALCNN {
             }
         }
     }
-    void MeanPoolLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void MeanPoolLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=after_diff);

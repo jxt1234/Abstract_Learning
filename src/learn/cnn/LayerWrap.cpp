@@ -3,8 +3,6 @@ namespace ALCNN {
     LayerWrap::LayerWrap(ALSp<ILayer> layer)
     {
         mLayer = layer;
-        mParameters = layer->vInitParameters();
-        mParameterDiff = layer->vInitParameters();
         mBefore = NULL;
         mNext = NULL;
     }
@@ -13,90 +11,57 @@ namespace ALCNN {
     {
     }
     
-    void LayerWrap::resetBatchSize(int batchSize)
+    size_t LayerWrap::getParameterSize() const
     {
-    }
-    
-    int LayerWrap::getParameterSize() const
-    {
-        int size = 0;
-        if (mParameters.get() != NULL)
+        auto info = mLayer->getInfo();
+        if (NULL == mNext.get())
         {
-            size = (int)(mParameters->width()*mParameters->height());
+            return info.pw*info.ph;
         }
-        if (NULL!=mNext.get())
-        {
-            return size + mNext->getParameterSize();
-        }
-        return size;
+        return info.pw*info.ph+mNext->getParameterSize();
     }
 
     
-    void LayerWrap::setParameters(const ALFloatMatrix* p, int offset)
+    void LayerWrap::mapParameters(const ALFloatMatrix* p, size_t offset)
     {
         ALASSERT(NULL!=p);
         ALASSERT(offset <= p->width());
-        int currentOffset = 0;
-        do
-        {
-            if (NULL == mParameters.get())
-            {
-                break;
-            }
-            ALASSERT(offset>=0);
-            auto p_cur = p->vGetAddr()+offset;
-            int cur = 0;
-            for (int i=0; i<mParameters->height(); ++i)
-            {
-                auto p_dst = mParameters->vGetAddr(i);
-                for (int j=0; j<mParameters->width(); ++j)
-                {
-                    p_dst[j] = p_cur[cur++];
-                }
-            }
-            currentOffset = (int)(mParameters->width()*mParameters->height());
-        } while(0);
+        ALASSERT(offset>=0);
+        auto p_cur = p->vGetAddr()+offset;
+        auto info = mLayer->getInfo();
+        int cur = 0;
+        mParameters = ALFloatMatrix::createRefMatrix(p_cur, info.pw, info.ph);
+        auto currentOffset = info.pw*info.ph;
         if (NULL != mNext.get())
         {
-            mNext->setParameters(p, offset+currentOffset);
+            mNext->mapParameters(p, offset+currentOffset);
         }
     }
-    void LayerWrap::readParametersDiff(const ALFloatMatrix* p, int offset)
+    void LayerWrap::mapParametersDiff(const ALFloatMatrix* p, size_t offset)
     {
         ALASSERT(NULL!=p);
         ALASSERT(offset <= p->width());
-        int currentOffset = 0;
-        do
-        {
-            if (NULL == mParameters.get())
-            {
-                break;
-            }
-            ALASSERT(offset>=0);
-            auto p_cur = p->vGetAddr()+offset;
-            int cur = 0;
-            for (int i=0; i<mParameterDiff->height(); ++i)
-            {
-                auto p_dst = mParameterDiff->vGetAddr(i);
-                for (int j=0; j<mParameterDiff->width(); ++j)
-                {
-                    p_cur[cur++] = p_dst[j];
-                }
-            }
-            currentOffset = (int)(mParameters->width()*mParameters->height());
-        } while(0);
+        ALASSERT(offset>=0);
+        auto p_cur = p->vGetAddr()+offset;
+        auto info = mLayer->getInfo();
+        int cur = 0;
+        mParameterDiff = ALFloatMatrix::createRefMatrix(p_cur, info.pw, info.ph);
+        auto currentOffset = info.pw*info.ph;
         if (NULL != mNext.get())
         {
-            mNext->readParametersDiff(p, offset+currentOffset);
+            mNext->mapParametersDiff(p, offset+currentOffset);
         }
     }
 
     ALSp<ALFloatMatrix> LayerWrap::forward(ALSp<ALFloatMatrix> input)
     {
-        ALASSERT(mLayer->vCheckInput(input.get()));
-        mOutput= mLayer->vInitOutput((int)input->height());
+        if (mOutput.get() == NULL || mOutput->height() != input->height())
+        {
+            mOutput = ALFloatMatrix::create(mLayer->getInfo().ow, input->height());
+        }
         mInput = input;
-        mLayer->vForward(input.get(), mOutput.get(), mParameters.get());
+        ALASSERT(NULL!=mOutput.get());
+        mLayer->vForward(input.get(), mOutput.get(), mParameters.get(), NULL);
         if (NULL != mForwardDump)
         {
             ALFloatMatrix::print(mOutput.get(), *mForwardDump);
@@ -116,12 +81,12 @@ namespace ALCNN {
         if (NULL!=mBefore)
         {
             ALSp<ALFloatMatrix> inputError = ALFloatMatrix::create(mInput->width(), mInput->height());
-            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get());
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get(), NULL);
             mBefore->backward(inputError);
         }
         else
         {
-            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), NULL, mParameterDiff.get());
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), NULL, mParameterDiff.get(), NULL);
         }
     }
 

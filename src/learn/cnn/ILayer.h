@@ -5,16 +5,27 @@ namespace ALCNN {
 class ILayer : public ALRefCount
 {
 public:
-    virtual ALFloatMatrix* vInitParameters() const = 0;
-    virtual ALFloatMatrix* vInitOutput(int batchSize) const = 0;
-    virtual bool vCheckInput(const ALFloatMatrix* input) const = 0;
-    virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const = 0;
-    virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const = 0;
+
+    virtual void vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const = 0;
+    virtual void vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const = 0;
 
     virtual ~ ILayer(){}
+
+    struct Info
+    {
+        size_t iw;//Input width
+        size_t ow;//Output width
+        size_t pw;//Parameter width
+        size_t ph;//Parameters height
+        size_t cw;//Cache width
+        size_t ch;//Cache height
+    };
     
+    const Info& getInfo() const {return mInfo;}
 protected:
-    ILayer(){}
+    ILayer(size_t iw, size_t ow, size_t pw, size_t ph, size_t cw, size_t ch);
+private:
+    Info mInfo;
 };
 }
 #endif

@@ -10,12 +10,13 @@ namespace ALCNN {
         virtual void vPredictProbability(const ALFloatMatrix* X, ALFloatMatrix* Y/*Output*/) const override;
         virtual const ALFloatMatrix* vGetPossiableValues() const override;
         
-        CNNPredictor(ALSp<LayerWrap> net, ALSp<ALFloatMatrix> prob);
+        CNNPredictor(ALSp<LayerWrap> net, ALSp<ALFloatMatrix> prob, ALSp<ALFloatMatrix> parameters);
         virtual ~ CNNPredictor();
 
     private:
         mutable ALSp<LayerWrap> mNet;
         ALSp<ALFloatMatrix> mProbability;
+        ALSp<ALFloatMatrix> mParameters;
 
     };
 }

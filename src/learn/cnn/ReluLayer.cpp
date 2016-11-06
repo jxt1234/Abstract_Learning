@@ -9,19 +9,7 @@
 #include "ReluLayer.hpp"
 #include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
-    ALFloatMatrix* ReluLayer::vInitParameters() const
-    {
-        return NULL;
-    }
-    ALFloatMatrix* ReluLayer::vInitOutput(int batchSize) const
-    {
-        return ALFloatMatrix::create(mInputWidth, batchSize);
-    }
-    bool ReluLayer::vCheckInput(const ALFloatMatrix* input) const
-    {
-        return input->width() == mInputWidth;
-    }
-    void ReluLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters) const
+    void ReluLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
         ALASSERT(NULL!=before);
         ALASSERT(NULL!=after);
@@ -43,7 +31,7 @@ namespace ALCNN {
             }
         }
     }
-    void ReluLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff) const
+    void ReluLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALASSERT(NULL!=before);
         ALASSERT(NULL!=after);
