@@ -31,6 +31,9 @@ public:
     
     /*If element is NAN, set as c*/
     static void checkAndSet(ALFloatMatrix* X, ALFLOAT c);
+    
+    //Set all element as c
+    static void set(ALFloatMatrix* X, ALFLOAT c);
 
     static void product(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     static void productT(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* BT);
@@ -99,7 +102,10 @@ public:
     static void transposeBasic(const ALFLOAT* src, size_t src_stride, ALFLOAT* dst, size_t dst_stride, size_t w, size_t h);
     
     /*Run function from src to dst, function args: (dstLine, srcLine, lineWidth)*/
-    static void runLineFunction(ALFloatMatrix* dst, ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function);
+    static void runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function);
+
+    /*dst is one line, src's each line is reduced to dst*/
+    static void runReduceFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function);
     
     /*For Discrete Matrix*/
     static ALFloatMatrix* genTypes(const ALFloatMatrix* Y);
@@ -112,6 +118,9 @@ public:
 
     /*c(i,j)=a(i,j)*b(i,j)*/
     static void productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
+
+    /*c(i,j)=a(i,j)/b(i,j)*/
+    static void productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     
 protected:
     ALFloatMatrix(size_t w, size_t h, size_t stride):mWidth(w), mHeight(h), mStride(stride){}

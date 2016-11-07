@@ -148,7 +148,7 @@ ALGradientMethod* ALCNNLearner::getGDMethod() const
     result->alpha = 0.35;
     result->iteration = mIteration;
     result->type = ALGradientMethod::CLASSIFY;
-    result->typeNumber = mProp->width();
+    result->typeNumber = (int)mProp->width();
     return result;
 }
 ALIMatrixPredictor* ALCNNLearner::load(const ALFloatMatrix* P)

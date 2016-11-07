@@ -28,6 +28,6 @@ namespace ALCNN {
     static auto gCreateFunction = [](const LayerParameters& p) {
         return new InnerProductLayer(p.uInputSize, p.uOutputSize);
     };
-    
+
     static LayerFactoryRegister __reg(gCreateFunction, "InnerProduct");
 }

@@ -437,6 +437,7 @@ ALFLOAT ALFloatMatrix::inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst)
 {
     ALASSERT(NULL!=A);
     ALASSERT(NULL!=dst);
+    ALASSERT(A->stride()!=0 && dst->stride() != 0);
     ALASSERT(A->width() > 0 && A->height() > 0);
     ALFLOAT det = 1.0;
     auto w = A->width();
@@ -451,8 +452,8 @@ ALFLOAT ALFloatMatrix::inverse_basic(const ALFloatMatrix* A, ALFloatMatrix* dst)
     ALAutoStorage<ALFLOAT> _c_r(w);
     ALFLOAT* c_r = _c_r.get();
     ALFLOAT* _a = (ALFLOAT*)A->vGetAddr();
-    auto rA = A->width();
-    auto rC = result->width();
+    auto rA = A->stride();
+    auto rC = result->stride();
     ALFLOAT* c = result->vGetAddr();
     for (int i=0; i<w; ++i)
     {
@@ -1214,7 +1215,7 @@ void ALFloatMatrix::linearVector(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLO
     }
 }
 
-void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
+void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
 {
     ALASSERT(NULL!=src);
     ALASSERT(NULL!=dst);
@@ -1251,4 +1252,56 @@ void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const A
         }
     }
 
+}
+void ALFloatMatrix::productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
+{
+    ALASSERT(NULL!=C);
+    ALASSERT(NULL!=B);
+    ALASSERT(NULL!=A);
+    ALASSERT(C->width() == A->width());
+    ALASSERT(C->width() == B->width());
+    ALASSERT(C->height() == A->height());
+    ALASSERT(C->height() == B->height());
+    auto w = A->width();
+    auto h = A->height();
+    for (size_t y=0; y<h; ++y)
+    {
+        auto c = C->vGetAddr(y);
+        auto b = B->vGetAddr(y);
+        auto a = A->vGetAddr(y);
+        for (size_t x=0; x<w; ++x)
+        {
+            c[x] = a[x]/b[x];
+        }
+    }
+}
+
+void ALFloatMatrix::set(ALFloatMatrix* X, ALFLOAT c)
+{
+    ALASSERT(NULL!=X);
+    auto w = X->width();
+    auto h = X->height();
+    for (size_t i=0; i<h; ++i)
+    {
+        auto a = X->vGetAddr(i);
+        for (size_t j=0; j<w; ++j)
+        {
+            a[j] = c;
+        }
+    }
+}
+void ALFloatMatrix::runReduceFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
+{
+    ALASSERT(NULL!=src);
+    ALASSERT(NULL!=dst);
+    ALASSERT(dst->height()==1);
+    ALASSERT(dst->width() == src->width());//TODO
+    auto w = src->width();
+    auto h = src->height();
+    auto _dst = dst->vGetAddr();
+    for (size_t y=0; y<h; ++y)
+    {
+        auto _src = src->vGetAddr(y);
+        function(_dst, _src, w);
+    }
 }
