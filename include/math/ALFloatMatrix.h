@@ -9,6 +9,7 @@ class ALFloatMatrix:public ALRefCount
 public:
     inline size_t width() const {return mWidth;}
     inline size_t height() const {return mHeight;}
+    inline bool continues() const {return mWidth == mStride;}
     
     /*stride is 0, means the matrix is not continues*/
     inline size_t stride() const {return mStride;}

@@ -35,6 +35,8 @@ namespace ALCNN {
         ALSp<ALFloatMatrix> mOutput;
         
         ALSp<ALFloatMatrix> mInput;
+        ALSp<ALFloatMatrix> mCache;
+        size_t mCacheSize;
         
         std::ostream* mForwardDump = NULL;
     };

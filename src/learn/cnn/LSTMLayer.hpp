@@ -23,6 +23,8 @@ namespace ALCNN {
         
     private:
         size_t mTime;
+        size_t mInputSize;
+        size_t mOutputSize;
     };
 };
 #endif /* LSTMLayer_hpp */

@@ -2,9 +2,11 @@
 namespace ALCNN {
     LayerWrap::LayerWrap(ALSp<ILayer> layer)
     {
+        ALASSERT(layer.get()!=NULL);
         mLayer = layer;
         mBefore = NULL;
         mNext = NULL;
+        mCacheSize = layer->getInfo().cw * layer->getInfo().ch;
     }
     
     LayerWrap::~LayerWrap()
@@ -29,7 +31,6 @@ namespace ALCNN {
         ALASSERT(offset>=0);
         auto p_cur = p->vGetAddr()+offset;
         auto info = mLayer->getInfo();
-        int cur = 0;
         mParameters = ALFloatMatrix::createRefMatrix(p_cur, info.pw, info.ph);
         auto currentOffset = info.pw*info.ph;
         if (NULL != mNext.get())
@@ -44,7 +45,6 @@ namespace ALCNN {
         ALASSERT(offset>=0);
         auto p_cur = p->vGetAddr()+offset;
         auto info = mLayer->getInfo();
-        int cur = 0;
         mParameterDiff = ALFloatMatrix::createRefMatrix(p_cur, info.pw, info.ph);
         auto currentOffset = info.pw*info.ph;
         if (NULL != mNext.get())
@@ -55,13 +55,17 @@ namespace ALCNN {
 
     ALSp<ALFloatMatrix> LayerWrap::forward(ALSp<ALFloatMatrix> input)
     {
+        if ((mCache.get() == NULL || mCache->height() != input->height()) && mCacheSize > 0)
+        {
+            mCache = ALFloatMatrix::create(mCacheSize, input->height());
+        }
         if (mOutput.get() == NULL || mOutput->height() != input->height())
         {
             mOutput = ALFloatMatrix::create(mLayer->getInfo().ow, input->height());
         }
         mInput = input;
         ALASSERT(NULL!=mOutput.get());
-        mLayer->vForward(input.get(), mOutput.get(), mParameters.get(), NULL);
+        mLayer->vForward(input.get(), mOutput.get(), mParameters.get(), mCache.get());
         if (NULL != mForwardDump)
         {
             ALFloatMatrix::print(mOutput.get(), *mForwardDump);
@@ -81,12 +85,12 @@ namespace ALCNN {
         if (NULL!=mBefore)
         {
             ALSp<ALFloatMatrix> inputError = ALFloatMatrix::create(mInput->width(), mInput->height());
-            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get(), NULL);
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), inputError.get(), mParameterDiff.get(), mCache.get());
             mBefore->backward(inputError);
         }
         else
         {
-            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), NULL, mParameterDiff.get(), NULL);
+            mLayer->vBackward(error.get(), mOutput.get(), mParameters.get(), mInput.get(), NULL, mParameterDiff.get(), mCache.get());
         }
     }
 
