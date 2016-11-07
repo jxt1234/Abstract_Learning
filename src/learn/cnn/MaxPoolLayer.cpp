@@ -11,7 +11,7 @@
 #include "LayerFactoryRegistor.hpp"
 
 namespace ALCNN {
-    MaxPoolLayer::MaxPoolLayer(int stride, int width, int height, int depth):ILayer(width*height*depth, width*height*depth/stride/stride, 0, 0, width*height*depth/stride/stride, 1)
+    MaxPoolLayer::MaxPoolLayer(int stride, int width, int height, int depth):ILayer(width*height*depth, width*height*depth/stride/stride, 0, 0, 0, 0)
     {
         ALASSERT(stride>=2);
         ALASSERT(width>0);
@@ -44,29 +44,24 @@ namespace ALCNN {
         ALASSERT(after->width() == mOutput.getTotalWidth());
         auto batchSize = after->height();
         ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
-        auto h = mOutput.iHeight;
-        auto w = mOutput.iWidth;
         for (int z=0; z<batchSize; ++z)
         {
             for (int p=0; p<mInput.iDepth; ++p)
             {
-                auto output_p = after->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight;
-                auto input_p = before->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight;
-                auto cache_p = cache->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight;
-
+                ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
+                ALSp<ALFloatMatrix> output = ALFloatMatrix::createRefMatrix(after->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight, mOutput.iWidth, mOutput.iHeight);
+                auto h = mOutput.iHeight;
+                auto w = mOutput.iWidth;
                 for (int i=0; i<h; ++i)
                 {
-                    auto dst = output_p + mOutput.iWidth*i;
-                    auto cache_dst = cache_p + mOutput.iWidth*i;
+                    auto dst = output->vGetAddr(i);
                     for (int k=0; k<mStride; ++k)
                     {
-                        srcLines[k] = input_p + (mStride*i+k)*mInput.iWidth;
+                        srcLines[k] = input->vGetAddr(mStride*i+k);
                     }
                     for (int j=0; j<w; ++j)
                     {
                         ALFLOAT maxNumber = srcLines[0][0];
-                        size_t maxX = 0;
-                        size_t maxY = 0;
                         for (int x=0; x<mStride; ++x)
                         {
                             for (int y=0; y<mStride; ++y)
@@ -75,13 +70,10 @@ namespace ALCNN {
                                 if (maxNumber < s)
                                 {
                                     maxNumber = s;
-                                    maxX = x;
-                                    maxY = y;
                                 }
                             }
                         }
                         dst[j] = maxNumber;
-                        cache_dst[j] = maxX + mStride*maxY;
                     }
                 }
             }
@@ -96,27 +88,45 @@ namespace ALCNN {
         ALASSERT(before_diff->width() == mInput.getTotalWidth());
         ALASSERT(after_diff->width() == mOutput.getTotalWidth());
         auto batchSize = after_diff->height();
+        ALAUTOSTORAGE(srcLines, ALFLOAT*, mStride);
+        ALAUTOSTORAGE(srcDiffLines, ALFLOAT*, mStride);
         ALFloatMatrix::zero(before_diff);
-        auto h = mOutput.iHeight;
-        auto w = mOutput.iWidth;
         for (int z=0; z<batchSize; ++z)
         {
             for (int p=0; p<mInput.iDepth; ++p)
             {
-                auto output_p = after_diff->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight;
-                auto input_diff_p = before_diff->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight;
-                auto cache_p = cache->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight;
-
+                ALSp<ALFloatMatrix> input = ALFloatMatrix::createRefMatrix(before->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
+                ALSp<ALFloatMatrix> input_diff = ALFloatMatrix::createRefMatrix(before_diff->vGetAddr(z)+p*mInput.iWidth*mInput.iHeight, mInput.iWidth, mInput.iHeight);
+                ALSp<ALFloatMatrix> output = ALFloatMatrix::createRefMatrix(after_diff->vGetAddr(z)+p*mOutput.iWidth*mOutput.iHeight, mOutput.iWidth, mOutput.iHeight);
+                auto h = mOutput.iHeight;
+                auto w = mOutput.iWidth;
                 for (int i=0; i<h; ++i)
                 {
-                    auto dst = output_p + i*mOutput.iWidth;
-                    auto cache_dst = cache_p + mOutput.iWidth*i;
+                    auto dst = output->vGetAddr(i);
+                    for (int k=0; k<mStride; ++k)
+                    {
+                        srcLines[k] = input->vGetAddr(mStride*i+k);
+                        srcDiffLines[k] = input_diff->vGetAddr(mStride*i+k);
+                    }
                     for (int j=0; j<w; ++j)
                     {
-                        auto mask = (size_t)(cache_dst[j]);
-                        auto maxX = mask % mStride;
-                        auto maxY = (mask - maxX)/mStride;
-                        *(input_diff_p+(mStride*i+maxY)*mInput.iWidth + mStride*j+maxX) = dst[j];
+                        ALFLOAT maxNumber = srcLines[0][0];
+                        int maxX = 0;
+                        int maxY = 0;
+                        for (int x=0; x<mStride; ++x)
+                        {
+                            for (int y=0; y<mStride; ++y)
+                            {
+                                auto s = srcLines[x][y+mStride*j];
+                                if (maxNumber < s)
+                                {
+                                    maxNumber = s;
+                                    maxX = x;
+                                    maxY = y;
+                                }
+                            }
+                        }
+                        srcDiffLines[maxX][maxY+mStride*j] = dst[j];
                     }
                 }
             }
