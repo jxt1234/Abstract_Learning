@@ -106,4 +106,12 @@ namespace ALCNN {
         ALASSERT(NULL!=output.get());
         mNext = output;
     }
+    LayerWrap* LayerWrap::getLastLayer()
+    {
+        if (NULL == mNext.get())
+        {
+            return this;
+        }
+        return mNext->getLastLayer();
+    }
 }

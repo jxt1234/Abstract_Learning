@@ -3,7 +3,6 @@
 #include "ILayer.h"
 #include <ostream>
 namespace ALCNN {
-    
     class LayerWrap : public ALRefCount
     {
     public:
@@ -12,6 +11,9 @@ namespace ALCNN {
         size_t getParameterSize() const;
         void mapParameters(const ALFloatMatrix* p, size_t offset);
         void mapParametersDiff(const ALFloatMatrix* p, size_t offset);
+
+        inline size_t inputWidth() const {return mLayer->getInfo().iw;}
+        inline size_t outputWidth() const {return mLayer->getInfo().ow;}
         
         
         void connectInput(LayerWrap* input);
@@ -22,10 +24,11 @@ namespace ALCNN {
         void backward(ALSp<ALFloatMatrix> error);
         
         void setForwardDebug(std::ostream* output) {mForwardDump = output;}
-        
+
+        LayerWrap* getLastLayer();
     private:
         ALSp<ILayer> mLayer;
-        
+
         LayerWrap* mBefore;
         ALSp<LayerWrap> mNext;
         

@@ -9,11 +9,11 @@ namespace ALCNN {
         virtual ALFloatMatrix* vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* Merge) const override;
         virtual size_t vInitParameters(ALFloatMatrix* coefficient) const override;
         
-        CNNDerivativeFunction(ALSp<LayerWrap> first, ALSp<LayerWrap> last, int outputSize);
+        CNNDerivativeFunction(ALSp<LayerWrap> first, int outputSize);
         virtual ~ CNNDerivativeFunction();
     private:
         ALSp<LayerWrap> mFirst;
-        ALSp<LayerWrap> mLast;
+        LayerWrap* mLast;
         int mOutputSize;
         ALFLOAT mDecay;
         mutable ALFLOAT mCurrentLoss;

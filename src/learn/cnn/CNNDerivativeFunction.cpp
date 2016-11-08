@@ -17,10 +17,11 @@ namespace ALCNN {
         }
         return size;
     }
-    CNNDerivativeFunction::CNNDerivativeFunction(ALSp<LayerWrap> first, ALSp<LayerWrap> last, int outputSize)
+    CNNDerivativeFunction::CNNDerivativeFunction(ALSp<LayerWrap> first, int outputSize)
     {
         mFirst = first;
-        mLast = last;
+        mLast = first->getLastLayer();
+        ALASSERT(mFirst.get()!=mLast);
         mOutputSize = outputSize;
         mDecay = 0.001;//TODO
     }

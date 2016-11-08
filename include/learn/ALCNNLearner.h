@@ -24,7 +24,6 @@ private:
     ALSp<ALIGradientDecent::DerivativeFunction> mDetFunction;
     unsigned int mIteration;
     unsigned int mBatchSize;
-    unsigned int mInputSize;
     LayerStruct* mLayerPredict;
     ALSp<ALFloatMatrix> mProp;
 };

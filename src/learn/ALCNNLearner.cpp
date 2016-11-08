@@ -1,15 +1,9 @@
 #include "learn/ALCNNLearner.h"
 #include "cnn/CNNPredictor.h"
 #include "cnn/CNNDerivativeFunction.h"
-#include "cnn/MeanPoolLayer.h"
-#include "cnn/CNNLayer.h"
-#include "cnn/SoftMaxLayer.h"
-#include "cnn/ReluLayer.hpp"
-#include "cnn/MaxPoolLayer.hpp"
-#include "cnn/InnerProductLayer.hpp"
-#include <fstream>
 #include <string.h>
-#include "cnn/LayerFactoryRegistor.hpp"
+#include <fstream>
+#include "cnn/LayerWrapFactory.h"
 using namespace ALCNN;
 
 struct ALCNNLearner::LayerStruct
@@ -17,44 +11,6 @@ struct ALCNNLearner::LayerStruct
     ALSp<LayerWrap> pFirstLayer;
 };
 
-static void _readLayerParameters(cJSON* layer, LayerParameters& p, std::string& type)
-{
-    ALASSERT(NULL!=layer);
-    p.mIntValues.clear();
-    for (auto c = layer->child; NULL!=c; c=c->next)
-    {
-        auto name = c->string;
-        if (!strcmp(name, "type"))
-        {
-            type = c->valuestring;
-            continue;
-        }
-        if (!strcmp(name, "input"))
-        {
-            p.uInputSize = c->valueint;
-            continue;
-        }
-        if (!strcmp(name, "output"))
-        {
-            p.uOutputSize = c->valueint;
-            continue;
-        }
-        if (!strcmp(name, "input_3D"))
-        {
-            auto ac = c->child;
-            ALASSERT(NULL!=ac);
-            p.mMatrixInfo.iWidth = ac->valueint;
-            ac = ac->next;
-            ALASSERT(NULL!=ac);
-            p.mMatrixInfo.iHeight = ac->valueint;
-            ac = ac->next;
-            ALASSERT(NULL!=ac);
-            p.mMatrixInfo.iDepth = ac->valueint;
-            continue;
-        }
-        p.mIntValues.insert(std::make_pair(name, c->valueint));
-    }
-}
 
 ALCNNLearner::ALCNNLearner(const cJSON* description)
 {
@@ -77,34 +33,13 @@ ALCNNLearner::ALCNNLearner(const cJSON* description)
         }
     }
     ALASSERT(NULL!=layer);
-    ALSp<LayerWrap> firstLayer;
-    ALSp<LayerWrap> currentLayer;
-    ALSp<LayerWrap> lastLayer;
-    ALSp<LayerWrap> nextLayer;
-    
-    LayerParameters parameters;
-    std::string type = "";
-    /*Construct first layer*/
-    _readLayerParameters(layer, parameters, type);
-    firstLayer = new LayerWrap(LayerFactory::get()->create(type.c_str(), parameters));
-    currentLayer = firstLayer;
-    
-    mInputSize = parameters.uInputSize;
-    
-    for (layer=layer->next;layer!=NULL; layer=layer->next)
-    {
-        _readLayerParameters(layer, parameters, type);
-        nextLayer = new LayerWrap(LayerFactory::get()->create(type.c_str(), parameters));
-        currentLayer->connectOutput(nextLayer);
-        nextLayer->connectInput(currentLayer.get());
-        currentLayer = nextLayer;
-    }
-    lastLayer = currentLayer;
+    ALSp<LayerWrap> firstLayer = LayerWrapFactory::create(layer);
+    auto ow = firstLayer->getLastLayer()->outputWidth();
     mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD, mBatchSize);
-    mDetFunction = new CNNDerivativeFunction(firstLayer, lastLayer, parameters.uOutputSize);
-    mProp = ALFloatMatrix::create(parameters.uOutputSize, 1);
+    mDetFunction = new CNNDerivativeFunction(firstLayer, ow);
+    mProp = ALFloatMatrix::create(ow, 1);
     auto p = mProp->vGetAddr();
-    for (size_t i=0; i<parameters.uOutputSize; ++i)
+    for (size_t i=0; i<ow; ++i)
     {
         p[i] = i;
     }
@@ -121,7 +56,6 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     ALASSERT(NULL!=X);
     ALASSERT(NULL!=Y);
     ALASSERT(Y->height() == X->height());
-    ALASSERT(X->width() == mInputSize);
     ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
     ALSp<ALFloatMatrix> prop = mProp;
     
