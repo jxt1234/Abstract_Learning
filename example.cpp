@@ -29,7 +29,7 @@ int test_main(int argc, char* argv[])
     ALSp<ALFloatDataChain> test_raw = s.load("./bao_predict_normal.txt");
     ALSp<ALLabeldData> test = ALPackageLabled(test_raw.get(), 1.0);
     
-    auto jsonString = readAll("res/cnn/lstm_single.json");
+    auto jsonString = readAll(argv[1]);
     auto jsonObject = cJSON_Parse(jsonString.c_str());
     ALSp<ALIChainLearner> learner = new ALRNNLearner(jsonObject);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
@@ -42,6 +42,10 @@ int test_main(int argc, char* argv[])
         {
             auto real = p.first;
             auto pre = predictor->vPredict(p.second);
+            if (ZERO(pre))
+            {
+                continue;
+            }
             auto error = real - pre;
             sumError += error*error;
             outputP << real <<"\t"<<pre<<"\n";
@@ -53,6 +57,10 @@ int test_main(int argc, char* argv[])
         {
             auto real = p.first;
             auto pre = predictor->vPredict(p.second);
+            if (ZERO(pre))
+            {
+                continue;
+            }
             auto error = real - pre;
             sumError += error*error;
             outputP << real <<"\t"<<pre<<"\n";

@@ -1,19 +1,18 @@
 {
-    "name": "LSTM",
+    "name": "Linear",
     "train-batch":64,
     "iteration":10000,
-    "time":20,
+    "time":5,
     "width":8,
     "layers":[
         {
-            "type":"LSTM",
-            "input":160,
-            "output":40,
-            "time":20
+            "type":"InnerProduct",
+            "input":40,
+            "output":2
         },
         {
             "type":"InnerProduct",
-            "input":40,
+            "input":2,
             "output":1
         }
     ]
