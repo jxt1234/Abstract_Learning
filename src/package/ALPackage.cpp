@@ -10,6 +10,7 @@
 #include "math/ALIGradientDecent.h"
 #include "cJSON/cJSON.h"
 #include "learn/ALCNNLearner.h"
+#include "learn/ALMatrixNormalizer.h"
 
 ALFloatPredictor* ALPackageLearn(ALIChainLearner* l, ALLabeldData* c)
 {
@@ -337,4 +338,12 @@ ALFloatMatrix* ALPackageMatrixLinear(ALFloatMatrix* X, double a, double b)
     ALFloatMatrix::copy(XC, X);
     ALFloatMatrix::linearDirect(XC, a, b);
     return XC;
+}
+ALIMatrixTransformer* ALPackageNormalizer(ALFloatMatrix* X)
+{
+    return new ALMatrixNormalizer(X);
+}
+ALFloatMatrix* ALPackageTransform(ALFloatMatrix* X, ALIMatrixTransformer* N)
+{
+    return N->vTransform(X);
 }

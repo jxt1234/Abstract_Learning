@@ -414,3 +414,25 @@ ALFloatMatrix* result = ALPackageMatrixLinear(X0, X1, X2);
 out->push(result,gALFloatMatrix);
 return out;
 }
+GPContents* ALPackageNormalizer_GPpackage(GPContents* inputs)
+{
+assert(1 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALIMatrixTransformer* result = ALPackageNormalizer(X0);
+out->push(result,gALIMatrixTransformer);
+return out;
+}
+GPContents* ALPackageTransform_GPpackage(GPContents* inputs)
+{
+assert(2 == inputs->size());
+assert(inputs->getType(0)->name() == gALFloatMatrix->name());
+assert(inputs->getType(1)->name() == gALIMatrixTransformer->name());
+GPContents* out =  new GPContents;
+ALFloatMatrix* X0 = (ALFloatMatrix*)inputs->get(0);
+ALIMatrixTransformer* X1 = (ALIMatrixTransformer*)inputs->get(1);
+ALFloatMatrix* result = ALPackageTransform(X0, X1);
+out->push(result,gALFloatMatrix);
+return out;
+}

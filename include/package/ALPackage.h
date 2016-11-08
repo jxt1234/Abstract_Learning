@@ -8,6 +8,7 @@
 #include "compose/ALComposeClassifier.h"
 #include "core/ALLabeldMethodFactory.h"
 #include "learn/ALSVMLearner.h"
+#include "math/ALIMatrixTransformer.h"
 
 class ALGradientMethod;
 
@@ -85,5 +86,7 @@ typedef ALIMatrixPredictor ALClassifier;
 /*GP FUNCTION*/ALFloatMatrix* ALPackageParameterInit(ALGradientMethod* decent);
 /*GP FUNCTION*/ALClassifier* ALPackageGDPredictorLoad(ALGradientMethod* gd, ALFloatMatrix*  P);
 /*GP FUNCTION*/ALFloatMatrix* ALPackageMatrixLinear(ALFloatMatrix* X, double a, double b);
+/*GP FUNCTION*/ALIMatrixTransformer* ALPackageNormalizer(ALFloatMatrix* X);
+/*GP FUNCTION*/ALFloatMatrix* ALPackageTransform(ALFloatMatrix* X, ALIMatrixTransformer* N);
 
 #endif

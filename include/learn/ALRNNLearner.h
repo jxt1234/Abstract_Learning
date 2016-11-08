@@ -1,3 +1,5 @@
+#ifndef LEARN_ALRNNLEARNER_H
+#define LEARN_ALRNNLEARNER_H
 #include "ALIChainLearner.h"
 #include "math/ALIGradientDecent.h"
 #include "cJSON/cJSON.h"
@@ -16,3 +18,4 @@ class ALRNNLearner : public ALIChainLearner
         //LayerStruct* mLayerPredict;
         ALSp<ALFloatMatrix> mProp;
 };
+#endif

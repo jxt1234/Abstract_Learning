@@ -143,6 +143,14 @@ if (name == "ALPackageMatrixLinear_GPpackage")
 {
 return (void*)ALPackageMatrixLinear_GPpackage;
 }
+if (name == "ALPackageNormalizer_GPpackage")
+{
+return (void*)ALPackageNormalizer_GPpackage;
+}
+if (name == "ALPackageTransform_GPpackage")
+{
+return (void*)ALPackageTransform_GPpackage;
+}
 if (name == "libAbstract_learning_GP_IStatusType_Create")
 {
 return (void*)libAbstract_learning_GP_IStatusType_Create;

@@ -11,6 +11,8 @@ IStatusType* gALGradientMethod = new ALGradientMethod_GPType();
 IStatusType* gdouble = new GPDoubleType();
 #include "ALDecisionTreeParameter_GPType.h"
 IStatusType* gALDecisionTreeParameter = new ALDecisionTreeParameter_GPType();
+#include "ALIMatrixTransformer_GPType.h"
+IStatusType* gALIMatrixTransformer = new ALIMatrixTransformer_GPType();
 #include "ALIUnSuperLearner_GPType.h"
 IStatusType* gALIUnSuperLearner = new ALIUnSuperLearner_GPType();
 #include "ALSVMParameter_GPType.h"
@@ -60,6 +62,10 @@ return gdouble;
 if (name == "ALDecisionTreeParameter")
 {
 return gALDecisionTreeParameter;
+}
+if (name == "ALIMatrixTransformer")
+{
+return gALIMatrixTransformer;
 }
 if (name == "ALIUnSuperLearner")
 {

@@ -279,4 +279,20 @@
 <inputNeedComplete>False False False </inputNeedComplete>
 </ALPackageMatrixLinear_GPpackage>
 
+<ALPackageNormalizer_GPpackage>
+<shortName>Normalizer</shortName>
+<output>ALIMatrixTransformer</output>
+<status></status>
+<input>ALFloatMatrix </input>
+<inputNeedComplete>False </inputNeedComplete>
+</ALPackageNormalizer_GPpackage>
+
+<ALPackageTransform_GPpackage>
+<shortName>Transform</shortName>
+<output>ALFloatMatrix</output>
+<status></status>
+<input>ALFloatMatrix ALIMatrixTransformer </input>
+<inputNeedComplete>False False </inputNeedComplete>
+</ALPackageTransform_GPpackage>
+
 </libAbstract_learning>

@@ -7,6 +7,7 @@ extern IStatusType* gALDividerParameter;
 extern IStatusType* gALGradientMethod;
 extern IStatusType* gdouble;
 extern IStatusType* gALDecisionTreeParameter;
+extern IStatusType* gALIMatrixTransformer;
 extern IStatusType* gALIUnSuperLearner;
 extern IStatusType* gALSVMParameter;
 extern IStatusType* gALCGPParameter;
