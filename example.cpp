@@ -2,20 +2,17 @@
 #include <iostream>
 #include <fstream>
 #include "math/ALFloatMatrix.h"
-#include "compose/ALRandomForestMatrix.h"
 #include "learn/ALLearnFactory.h"
-#include "learn/ALCNNLearner.h"
+#include "learn/ALRNNLearner.h"
 #include <math.h>
 #include <sstream>
 #include "cJSON/cJSON.h"
+#include "core/ALARStructure.h"
+#include "core/ALExpanderFactory.h"
+#include "loader/ALStandardLoader.h"
+#include <iostream>
+#include "package/ALPackage.h"
 using namespace std;
-
-static ALSp<ALFloatMatrix> _readMatrix(const char* fileName)
-{
-    ALSp<ALStream> input = ALStreamFactory::readFromFile(fileName);
-    return ALFloatMatrix::load(input.get());
-}
-
 static std::string readAll(const char* file)
 {
     std::ostringstream output;
@@ -26,54 +23,42 @@ static std::string readAll(const char* file)
 
 int test_main(int argc, char* argv[])
 {
-    ALSp<ALFloatMatrix> X_Train = _readMatrix("../data/t10k/train_x.txt");
-    ALSp<ALFloatMatrix> Y_Train = _readMatrix("../data/t10k/train_y.txt");
-    ALSp<ALFloatMatrix> X_Test = _readMatrix("../data/t10k/test_x.txt");
-    ALSp<ALFloatMatrix> Y_Test = _readMatrix("../data/t10k/test_y.txt");
+    ALStandardLoader s;
+    ALSp<ALFloatDataChain> train_raw = s.load("./bao_normal.txt");
+    ALSp<ALLabeldData> train = ALPackageLabled(train_raw.get(), 1.0);
+    ALSp<ALFloatDataChain> test_raw = s.load("./bao_predict_normal.txt");
+    ALSp<ALLabeldData> test = ALPackageLabled(test_raw.get(), 1.0);
     
-    ALFloatMatrix::linearDirect(X_Train.get(), 1.0/255.0, 0.0);
-    ALFloatMatrix::linearDirect(X_Test.get(), 1.0/255.0, 0.0);
-    if (0)
-    {
-        std::ofstream outputP("../data/t10k/train_x_normal.txt");
-        ALFloatMatrix::print(X_Train.get(), outputP);
-        std::ofstream outputP2("../data/t10k/test_x_normal.txt");
-        ALFloatMatrix::print(X_Test.get(), outputP2);
-    }
-    
-    ALSp<ALFloatMatrix> Y_P = ALFloatMatrix::create(Y_Test->width(), Y_Test->height());
-    
-    auto jsonString = readAll("res/cnn/lenet.json");
+    auto jsonString = readAll("res/cnn/lstm_single.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
-    ALSp<ALISuperviseLearner> learner = new ALCNNLearner(jsonObject);
+    ALSp<ALIChainLearner> learner = new ALRNNLearner(jsonObject);
     //ALSp<ALISuperviseLearner> learner = new ALRandomForestMatrix(55);
-    ALSp<ALIMatrixPredictor> predictor = learner->vLearn(X_Train.get(), Y_Train.get());
+    ALSp<ALFloatPredictor> predictor = learner->vLearn(train.get());
     
-    ALSp<ALFloatMatrix> Y_P_Detail = ALFloatMatrix::create(predictor->vGetPossiableValues()->width(), Y_Test->height());
-    predictor->vPredictProbability(X_Test.get(), Y_P_Detail.get());
+    ALFLOAT sumError = 0.0f;
     {
-        std::ofstream outputP("output/ALCNNLearnerTestProp.txt");
-        ALFloatMatrix::print(Y_P_Detail.get(), outputP);
-    }
-
-    
-    predictor->vPredict(X_Test.get(), Y_P.get());
-    auto h = Y_Test->height();
-    int correct = 0;
-    for (int i=0; i<h; ++i)
-    {
-        auto y = Y_Test->vGetAddr(i)[0];
-        auto yp = Y_P->vGetAddr(i)[0];
-        if (ZERO(y-yp))
+        std::ofstream outputP("output/ALRNNLearnerTest.txt");
+        for (auto p : test->get())
         {
-            correct++;
+            auto real = p.first;
+            auto pre = predictor->vPredict(p.second);
+            auto error = real - pre;
+            sumError += error*error;
+            outputP << real <<"\t"<<pre<<"\n";
         }
     }
-    
-    ALSp<ALFloatMatrix> YYP = ALFloatMatrix::unionHorizontal(Y_P.get(), Y_Test.get());
-    std::ofstream output("output/ALCNNLearnerTest.txt");
-    ALFloatMatrix::print(YYP.get(), output);
-    std::cout << "correct: "<<correct<<"/"<<h<<std::endl;
+    {
+        std::ofstream outputP("output/ALRNNLearnerTrain.txt");
+        for (auto p : train->get())
+        {
+            auto real = p.first;
+            auto pre = predictor->vPredict(p.second);
+            auto error = real - pre;
+            sumError += error*error;
+            outputP << real <<"\t"<<pre<<"\n";
+        }
+    }
+    std::cout << sumError << "/"<<test->get().size()<<"\n";
     return 1;
 }
 

@@ -3,6 +3,7 @@
     "train-batch":64,
     "iteration":10000,
     "time":50,
+    "width":8,
     "layers":[
         {
             "type":"LSTM",
@@ -11,9 +12,9 @@
             "time":50
         },
         {
-            "type":"SoftMax",
+            "type":"InnerProduct",
             "input":300,
-            "output":8
+            "output":1
         }
     ]
 }

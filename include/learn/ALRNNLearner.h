@@ -3,9 +3,12 @@
 #include "ALIChainLearner.h"
 #include "math/ALIGradientDecent.h"
 #include "cJSON/cJSON.h"
+#include "core/ALARStructure.h"
+#include "core/ALBasicExpander.h"
 class ALRNNLearner : public ALIChainLearner
 {
     public:
+        class LayerStruct;
         ALRNNLearner(const cJSON* info);
         virtual ~ALRNNLearner();
         virtual ALFloatPredictor* vLearn(const ALLabeldData* data) const override;
@@ -14,8 +17,8 @@ class ALRNNLearner : public ALIChainLearner
         ALSp<ALIGradientDecent::DerivativeFunction> mDetFunction;
         unsigned int mIteration;
         unsigned int mBatchSize;
-        unsigned int mInputSize;
-        //LayerStruct* mLayerPredict;
-        ALSp<ALFloatMatrix> mProp;
+        ALARStructure mAR;
+        ALSp<ALIExpander> mExpander;
+        LayerStruct* mLayerPredict;
 };
 #endif

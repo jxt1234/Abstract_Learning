@@ -109,9 +109,9 @@ namespace ALCNN {
             
             if (NULL != h_t_1)
             {
-                ALSp<ALFloatMatrix> b_diff = ALFloatMatrix::create(mOw, mOw);
-                ALFloatMatrix::productTA(b_diff.get(), h_diff, h_t_1);
-                ALFloatMatrix::linear(b.get(), 1.0, b_diff.get(), 1.0);
+                ALSp<ALFloatMatrix> u_diff = ALFloatMatrix::create(mOw, mOw);
+                ALFloatMatrix::productTA(u_diff.get(), h_diff, h_t_1);
+                ALFloatMatrix::linear(u.get(), 1.0, u_diff.get(), 1.0);
             }
         }
     };
@@ -151,9 +151,9 @@ namespace ALCNN {
             cache.merge = ALFloatMatrix::createCropVirtualMatrix(total.get(), 0, t*mBatchSize, WEIGHTSIZE*mOw-1, (t+1)*mBatchSize-1);
             cache.i = ALFloatMatrix::createCropVirtualMatrix(cache.merge.get(), 0, 0, mOw-1, mBatchSize-1);
             cache.c = ALFloatMatrix::createCropVirtualMatrix(cache.merge.get(), mOw, 0, mOw*2-1, mBatchSize-1);
-            cache.f = ALFloatMatrix::createCropVirtualMatrix(cache.merge.get(), 0, mOw*2, mOw*3-1, mBatchSize-1);
+            cache.f = ALFloatMatrix::createCropVirtualMatrix(cache.merge.get(), mOw*2, 0, mOw*3-1, mBatchSize-1);
             cache.o = ALFloatMatrix::createCropVirtualMatrix(cache.merge.get(), mOw*3, 0, mOw*4-1, mBatchSize-1);
-            cache.c_bar = ALFloatMatrix::createCropVirtualMatrix(total.get(), WEIGHTSIZE*mOw, t*mBatchSize, mOw*(WEIGHTSIZE+1), (t+1)*mBatchSize-1);
+            cache.c_bar = ALFloatMatrix::createCropVirtualMatrix(total.get(), WEIGHTSIZE*mOw, t*mBatchSize, mOw*(WEIGHTSIZE+1)-1, (t+1)*mBatchSize-1);
             return cache;
         }
         size_t mOw;
@@ -168,7 +168,10 @@ namespace ALCNN {
         ALASSERT(NULL!=cache);
         ALASSERT(cache->width() == getInfo().cw*getInfo().ch);
         ALASSERT(parameters->height() == 1);
-        WeightMatrix weight(parameters, before->width(), after->width());
+        ALASSERT(before->width() == mInputSize*mTime);
+        ALASSERT(after->width() == mOutputSize*mTime);
+        ALASSERT(before->height() == after->height());
+        WeightMatrix weight(parameters, mInputSize, mOutputSize);
         auto batchSize = before->height();
         Cache cacheMatrix(cache, mOutputSize, mTime);
         
@@ -188,7 +191,7 @@ namespace ALCNN {
 
             ALFloatMatrix::productT(tCache.merge.get(), x_t.get(), weight.W.get());
             ALFloatMatrix::linearVector(tCache.merge.get(), tCache.merge.get(), 1.0, weight.B.get(), 1.0);
-            ALFloatMatrix::productT(u_h_t_1.get(), h_t_1.get(), weight.U.get());
+            ALFloatMatrix::product(u_h_t_1.get(), h_t_1.get(), weight.U.get());
             //Use w_x_t to save total result
             ALFloatMatrix::linear(tCache.merge.get(), tCache.merge.get(), 1.0, u_h_t_1.get(), 1.0);
             
@@ -293,7 +296,8 @@ namespace ALCNN {
             }
             else
             {
-                ALSp<ALFloatMatrix> c_t_1 = cacheMatrix.get(t-1).c;
+                auto tCache_1 = cacheMatrix.get(t-1);
+                ALSp<ALFloatMatrix> c_t_1 = tCache_1.c;
                 ALFloatMatrix::productDot(w_u_b_f.get(), ot_sec_2_c_t.get(), c_t_1.get());
                 ALFloatMatrix::runLineFunction(w_u_b_f.get(), tCache.f.get(), gSigmodDetMulti);
             }
