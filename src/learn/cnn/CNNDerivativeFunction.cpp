@@ -21,7 +21,7 @@ namespace ALCNN {
     {
         mFirst = first;
         mLast = first->getLastLayer();
-        ALASSERT(mFirst.get()!=mLast);
+        //ALASSERT(mFirst.get()!=mLast);
         mOutputSize = outputSize;
         mDecay = 0.001;//TODO
     }
@@ -32,8 +32,8 @@ namespace ALCNN {
     ALFloatMatrix* CNNDerivativeFunction::vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* Merge) const
     {
         //ALFORCEAUTOTIME;
-        ALSp<ALFloatMatrix> X = ALFloatMatrix::createCropVirtualMatrix(Merge, mOutputSize, 0, Merge->width()-1, Merge->height()-1);
-        ALSp<ALFloatMatrix> Y = ALFloatMatrix::createCropVirtualMatrix(Merge, 0, 0, mOutputSize-1, Merge->height()-1);
+        ALSp<ALFloatMatrix> X = ALFloatMatrix::createCropVirtualMatrix(Merge, 0, 0, Merge->width()-1-mOutputSize, Merge->height()-1);
+        ALSp<ALFloatMatrix> Y = ALFloatMatrix::createCropVirtualMatrix(Merge, Merge->width()-mOutputSize, 0, Merge->width()-1, Merge->height()-1);
         ALFloatMatrix* resultDiff = ALFloatMatrix::create(coefficient->width(), coefficient->height());
         
         mFirst->mapParameters(coefficient, 0);

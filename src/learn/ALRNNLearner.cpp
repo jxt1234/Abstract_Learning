@@ -93,7 +93,7 @@ ALFloatPredictor* ALRNNLearner::vLearn(const ALLabeldData* data) const
     ALIExpander::expandXY(mExpander.get(), data, X, YT);
     ALASSERT(NULL!=X.get() && NULL!=YT.get());//TODO
     ALSp<ALFloatMatrix> Y = ALFloatMatrix::transpose(YT.get());
-    ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(Y.get(), X.get());
+    ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(X.get(), Y.get());
     X = NULL;
     Y = NULL;
     /*Optimize parameters*/

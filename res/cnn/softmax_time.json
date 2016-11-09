@@ -1,0 +1,14 @@
+{
+    "name": "LSTM",
+    "train-batch":64,
+    "iteration":10000,
+    "time":50,
+    "width":21,
+    "layers":[
+        {
+            "type":"SoftMax",
+            "input":1050,
+            "output":21
+        }
+    ]
+}

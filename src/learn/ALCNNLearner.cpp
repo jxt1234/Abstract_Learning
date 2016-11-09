@@ -62,7 +62,7 @@ ALIMatrixPredictor* ALCNNLearner::vLearn(const ALFloatMatrix* X, const ALFloatMa
     /*Prepare Data*/
     ALSp<ALFloatMatrix> Y_Expand = ALFloatMatrix::create(prop->width(), Y->height());
     ALFloatMatrix::typeExpand(Y_Expand.get(), YT.get());
-    ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(Y_Expand.get(), X);
+    ALSp<ALFloatMatrix> Merge = ALFloatMatrix::unionHorizontal(X, Y_Expand.get());
     
     /*Optimize parameters*/
     auto parameterSize = mLayerPredict->pFirstLayer->getParameterSize();
