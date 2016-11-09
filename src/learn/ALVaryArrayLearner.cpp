@@ -33,10 +33,18 @@ ALVaryArrayLearner::ALVaryArrayLearner(cJSON* description)
         {
             mNumber = c->valueint;
         }
+        else if (strcmp(c->string, "prop")==0)
+        {
+            mPropWidth = c->valueint;
+        }
+    }
+    if (0 == mPropWidth)
+    {
+        mPropWidth = mNumber;
     }
     ALASSERT(NULL!=layer);
     ALSp<LayerWrap> firstLayer = LayerWrapFactory::create(layer);
-    auto ow = mNumber;
+    auto ow = mPropWidth;
     mGDMethod = ALIGradientDecent::create(ALIGradientDecent::SGD, mBatchSize);
     mDetFunction = new CNNDerivativeFunction(firstLayer, ow);
     mLayerPredict = new LayerStruct;
@@ -48,9 +56,22 @@ ALVaryArrayLearner::~ALVaryArrayLearner()
 {
     delete mLayerPredict;
 }
-void ALVaryArrayLearner::train(const ALVaryArray* array)
+void ALVaryArrayLearner::train(const ALVaryArray* array, const ALFloatMatrix* label)
 {
-    ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, mTime+1, mNumber);
+    size_t time = mTime;
+    ALSp<ALFloatMatrix> labelExpand;
+    if (NULL == label)
+    {
+        time = mTime+1;//Last for predict
+    }
+    else
+    {
+        ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(label);
+        ALSp<ALFloatMatrix> Y_Expand = ALFloatMatrix::create(mPropWidth, label->height());
+        ALFloatMatrix::typeExpand(Y_Expand.get(), YT.get());
+        labelExpand = Y_Expand;
+    }
+    ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, time, mNumber, labelExpand.get());
     mDetFunction->vInitParameters(mCoeffecient.get());
     mGDMethod->vOptimize(mCoeffecient.get(), varyMatrix.get(), mDetFunction.get(), 0.35, mIteration);
     mLayerPredict->pFirstLayer->mapParameters(mCoeffecient.get(), 0);

@@ -10,7 +10,7 @@ namespace ALCNN{
         mInfo.ch = ch;
 
         //FIXME
-        ALASSERT(pw < 10000000);
-        ALASSERT(ph < 10000000);
+        //ALASSERT(pw < 10000000);
+        //ALASSERT(ph < 10000000);
     }
 }

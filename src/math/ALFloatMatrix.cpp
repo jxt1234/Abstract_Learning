@@ -996,6 +996,7 @@ ALFloatMatrix* ALFloatMatrix::genTypes(const ALFloatMatrix* Y)
 
 ALFloatMatrix* ALFloatMatrix::randomSelectMatrix(const ALFloatMatrix* base, size_t height, bool copy)
 {
+    //ALFORCEAUTOTIME;
     ALASSERT(NULL!=base);
     ALASSERT(height < base->height());
     ALASSERT(height>0);

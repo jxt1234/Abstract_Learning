@@ -1,16 +1,26 @@
 #include "data/ALVaryArrayMatrix.h"
 #include <string.h>
+static size_t _getWidth(const ALFloatMatrix* l)
+{
+    if (NULL == l)
+    {
+        return 0;
+    }
+    return l->width();
+}
 
-ALVaryArrayMatrix::ALVaryArrayMatrix(const ALVaryArray* array, size_t time, size_t number):ALFloatMatrix(time*number, array->size(), 0)
+
+ALVaryArrayMatrix::ALVaryArrayMatrix(const ALVaryArray* array, size_t time, size_t number, const ALFloatMatrix* target):ALFloatMatrix(time*number+_getWidth(target), array->size(), 0)
 {
     ALASSERT(number>0);
     ALASSERT(time>0);
     ALASSERT(array!=NULL);
     mTime = time;
     mNumber = number;
-    mCache = new ALFLOAT[time*number];
+    mCache = new ALFLOAT[time*number+_getWidth(target)];
     mCur = 0;
     mArray = array;
+    mLabel = target;
 
     _refreshCache();
 }
@@ -34,16 +44,21 @@ void ALVaryArrayMatrix::_refreshCache() const
 {
     auto a = mArray->getArray(mCur);
     ::memset(mCache, 0, sizeof(ALFLOAT)*mTime*mNumber);
-    size_t t_sta = 0;
-    int sta = a.length-mTime;
-    if (sta < 0)
+    size_t t_fin = mTime;
+    if (a.length < mTime)
     {
-        t_sta = mTime-a.length;
+        t_fin = a.length;
     }
 
-    for (size_t t=t_sta; t<mTime; ++t)
+    for (size_t t=0; t<t_fin; ++t)
     {
         auto ct = mCache + t*mNumber;
-        ct[a.c[sta+t]] = 1.0f;
+        ct[a.c[t]] = 1.0f;
+    }
+    if (NULL!=mLabel)
+    {
+        auto ct = mCache + mTime*mNumber;
+        auto y = mLabel->vGetAddr(mCur);
+        ::memcpy(ct, y, mLabel->width()*sizeof(ALFLOAT));
     }
 }
