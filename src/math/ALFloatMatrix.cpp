@@ -739,27 +739,6 @@ ALFloatMatrix* ALFloatMatrix::createIdentity(size_t n)
     }
     return M;
 }
-ALFloatMatrix* ALFloatMatrix::linear(const ALFloatMatrix* A, ALFLOAT pa, const ALFloatMatrix* B, ALFLOAT pb)
-{
-    ALASSERT(NULL!=A);
-    ALASSERT(NULL!=B);
-    ALASSERT(A->width() == B->width());
-    ALASSERT(A->height() == B->height());
-    auto w = A->width();
-    auto h = B->height();
-    ALFloatMatrix* C = new ALBaseFloatMatrix(w, h);
-    for (size_t i=0; i<h; ++i)
-    {
-        ALFLOAT* a = A->vGetAddr(i);
-        ALFLOAT* b = B->vGetAddr(i);
-        ALFLOAT* c = C->vGetAddr(i);
-        for (size_t j=0; j<w; ++j)
-        {
-            *(c+j) = *(a+j)*pa + *(b+j)*pb;
-        }
-    }
-    return C;
-}
 
 ALFLOAT ALFloatMatrix::norm(const ALFloatMatrix* X)
 {

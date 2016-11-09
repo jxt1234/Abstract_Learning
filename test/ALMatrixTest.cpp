@@ -69,7 +69,7 @@ class ALMatrixTest:public GPTest
             }
             out << "XM:\n";
             ALFloatMatrix::print(XM.get(), out);
-            XM = ALFloatMatrix::linear(X.get(), 0.5, XM.get(), -0.4);
+            ALFloatMatrix::linear(XM.get(), X.get(), 0.5, XM.get(), -0.4);
             out << "X*0.5-XM*0.4:\n";
             ALFloatMatrix::print(XM.get(), out);
             XM = ALFloatMatrix::createIdentity(5);

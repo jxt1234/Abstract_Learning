@@ -1,6 +1,5 @@
 #include "user/GPAPI.h"
 #include <stdlib.h>
-using namespace std;
 
 
 static void __run()

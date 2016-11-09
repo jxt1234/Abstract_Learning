@@ -21,8 +21,6 @@ public:
     static ALFLOAT norm(const ALFloatMatrix* X);
     static ALFloatMatrix* createIdentity(size_t n);
     static ALFloatMatrix* createDiag(const ALFloatMatrix* X);
-    static ALFloatMatrix* linear(const ALFloatMatrix* A, ALFLOAT a, const ALFloatMatrix* B, ALFLOAT b);
-    
     
     
     static ALFloatMatrix* product(const ALFloatMatrix* A, const ALFloatMatrix* B);

@@ -29,8 +29,7 @@ void GradientDecent::vOptimize(ALFloatMatrix* coefficient, const ALFloatMatrix* 
             }
             ALSp<ALFloatMatrix> XSelect = ALFloatMatrix::createCropVirtualMatrix(X, 0, x_sta, X->width()-1, x_fin);
             ALSp<ALFloatMatrix> deltaC = delta->vCompute(coefficient, XSelect.get());
-            ALSp<ALFloatMatrix> C = ALFloatMatrix::linear(coefficient, 1.0, deltaC.get(), -alpha);
-            ALFloatMatrix::copy(coefficient, C.get());
+            ALFloatMatrix::linear(coefficient, coefficient, 1.0, deltaC.get(), -alpha);
         }
     }
 }

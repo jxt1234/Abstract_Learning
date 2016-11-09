@@ -111,7 +111,7 @@ namespace ALCNN {
             {
                 ALSp<ALFloatMatrix> u_diff = ALFloatMatrix::create(mOw, mOw);
                 ALFloatMatrix::productTA(u_diff.get(), h_diff, h_t_1);
-                ALFloatMatrix::linear(u.get(), 1.0, u_diff.get(), 1.0);
+                ALFloatMatrix::linear(u.get(), u.get(), 1.0, u_diff.get(), 1.0);
             }
         }
     };
