@@ -1,3 +1,5 @@
+#ifndef PACKAGE_ALIMATRIXTRANSFORMER_GPTYPE_H
+#define PACKAGE_ALIMATRIXTRANSFORMER_GPTYPE_H
 #include <sstream>
 class ALIMatrixTransformer_GPType:public IStatusType
 {
@@ -37,3 +39,4 @@ class ALIMatrixTransformer_GPType:public IStatusType
         virtual bool vCheckCompleted(void* content) const {return NULL!=content;}
         virtual void* vMerge(void* dst, void* src) const {return NULL;}
 };
+#endif

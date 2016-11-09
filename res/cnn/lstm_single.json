@@ -8,12 +8,17 @@
         {
             "type":"LSTM",
             "input":160,
-            "output":40,
+            "output":160,
             "time":20
         },
         {
+            "type":"Mean",
+            "input":160,
+            "output":8
+        },
+        {
             "type":"InnerProduct",
-            "input":40,
+            "input":8,
             "output":1
         }
     ]
