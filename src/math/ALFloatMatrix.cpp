@@ -1015,26 +1015,26 @@ ALFloatMatrix* ALFloatMatrix::genTypes(const ALFloatMatrix* Y)
     return result;
 }
 
-ALFloatMatrix* ALFloatMatrix::randomeSelectMatrix(const ALFloatMatrix* base, size_t height)
+ALFloatMatrix* ALFloatMatrix::randomSelectMatrix(const ALFloatMatrix* base, size_t height, bool copy)
 {
     ALASSERT(NULL!=base);
     ALASSERT(height < base->height());
-    ALAUTOSTORAGE(indexes, ALFLOAT*, height);
+    ALASSERT(height>0);
     auto totalHeight = base->height();
-//    ALAUTOSTORAGE(allIndexes, ALFLOAT*, totalHeight);
-//    for (int i=0; i<totalHeight; ++i)
-//    {
-//        allIndexes[i] = base->vGetAddr(i);
-//    }
-//    /*random shuffle*/
-//    for (int i=1; i<totalHeight; ++i)
-//    {
-//        int j = ALRandom::mid(0, i);
-//        ALFLOAT* temp = allIndexes[i];
-//        allIndexes[i] = allIndexes[j];
-//        allIndexes[j] = temp;
-//    }
-    
+    auto width = base->width();
+    if (copy)
+    {
+        ALFloatMatrix* copyedM = create(width, height);
+        for (size_t i=0; i<height; ++i)
+        {
+            int j = ALRandom::mid(0, (int)totalHeight);
+            auto src = base->vGetAddr(j);
+            auto dst = copyedM->vGetAddr(i);
+            ::memcpy(dst, src, sizeof(ALFLOAT)*width);
+        }
+        return copyedM;
+    }
+    ALAUTOSTORAGE(indexes, ALFLOAT*, height);
     for (int i=0; i<height; ++i)
     {
         int j = ALRandom::mid(0, (int)totalHeight);

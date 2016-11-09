@@ -13,7 +13,7 @@ void StochasticGradientDecent::vOptimize(ALFloatMatrix* coefficient, const ALFlo
     }
     for (int i=0; i<iteration; ++i)
     {
-        ALSp<ALFloatMatrix> selectX = ALFloatMatrix::randomeSelectMatrix(X, mBatchSize);
+        ALSp<ALFloatMatrix> selectX = ALFloatMatrix::randomSelectMatrix(X, mBatchSize, true);
         ALSp<ALFloatMatrix> deltaC = delta->vCompute(coefficient, selectX.get());
         ALFloatMatrix::linear(coefficient, coefficient, 1.0, deltaC.get(), -alpha);
         ALFloatMatrix::checkAndSet(coefficient, 0.0f);

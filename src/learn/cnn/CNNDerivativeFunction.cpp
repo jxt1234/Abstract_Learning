@@ -32,14 +32,10 @@ namespace ALCNN {
     ALFloatMatrix* CNNDerivativeFunction::vCompute(ALFloatMatrix* coefficient, const ALFloatMatrix* Merge) const
     {
         //ALFORCEAUTOTIME;
-        ALSp<ALFloatMatrix> XV = ALFloatMatrix::createCropVirtualMatrix(Merge, mOutputSize, 0, Merge->width()-1, Merge->height()-1);
-        ALSp<ALFloatMatrix> YV = ALFloatMatrix::createCropVirtualMatrix(Merge, 0, 0, mOutputSize-1, Merge->height()-1);
+        ALSp<ALFloatMatrix> X = ALFloatMatrix::createCropVirtualMatrix(Merge, mOutputSize, 0, Merge->width()-1, Merge->height()-1);
+        ALSp<ALFloatMatrix> Y = ALFloatMatrix::createCropVirtualMatrix(Merge, 0, 0, mOutputSize-1, Merge->height()-1);
         ALFloatMatrix* resultDiff = ALFloatMatrix::create(coefficient->width(), coefficient->height());
         
-        ALSp<ALFloatMatrix> X = ALFloatMatrix::create(XV->width(), XV->height());
-        ALFloatMatrix::copy(X.get(), XV.get());
-        ALSp<ALFloatMatrix> Y = ALFloatMatrix::create(YV->width(), YV->height());
-        ALFloatMatrix::copy(Y.get(), YV.get());
         mFirst->mapParameters(coefficient, 0);
         mFirst->mapParametersDiff(resultDiff, 0);
 

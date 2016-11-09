@@ -93,7 +93,7 @@ public:
     /*For Virtual Matrix*/
     static ALFloatMatrix* createCropVirtualMatrix(const ALFloatMatrix* base, size_t l, size_t t, size_t r, size_t b);
     static ALFloatMatrix* createIndexVirtualMatrix(ALFLOAT** indexes, size_t w, size_t h);
-    static ALFloatMatrix* randomeSelectMatrix(const ALFloatMatrix* base, size_t height);
+    static ALFloatMatrix* randomSelectMatrix(const ALFloatMatrix* base, size_t height, bool copy = false);
     
     /*General function*/
     static void productBasic(ALFLOAT* c, size_t c_stride, const ALFLOAT* a, size_t a_stride, const ALFLOAT* b, size_t b_stride, size_t w, size_t h, size_t k);
