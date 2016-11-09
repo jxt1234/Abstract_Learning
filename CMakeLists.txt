@@ -27,7 +27,7 @@ if (HAS_BLAS)
     remove_definitions(-DALOPENCL_MAC)
 endif()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -Werror")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 

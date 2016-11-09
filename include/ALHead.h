@@ -20,4 +20,7 @@ typedef float ALFLOAT;
 typedef double ALFLOAT;
 #endif
 
+typedef uint32_t ALUINT;
+typedef int32_t ALINT;
+
 #endif
