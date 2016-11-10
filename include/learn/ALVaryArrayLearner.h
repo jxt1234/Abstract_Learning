@@ -10,7 +10,7 @@ class ALVaryArrayLearner : public ALRefCount
         ALVaryArrayLearner(cJSON* json);
         virtual ~ ALVaryArrayLearner();
         void train(const ALVaryArray* array, const ALFloatMatrix* label = NULL);
-        ALINT predict(const ALVaryArray::Array& array);
+        void predict(const ALVaryArray* array, ALFloatMatrix* dst);
     private:
         ALSp<ALIGradientDecent> mGDMethod;
         ALSp<ALIGradientDecent::DerivativeFunction> mDetFunction;

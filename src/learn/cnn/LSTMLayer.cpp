@@ -10,7 +10,9 @@
 #include "LayerFactoryRegistor.hpp"
 #include <math.h>
 #include <fstream>
+static int gNumber = 0;
 #define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x.get(), output);}
+#define DUMP2(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x, output);}
 
 namespace ALCNN {
     static auto gAddFunction = [](ALFLOAT* dst, ALFLOAT* src, size_t w) {
@@ -178,6 +180,7 @@ namespace ALCNN {
     
     void LSTMLayer::vForward(const ALFloatMatrix* before, ALFloatMatrix* after, const ALFloatMatrix* parameters, ALFloatMatrix* cache) const
     {
+        gNumber++;
         ALLEARNAUTOTIME;
         ALASSERT(NULL!=parameters);
         ALASSERT(NULL!=cache);
@@ -219,8 +222,6 @@ namespace ALCNN {
             ALSp<ALFloatMatrix> o_t = tCache.o;
             ALSp<ALFloatMatrix> c_t_bar = tCache.c_bar;
             
-            
-            
             ALFloatMatrix::runLineFunction(i_t.get(), i_t.get(), gSigmod);
             ALFloatMatrix::runLineFunction(f_t.get(), f_t.get(), gSigmod);
             ALFloatMatrix::runLineFunction(o_t.get(), o_t.get(), gSigmod);
@@ -237,7 +238,21 @@ namespace ALCNN {
             //Copy c_t as c_t_1, h_t as h_t_1
             ALFloatMatrix::copy(c_t_1.get(), c_t.get());
             ALFloatMatrix::copy(h_t_1.get(), h_t.get());
-            
+            if (false)
+            {
+                if (gNumber % 100 == 99)
+                {
+                    DUMP(tCache.i);
+                    DUMP(tCache.c);
+                    DUMP(tCache.f);
+                    DUMP(tCache.o);
+                    DUMP(tCache.c_bar);
+                    DUMP(h_t);
+                    DUMP(x_t);
+                    DUMP(weight.W);
+                }
+            }
+
         }
         
         before = NULL;
@@ -352,19 +367,23 @@ namespace ALCNN {
             weightDiff.addBias(1, x_t.get(), h_t_1.get(), w_u_b_c.get());
             weightDiff.addBias(2, x_t.get(), h_t_1.get(), w_u_b_f.get());
             
+            
             if (false)
             {
-                DUMP(tCache.i);
-                DUMP(tCache.c);
-                DUMP(tCache.f);
-                DUMP(tCache.o);
-                DUMP(tCache.c_bar);
-                DUMP(h_t);
-                DUMP(h_diff_t);
-                DUMP(x_t);
-                DUMP(weight.W);
-                DUMP(ot_sec_2_c_t);
-                DUMP(tanh_c_t_o_t_det);
+                if (gNumber % 100 == 99)
+                {
+                    DUMP(tCache.i);
+                    DUMP(tCache.c);
+                    DUMP(tCache.f);
+                    DUMP(tCache.o);
+                    DUMP(tCache.c_bar);
+                    DUMP(h_t);
+                    DUMP(h_diff_t);
+                    DUMP(x_t);
+                    DUMP(weight.W);
+                    DUMP(ot_sec_2_c_t);
+                    DUMP(tanh_c_t_o_t_det);
+                }
             }
             
             //Compute h_diff_t
@@ -379,6 +398,13 @@ namespace ALCNN {
                 ALFloatMatrix::linear(h_diff_t.get(), h_diff_t.get(), 1.0, h_cache.get(), 1.0);
             }
         }
+        
+//        DUMP2(before);
+//        DUMP2(after_diff);
+//        DUMP2(after);
+//        DUMP2(parameters_diff);
+//        DUMP2(parameters);
+        
     }
     
     //iw and ow is expanded by time

@@ -1,14 +1,20 @@
 {
     "name": "LSTM",
-    "train-batch":32,
+    "train-batch":16,
     "iteration":50000,
     "time":100,
-    "width":1000,
     "prop":2,
     "layers":[
         {
+            "type":"Embedding",
+            "input":100,
+            "output":12800,
+            "time":100,
+            "number":1000
+        },
+        {
             "type":"SoftMax",
-            "input":100000,
+            "input":12800,
             "output":2
         }
     ]

@@ -69,7 +69,23 @@ void ALVaryArrayLearner::train(const ALVaryArray* array, const ALFloatMatrix* la
     mLayerPredict->pFirstLayer->mapParameters(mCoeffecient.get(), 0);
 }
 
-ALINT ALVaryArrayLearner::predict(const ALVaryArray::Array& array)
+void ALVaryArrayLearner::predict(const ALVaryArray* array, ALFloatMatrix* dst)
 {
-    return 0;
+    ALASSERT(NULL!=array);
+    ALASSERT(NULL!=dst);
+    ALASSERT(dst->height() == array->size());
+    ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, mTime, NULL);
+    auto h = varyMatrix->height();
+    auto iw = varyMatrix->width();
+    auto ow = dst->width();
+    ALSp<ALFloatMatrix> expandLine = ALFloatMatrix::create(varyMatrix->width(), 1);
+    auto _expand = expandLine->vGetAddr();
+    for (size_t i=0; i<h; ++i)
+    {
+        auto v = varyMatrix->vGetAddr(i);
+        ::memcpy(_expand, v, iw*sizeof(ALFLOAT));
+        ALSp<ALFloatMatrix> p_line = mLayerPredict->pFirstLayer->forward(expandLine);
+        auto _dst = dst->vGetAddr(i);
+        ::memcpy(_dst, p_line->vGetAddr(), ow*sizeof(ALFLOAT));
+    }
 }
