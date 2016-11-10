@@ -13,7 +13,7 @@
             "time":10
         },
         {
-            "type":"Mean",
+            "type":"Max",
             "input":1000,
             "output":100
         },
