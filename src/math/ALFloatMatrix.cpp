@@ -12,6 +12,7 @@
 #include <algorithm>
 #ifdef ALOPENCL_MAC
 #include "opencl/ALOpenCL.h"
+#undef ALOPENCL_MAC
 #endif
 #ifdef ALBLAS
 #include "cblas.h"
