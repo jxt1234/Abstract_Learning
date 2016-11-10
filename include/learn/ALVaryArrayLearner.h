@@ -17,7 +17,6 @@ class ALVaryArrayLearner : public ALRefCount
         unsigned int mIteration;
         unsigned int mBatchSize;
         size_t mTime = 0;
-        size_t mNumber = 0;
         size_t mPropWidth = 0;
         LayerStruct* mLayerPredict;
         ALSp<ALFloatMatrix> mCoeffecient;

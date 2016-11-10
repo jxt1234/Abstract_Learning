@@ -5,7 +5,7 @@
 class ALVaryArrayMatrix : public ALFloatMatrix
 {
     public:
-        ALVaryArrayMatrix(const ALVaryArray* array, size_t time, size_t number, const ALFloatMatrix* label);
+        ALVaryArrayMatrix(const ALVaryArray* array, size_t time, const ALFloatMatrix* label);
         virtual ~ ALVaryArrayMatrix();
         virtual ALFLOAT* vGetAddr(size_t y) const override;
     private:
@@ -13,7 +13,6 @@ class ALVaryArrayMatrix : public ALFloatMatrix
         mutable size_t mCur = 0;
         mutable ALFLOAT* mCache = NULL;
         size_t mTime = 0;
-        size_t mNumber = 0;
         const ALVaryArray* mArray;
         const ALFloatMatrix* mLabel;
 };

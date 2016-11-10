@@ -29,18 +29,10 @@ ALVaryArrayLearner::ALVaryArrayLearner(cJSON* description)
         {
             mTime = c->valueint;
         }
-        else if (strcmp(c->string, "width")==0)
-        {
-            mNumber = c->valueint;
-        }
         else if (strcmp(c->string, "prop")==0)
         {
             mPropWidth = c->valueint;
         }
-    }
-    if (0 == mPropWidth)
-    {
-        mPropWidth = mNumber;
     }
     ALASSERT(NULL!=layer);
     ALSp<LayerWrap> firstLayer = LayerWrapFactory::create(layer);
@@ -71,7 +63,7 @@ void ALVaryArrayLearner::train(const ALVaryArray* array, const ALFloatMatrix* la
         ALFloatMatrix::typeExpand(Y_Expand.get(), YT.get());
         labelExpand = Y_Expand;
     }
-    ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, time, mNumber, labelExpand.get());
+    ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, time, labelExpand.get());
     mDetFunction->vInitParameters(mCoeffecient.get());
     mGDMethod->vOptimize(mCoeffecient.get(), varyMatrix.get(), mDetFunction.get(), 0.35, mIteration);
     mLayerPredict->pFirstLayer->mapParameters(mCoeffecient.get(), 0);

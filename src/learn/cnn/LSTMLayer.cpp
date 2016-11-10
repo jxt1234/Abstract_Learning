@@ -10,7 +10,7 @@
 #include "LayerFactoryRegistor.hpp"
 #include <math.h>
 #include <fstream>
-#define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/."#x); ALFloatMatrix::print(x.get(), output);}
+#define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x.get(), output);}
 
 namespace ALCNN {
     static auto gAddFunction = [](ALFLOAT* dst, ALFLOAT* src, size_t w) {

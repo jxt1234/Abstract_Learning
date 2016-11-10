@@ -3,23 +3,29 @@
     "train-batch":16,
     "iteration":50000,
     "time":10,
-    "width":1000,
     "prop":2,
     "layers":[
         {
+            "type":"Embedding",
+            "input":10,
+            "output":1280,
+            "time":10,
+            "number":1000
+        },
+        {
             "type":"LSTM",
-            "input":10000,
-            "output":1000,
+            "input":1280,
+            "output":1280,
             "time":10
         },
         {
-            "type":"Max",
-            "input":1000,
-            "output":100
+            "type":"Mean",
+            "input":1280,
+            "output":128
         },
         {
-            "type":"InnerProduct",
-            "input":100,
+            "type":"SoftMax",
+            "input":128,
             "output":2
         }
     ]

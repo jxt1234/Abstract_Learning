@@ -13,11 +13,11 @@ namespace ALCNN {
         ALASSERT(1 == coefficient->height());
         for (size_t i=0; i<size; ++i)
         {
-            c[i] = 0.1*ALRandom::rate()-0.05;
+            c[i] = (0.1*ALRandom::rate()-0.05);
         }
         return size;
     }
-    CNNDerivativeFunction::CNNDerivativeFunction(ALSp<LayerWrap> first, int outputSize)
+    CNNDerivativeFunction::CNNDerivativeFunction(ALSp<LayerWrap> first, size_t outputSize)
     {
         mFirst = first;
         mLast = first->getLastLayer();

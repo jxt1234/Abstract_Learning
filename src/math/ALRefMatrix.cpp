@@ -9,5 +9,6 @@ ALRefMatrix::~ALRefMatrix()
 }
 ALFLOAT* ALRefMatrix::vGetAddr(size_t y) const
 {
+    ALASSERT(y<mHeight);
     return mBase + y*width();
 }
