@@ -380,9 +380,10 @@ namespace ALCNN {
                     DUMP(h_t);
                     DUMP(h_diff_t);
                     DUMP(x_t);
-                    DUMP(weight.W);
                     DUMP(ot_sec_2_c_t);
                     DUMP(tanh_c_t_o_t_det);
+                    DUMP(weightDiff.W);
+                    DUMP(weight.W);
                 }
             }
             

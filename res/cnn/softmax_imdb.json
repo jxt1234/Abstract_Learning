@@ -1,6 +1,6 @@
 {
     "name": "LSTM",
-    "train-batch":16,
+    "train-batch":64,
     "iteration":50000,
     "time":100,
     "prop":2,

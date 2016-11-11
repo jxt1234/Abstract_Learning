@@ -120,12 +120,27 @@ public:
     /*c(i,j)=a(i,j)/b(i,j)*/
     static void productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     
+    //For Time series
+    struct LineInfo:public ALRefCount
+    {
+        ALINT* mTime;
+        LineInfo(size_t h)
+        {
+            mTime = new ALINT[h];
+        }
+        virtual ~ LineInfo()
+        {
+            delete [] mTime;
+        }
+    };
+    
+    
 protected:
     ALFloatMatrix(size_t w, size_t h, size_t stride):mWidth(w), mHeight(h), mStride(stride){}
     virtual ~ALFloatMatrix(){}
     size_t mWidth;
     size_t mHeight;
-    size_t mStride;
+    size_t mStride;    
 };
 
 #endif

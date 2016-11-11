@@ -32,12 +32,18 @@ namespace ALCNN {
         {
             auto dst = after->vGetAddr(y);
             auto src = before->vGetAddr(y);
-            for (size_t t=0; t<time; ++t)
+            size_t real_t = src[0];
+            ALASSERT(time >= real_t);
+            for (size_t t=0; t<real_t; ++t)
             {
                 auto _dst = dst + t*ow;
-                size_t index = src[t];
+                size_t index = src[t+1];
                 auto _src = parameters->vGetAddr(index);
                 ::memcpy(_dst, _src, ow*sizeof(ALFLOAT));
+            }
+            if (real_t < time)
+            {
+                ::memset(dst+real_t*ow, 0, (time-real_t)*ow*sizeof(ALFLOAT));
             }
         }
     }
@@ -54,10 +60,13 @@ namespace ALCNN {
         {
             auto dst_diff = after_diff->vGetAddr(y);
             auto src = before->vGetAddr(y);
-            for (size_t t=0; t<time; ++t)
+            size_t real_t = src[0];
+            ALASSERT(time >= real_t);
+
+            for (size_t t=0; t<real_t; ++t)
             {
                 auto _dst_diff = dst_diff + t*ow;
-                size_t index = src[t];
+                size_t index = src[t+1];
                 auto _p_diff = parameters_diff->vGetAddr(index);
                 for (size_t i=0; i<ow; ++i)
                 {
