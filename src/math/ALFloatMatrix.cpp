@@ -1201,9 +1201,9 @@ void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src
     ALASSERT(NULL!=src);
     ALASSERT(NULL!=dst);
     ALASSERT(dst->height() == src->height());
-    ALASSERT(dst->width() == src->width());//TODO
-    auto w = src->width();
-    auto h = src->height();
+    //ALASSERT(dst->width() == src->width());//TODO
+    auto w = dst->width();
+    auto h = dst->height();
     for (size_t y=0; y<h; ++y)
     {
         auto _dst = dst->vGetAddr(y);

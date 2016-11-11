@@ -186,8 +186,8 @@ namespace ALCNN {
         ALASSERT(NULL!=cache);
         ALASSERT(cache->width() == getInfo().cw*getInfo().ch);
         ALASSERT(parameters->height() == 1);
-        ALASSERT(before->width() == mInputSize*mTime);
-        ALASSERT(after->width() == mOutputSize*mTime);
+        ALASSERT(before->width() == mInputSize*mTime+1);
+        ALASSERT(after->width() == mOutputSize*mTime+1);
         ALASSERT(before->height() == after->height());
         WeightMatrix weight(parameters, mInputSize, mOutputSize);
         auto batchSize = before->height();

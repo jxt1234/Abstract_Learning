@@ -10,11 +10,16 @@
             "input":100,
             "output":12800,
             "time":100,
-            "number":1000
+            "number":10000
+        },
+        {
+            "type":"Mean",
+            "input":12800,
+            "output":128
         },
         {
             "type":"SoftMax",
-            "input":12800,
+            "input":128,
             "output":2
         }
     ]

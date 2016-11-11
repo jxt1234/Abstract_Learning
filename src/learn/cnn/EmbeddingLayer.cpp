@@ -10,7 +10,7 @@
 #include <fstream>
 #include "LayerFactoryRegistor.hpp"
 namespace ALCNN {
-    EmbeddingLayer::EmbeddingLayer(size_t iw, size_t ow, size_t time, size_t number):ILayer(iw, ow, ow/time, number, 0, 0)
+    EmbeddingLayer::EmbeddingLayer(size_t iw, size_t ow, size_t time, size_t number):ILayer(iw, ow+1, ow/time, number, 0, 0)
     {
         ALASSERT(iw%time == 0);
         ALASSERT(ow%time == 0);
@@ -23,8 +23,8 @@ namespace ALCNN {
     {
         auto info = getInfo();
         auto time = info.iw;
-        auto ow = info.ow / time;
-        ALASSERT(info.ow%ow == 0);
+        auto ow = (info.ow-1) / time;
+        ALASSERT((info.ow-1)%time == 0);
         auto h = after->height();
         ALASSERT(parameters->width() == ow);
         ALASSERT(parameters->height() == mNumber);
@@ -33,17 +33,14 @@ namespace ALCNN {
             auto dst = after->vGetAddr(y);
             auto src = before->vGetAddr(y);
             size_t real_t = src[0];
+            dst[0] = real_t;
             ALASSERT(time >= real_t);
             for (size_t t=0; t<real_t; ++t)
             {
-                auto _dst = dst + t*ow;
+                auto _dst = dst + t*ow + 1;
                 size_t index = src[t+1];
                 auto _src = parameters->vGetAddr(index);
                 ::memcpy(_dst, _src, ow*sizeof(ALFLOAT));
-            }
-            if (real_t < time)
-            {
-                ::memset(dst+real_t*ow, 0, (time-real_t)*ow*sizeof(ALFLOAT));
             }
         }
     }
@@ -52,7 +49,8 @@ namespace ALCNN {
         ALASSERT(NULL == before_diff);
         auto info = getInfo();
         auto time = info.iw;
-        auto ow = info.ow / time;
+        auto ow = (info.ow-1) / time;
+        ALASSERT((info.ow-1)%time == 0);
         auto h = after->height();
         ALFloatMatrix::zero(parameters_diff);
 
@@ -65,7 +63,7 @@ namespace ALCNN {
 
             for (size_t t=0; t<real_t; ++t)
             {
-                auto _dst_diff = dst_diff + t*ow;
+                auto _dst_diff = dst_diff + t*ow + 1;
                 size_t index = src[t+1];
                 auto _p_diff = parameters_diff->vGetAddr(index);
                 for (size_t i=0; i<ow; ++i)

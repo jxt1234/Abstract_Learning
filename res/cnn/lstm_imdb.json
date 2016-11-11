@@ -1,26 +1,26 @@
 {
     "name": "LSTM",
-    "train-batch":16,
+    "train-batch":64,
     "iteration":50000,
-    "time":10,
+    "time":100,
     "prop":2,
     "layers":[
         {
             "type":"Embedding",
-            "input":10,
-            "output":1280,
-            "time":10,
-            "number":1000
+            "input":100,
+            "output":12800,
+            "time":100,
+            "number":10000
         },
         {
             "type":"LSTM",
-            "input":1280,
-            "output":1280,
-            "time":10
+            "input":12800,
+            "output":12800,
+            "time":100
         },
         {
             "type":"Mean",
-            "input":1280,
+            "input":12800,
             "output":128
         },
         {
