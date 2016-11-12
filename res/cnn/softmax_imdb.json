@@ -10,7 +10,7 @@
             "input":100,
             "output":12800,
             "time":100,
-            "number":1000
+            "number":10000
         },
         {
             "type":"SoftMax",
