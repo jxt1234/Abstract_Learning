@@ -1198,6 +1198,7 @@ void ALFloatMatrix::linearVector(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLO
 
 void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
 {
+    ALAUTOTIME;
     ALASSERT(NULL!=src);
     ALASSERT(NULL!=dst);
     ALASSERT(dst->height() == src->height());
@@ -1213,6 +1214,7 @@ void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src
 }
 void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
 {
+    ALAUTOTIME;
     ALASSERT(NULL!=C);
     ALASSERT(NULL!=B);
     ALASSERT(NULL!=A);
@@ -1236,6 +1238,7 @@ void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const A
 }
 void ALFloatMatrix::productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
 {
+    ALAUTOTIME;
     ALASSERT(NULL!=C);
     ALASSERT(NULL!=B);
     ALASSERT(NULL!=A);
@@ -1273,6 +1276,7 @@ void ALFloatMatrix::set(ALFloatMatrix* X, ALFLOAT c)
 }
 void ALFloatMatrix::runReduceFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function)
 {
+    ALAUTOTIME;
     ALASSERT(NULL!=src);
     ALASSERT(NULL!=dst);
     ALASSERT(dst->height()==1);

@@ -65,7 +65,7 @@ void ALVaryArrayLearner::train(const ALVaryArray* array, const ALFloatMatrix* la
     }
     ALSp<ALFloatMatrix> varyMatrix = new ALVaryArrayMatrix(array, time, labelExpand.get());
     mDetFunction->vInitParameters(mCoeffecient.get());
-    mGDMethod->vOptimize(mCoeffecient.get(), varyMatrix.get(), mDetFunction.get(), 0.35, mIteration);
+    mGDMethod->vOptimize(mCoeffecient.get(), varyMatrix.get(), mDetFunction.get(), mAlpha, mIteration);
     mLayerPredict->pFirstLayer->mapParameters(mCoeffecient.get(), 0);
 }
 

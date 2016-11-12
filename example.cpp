@@ -22,7 +22,7 @@ int test_main(int argc, char* argv[])
     ALSp<ALStream> inputStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/Abstract_Learning/../data/imdb2/train_x.txt");
     ALSp<ALVaryArray> array = ALVaryArray::create(inputStream.get());
     ALSp<ALStream> propStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/Abstract_Learning/../data/imdb2/train_y.txt");
-    auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/./res/cnn/softmax_imdb.json");
+    auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/./res/cnn/lstm_imdb.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
     ALSp<ALVaryArrayLearner> learner = new ALVaryArrayLearner(jsonObject);
     ALSp<ALFloatMatrix> Y = ALFloatMatrix::load(propStream.get());

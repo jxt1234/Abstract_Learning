@@ -1,5 +1,6 @@
 #include "CNNDerivativeFunction.h"
 #include <fstream>
+#include <math.h>
 namespace ALCNN {
     size_t CNNDerivativeFunction::vInitParameters(ALFloatMatrix* coefficient) const
     {
@@ -61,6 +62,9 @@ namespace ALCNN {
             {
                 dst[j] = (srcP[j]-srcO[j]);
                 loss += dst[j]*dst[j];
+
+//                dst[j] = -(srcO[j]/srcP[j]);
+//                loss += -::log(srcP[j])*srcO[j];
             }
         }
         loss/=YP->height();

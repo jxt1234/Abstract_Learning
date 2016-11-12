@@ -381,9 +381,14 @@ namespace ALCNN {
                     DUMP(h_diff_t);
                     DUMP(x_t);
                     DUMP(ot_sec_2_c_t);
+                    DUMP(w_u_b_o);
+                    DUMP(w_u_b_i);
+                    DUMP(w_u_b_c);
+                    DUMP(w_u_b_f);
                     DUMP(tanh_c_t_o_t_det);
                     DUMP(weightDiff.W);
                     DUMP(weight.W);
+                    auto aaaa = 1;
                 }
             }
             
@@ -403,9 +408,14 @@ namespace ALCNN {
 //        DUMP2(before);
 //        DUMP2(after_diff);
 //        DUMP2(after);
+//        DUMP(cacheMatrix.total);
 //        DUMP2(parameters_diff);
 //        DUMP2(parameters);
-        
+//        DUMP(weightDiff.W);
+//        DUMP(weight.W);
+//        DUMP2(before_diff_);
+
+        auto aaaa = 0;
     }
     
     //iw and ow is expanded by time
