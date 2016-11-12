@@ -105,6 +105,9 @@ public:
     /*dst is one line, src's each line is reduced to dst*/
     static void runReduceFunction(ALFloatMatrix* dst, const ALFloatMatrix* src, std::function<void(ALFLOAT*, ALFLOAT*, size_t)> function);
     
+    /*Run function from src1, src2 to dst, function args: (dstLine, srcLine1, srcLine2, lineWidth)*/
+    static void runLineFunctionBi(ALFloatMatrix* dst, const ALFloatMatrix* src1, const ALFloatMatrix* src2, std::function<void(ALFLOAT*, ALFLOAT*, ALFLOAT*, size_t)> function);
+
     /*For Discrete Matrix*/
     static ALFloatMatrix* genTypes(const ALFloatMatrix* Y);
     
@@ -115,7 +118,7 @@ public:
     static void typeExpand(ALFloatMatrix* Y_Expand/*Output*/, const ALFloatMatrix* YT/*Input*/);
 
     /*c(i,j)=a(i,j)*b(i,j)*/
-    static void productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
+    static void productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B, bool add=false);
 
     /*c(i,j)=a(i,j)/b(i,j)*/
     static void productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);

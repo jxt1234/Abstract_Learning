@@ -20,30 +20,30 @@
 
 #ifdef ALOPENCL_MAC
 static const char* gProductSource = KERNEL(
-                                       __kernel void product(__global float *a, __global float* b, __global float* c, size_t w, size_t h, size_t l)
-                                       {
-                                           int x = get_global_id(0);
-                                           int y = get_global_id(1);
+                                           __kernel void product(__global float *a, __global float* b, __global float* c, size_t w, size_t h, size_t l)
                                            {
-                                               float sum = 0.0;
-                                               int i=0;
-                                               __global float* _a = a + y*l;
-                                               __global float* _b = b + x*l;
-                                               for (i=0; i<l/4; i=i+1)
+                                               int x = get_global_id(0);
+                                               int y = get_global_id(1);
                                                {
-                                                   float4 aa = vload4(i, _a);
-                                                   float4 bb = vload4(i, _b);
-                                                   sum += dot(aa, bb);
+                                                   float sum = 0.0;
+                                                   int i=0;
+                                                   __global float* _a = a + y*l;
+                                                   __global float* _b = b + x*l;
+                                                   for (i=0; i<l/4; i=i+1)
+                                                   {
+                                                       float4 aa = vload4(i, _a);
+                                                       float4 bb = vload4(i, _b);
+                                                       sum += dot(aa, bb);
+                                                   }
+                                                   i = i*4;
+                                                   for (; i<l; ++i)
+                                                   {
+                                                       sum+= _a[i] * _b[i];
+                                                   }
+                                                   *(c + y*w + x) = sum;
                                                }
-                                               i = i*4;
-                                               for (; i<l; ++i)
-                                               {
-                                                   sum+= _a[i] * _b[i];
-                                               }
-                                               *(c + y*w + x) = sum;
                                            }
-                                       }
-                                       );
+                                           );
 static cl_kernel gKernel = NULL;
 static ALOpenCL::PrepareWork gPrepare = {
     [](cl_context context, cl_device_id device) {
@@ -173,7 +173,7 @@ void ALFloatMatrix::productTA(ALFloatMatrix* C, const ALFloatMatrix* AT, const A
             *_c = sum;
         }
     }
-
+    
 }
 
 
@@ -210,7 +210,7 @@ ALFloatMatrix* ALFloatMatrix::product(const ALFloatMatrix* A, const ALFloatMatri
     ALASSERT(A->width() == B->height());
     auto w = B->width();
     auto h = A->height();
-
+    
     ALFloatMatrix* C = new ALBaseFloatMatrix(w, h);
     product(C, A, B);
     return C;
@@ -676,7 +676,7 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
     }
     auto rC = result->width();
     ALFLOAT* c = result->vGetAddr();
-
+    
 #ifdef ALBLAS
     auto a_stride = rA;
     auto c_stride = rC;
@@ -697,7 +697,7 @@ ALFloatMatrix* ALFloatMatrix::sts(const ALFloatMatrix* A, bool transpose)
     {
         for (int j=i; j<w; ++j)
         {
-            ALFLOAT sum = 0; 
+            ALFLOAT sum = 0;
             ALFLOAT* sA = a + i*ws;
             ALFLOAT* sB = b + j*ws;
             for (int k=0; k<h; ++k)
@@ -937,7 +937,7 @@ ALFloatMatrix* ALFloatMatrix::load(ALStream* f)
             ALStandardLoader::loadNumbers(unit->vGetAddr(cur++), num, dyBuffer.content(), len);
         }
         unit->mHeight = cur;
-
+        
         result->addMatrix(unit);
     }
     return result;
@@ -1068,7 +1068,7 @@ void ALFloatMatrix::linear(ALFloatMatrix* C, const ALFloatMatrix* A, ALFLOAT pa,
             *(c+j) = _a*pa + _b*pb;
         }
     }
-
+    
 }
 
 void ALFloatMatrix::linearDirect(ALFloatMatrix* X, ALFLOAT a, ALFLOAT b)
@@ -1212,7 +1212,7 @@ void ALFloatMatrix::runLineFunction(ALFloatMatrix* dst, const ALFloatMatrix* src
         function(_dst, _src, w);
     }
 }
-void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
+void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B, bool add)
 {
     ALAUTOTIME;
     ALASSERT(NULL!=C);
@@ -1224,17 +1224,32 @@ void ALFloatMatrix::productDot(ALFloatMatrix* C, const ALFloatMatrix* A, const A
     ALASSERT(C->height() == B->height());
     auto w = A->width();
     auto h = A->height();
-    for (size_t y=0; y<h; ++y)
+    if (!add)
     {
-        auto c = C->vGetAddr(y);
-        auto b = B->vGetAddr(y);
-        auto a = A->vGetAddr(y);
-        for (size_t x=0; x<w; ++x)
+        for (size_t y=0; y<h; ++y)
         {
-            c[x] = b[x]*a[x];
+            auto c = C->vGetAddr(y);
+            auto b = B->vGetAddr(y);
+            auto a = A->vGetAddr(y);
+            for (size_t x=0; x<w; ++x)
+            {
+                c[x] = b[x]*a[x];
+            }
         }
     }
-
+    else
+    {
+        for (size_t y=0; y<h; ++y)
+        {
+            auto c = C->vGetAddr(y);
+            auto b = B->vGetAddr(y);
+            auto a = A->vGetAddr(y);
+            for (size_t x=0; x<w; ++x)
+            {
+                c[x] += b[x]*a[x];
+            }
+        }
+    }    
 }
 void ALFloatMatrix::productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B)
 {
@@ -1289,4 +1304,25 @@ void ALFloatMatrix::runReduceFunction(ALFloatMatrix* dst, const ALFloatMatrix* s
         auto _src = src->vGetAddr(y);
         function(_dst, _src, w);
     }
+}
+
+void ALFloatMatrix::runLineFunctionBi(ALFloatMatrix* dst, const ALFloatMatrix* src1, const ALFloatMatrix* src2, std::function<void(ALFLOAT*, ALFLOAT*, ALFLOAT*, size_t)> function)
+{
+    ALAUTOTIME;
+    ALASSERT(NULL!=src1);
+    ALASSERT(NULL!=src2);
+    ALASSERT(NULL!=dst);
+    ALASSERT(dst->height() == src1->height());
+    ALASSERT(dst->height() == src2->height());
+    //ALASSERT(dst->width() == src->width());//TODO
+    auto w = dst->width();
+    auto h = dst->height();
+    for (size_t y=0; y<h; ++y)
+    {
+        auto _dst = dst->vGetAddr(y);
+        auto _src1 = src1->vGetAddr(y);
+        auto _src2 = src2->vGetAddr(y);
+        function(_dst, _src1, _src2, w);
+    }
+    
 }
