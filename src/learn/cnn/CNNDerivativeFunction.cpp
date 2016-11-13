@@ -73,7 +73,7 @@ namespace ALCNN {
         {
             static int gNumber = 0;
             gNumber++;
-            if (gNumber % 100==0)
+            //if (gNumber % 100==0)
             {
                 FUNC_PRINT_ALL(mCurrentLoss, f);
             }
