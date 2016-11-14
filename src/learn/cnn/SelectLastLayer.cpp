@@ -1,8 +1,6 @@
 #include "SelectLastLayer.h"
 #include <fstream>
 #include "LayerFactoryRegistor.hpp"
-#define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x.get(), output);}
-#define DUMP2(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x, output);}
 
 namespace ALCNN {
     SelectLastLayer::SelectLastLayer(size_t iw, size_t ow):ILayer(iw+1, ow, 0, 0, 0, 0)
@@ -26,12 +24,8 @@ namespace ALCNN {
     }
     void SelectLastLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
-        if (NULL == before_diff)
-        {
-            return;
-        }
+        ALASSERT(NULL!=before_diff);
         ALFloatMatrix::zero(before_diff);
-        auto ow = after_diff->width();
         auto h = after_diff->height();
         for (size_t i=0; i<h; ++i)
         {
@@ -40,14 +34,8 @@ namespace ALCNN {
             src_diff[0] = src[0];
             auto dst_diff = after_diff->vGetAddr(i);
             size_t time = src[0];
-            ::memcpy(src_diff+1+(time-1)*mOw, dst_diff, ow*sizeof(ALFLOAT));
+            ::memcpy(src_diff+1+(time-1)*mOw, dst_diff, mOw*sizeof(ALFLOAT));
         }
-//        DUMP2(before_diff);
-//        DUMP2(before);
-//        DUMP2(after_diff);
-//        DUMP2(after);
-        
-        ow = 0;
     }
     static auto gCreateFunction = [](const LayerParameters& p) {
         return new SelectLastLayer(p.uInputSize, p.uOutputSize);

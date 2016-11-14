@@ -1326,3 +1326,25 @@ void ALFloatMatrix::runLineFunctionBi(ALFloatMatrix* dst, const ALFloatMatrix* s
     }
     
 }
+
+bool ALFloatMatrix::checkNAN(const ALFloatMatrix* C)
+{
+    ALAUTOTIME;
+    ALASSERT(NULL!=C);
+    auto w = C->width();
+    auto h = C->height();
+    for (size_t i=0; i<h; ++i)
+    {
+        auto c = C->vGetAddr(i);
+        for (size_t j=0; j<w; ++j)
+        {
+            auto xj = c[j];
+            if (!(xj>=0)&&(!(xj<0)))
+            {
+                return true;
+            }
+
+        }
+    }
+    return false;
+}

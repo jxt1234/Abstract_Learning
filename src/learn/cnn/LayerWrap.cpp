@@ -1,4 +1,8 @@
 #include "LayerWrap.h"
+#include <fstream>
+#define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x.get(), output);}
+#define DUMP2(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x, output);}
+
 namespace ALCNN {
     LayerWrap::LayerWrap(ALSp<ILayer> layer)
     {
@@ -66,6 +70,22 @@ namespace ALCNN {
         mInput = input;
         ALASSERT(NULL!=mOutput.get());
         mLayer->vForward(input.get(), mOutput.get(), mParameters.get(), mCache.get());
+        
+        if(ALFloatMatrix::checkNAN(mOutput.get()))
+        {
+            DUMP(input);
+            DUMP(mOutput);
+            if (NULL!=mParameters.get())
+            {
+                DUMP(mParameters);
+            }
+            if (NULL!=mCache.get())
+            {
+                DUMP(mCache);
+            }
+            ALASSERT(false);
+        }
+        
         if (NULL != mForwardDump)
         {
             ALFloatMatrix::print(mOutput.get(), *mForwardDump);

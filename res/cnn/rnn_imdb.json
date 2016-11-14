@@ -1,5 +1,5 @@
 {
-    "name": "LSTM",
+    "name": "RNN",
     "train-batch":64,
     "iteration":50000,
     "time":10,

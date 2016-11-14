@@ -1,6 +1,9 @@
 #include "CNNDerivativeFunction.h"
 #include <fstream>
 #include <math.h>
+#define DUMP(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x.get(), output);}
+#define DUMP2(x) {std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/dump/."#x); ALFloatMatrix::print(x, output);}
+
 namespace ALCNN {
     size_t CNNDerivativeFunction::vInitParameters(ALFloatMatrix* coefficient) const
     {
@@ -24,7 +27,8 @@ namespace ALCNN {
         mLast = first->getLastLayer();
         //ALASSERT(mFirst.get()!=mLast);
         mOutputSize = outputSize;
-        mDecay = 0.001;//TODO
+        mDecay = 0.000;//TODO
+        mCurrentLoss = 11.0;
     }
     CNNDerivativeFunction::~CNNDerivativeFunction()
     {
@@ -68,12 +72,32 @@ namespace ALCNN {
             }
         }
         loss/=YP->height();
+        if ((!(loss>0)) &&(!(loss<=0)))
+        {
+            DUMP(YP);
+            DUMP(X);
+            ALSp<ALFloatMatrix> CT = ALFloatMatrix::transpose(coefficient);
+            DUMP(CT);
+            ALASSERT(false);
+        }
+        
+//        if (mCurrentLoss < loss - 0.01)
+//        {
+//            DUMP(YP);
+//            DUMP(X);
+//            ALSp<ALFloatMatrix> CT = ALFloatMatrix::transpose(coefficient);
+//            DUMP(CT);
+//            ALASSERT(false);
+//        }
+
         mCurrentLoss = loss;
+        
         if (true)
         {
             static int gNumber = 0;
             gNumber++;
-            //if (gNumber % 100==0)
+
+            if (gNumber % 100==0)
             {
                 FUNC_PRINT_ALL(mCurrentLoss, f);
             }

@@ -105,25 +105,22 @@ namespace ALCNN {
         }
         ~ WeightMatrix() {}
         
-        void addBias(size_t index, const ALFloatMatrix* x_t, const ALFloatMatrix* h_t_1, const ALFloatMatrix* h_diff)
+        void addBias(const ALFloatMatrix* x_t, const ALFloatMatrix* h_t_1, const ALFloatMatrix* w_u_b)
         {
-            ALASSERT(0<=index && index<4);
+            //return;
             ALASSERT(x_t!=NULL);
-            ALASSERT(h_diff!=NULL);
-            ALSp<ALFloatMatrix> w = ALFloatMatrix::createCropVirtualMatrix(W.get(), 0, mOw*index, mIw-1, mOw*(index+1)-1);
-            ALSp<ALFloatMatrix> b = ALFloatMatrix::createCropVirtualMatrix(B.get(), mOw*index, 0, mOw*(index+1)-1, 0);
-            ALSp<ALFloatMatrix> u = ALFloatMatrix::createCropVirtualMatrix(U.get(), mOw*index, 0, mOw*(index+1)-1, mOw-1);
-            ALSp<ALFloatMatrix> w_diff = ALFloatMatrix::create(mIw, mOw);
-            ALFloatMatrix::productTA(w_diff.get(), h_diff, x_t);
-            ALFloatMatrix::linear(w.get(), w.get(), 1.0, w_diff.get(), 1.0);
+            ALASSERT(w_u_b!=NULL);
+            ALSp<ALFloatMatrix> w_diff = ALFloatMatrix::create(mIw, mOw*4);
+            ALFloatMatrix::productTA(w_diff.get(), w_u_b, x_t);
+            ALFloatMatrix::linear(W.get(), W.get(), 1.0, w_diff.get(), 1.0);
             
-            ALFloatMatrix::runReduceFunction(b.get(), h_diff, gAddFunction);
+            ALFloatMatrix::runReduceFunction(B.get(), w_u_b, gAddFunction);
             
             if (NULL != h_t_1)
             {
-                ALSp<ALFloatMatrix> u_diff = ALFloatMatrix::create(mOw, mOw);
-                ALFloatMatrix::productTA(u_diff.get(), h_diff, h_t_1);
-                ALFloatMatrix::linear(u.get(), u.get(), 1.0, u_diff.get(), 1.0);
+                ALSp<ALFloatMatrix> u_diff = ALFloatMatrix::create(mOw*4, mOw);
+                ALFloatMatrix::productTA(u_diff.get(), w_u_b, h_t_1);
+                ALFloatMatrix::linear(U.get(), U.get(), 1.0, u_diff.get(), 1.0);
             }
         }
     };
@@ -262,7 +259,7 @@ namespace ALCNN {
             ALFloatMatrix::product(u_h_t_1.get(), h_t_1.get(), weight.U.get());
             //Use w_x_t to save total result
             ALFloatMatrix::linear(tCache.merge.get(), tCache.merge.get(), 1.0, u_h_t_1.get(), 1.0);
-            
+
             //Now merge means: Wx+Uh+b, compute others
             
             ALSp<ALFloatMatrix> i_t = tCache.i;
@@ -305,49 +302,36 @@ namespace ALCNN {
             }
 
         }
-        
+
         before = NULL;
         
     }
     void LSTMLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
         ALLEARNAUTOTIME;
-        
         WeightMatrix weight(parameters, mInputSize, mOutputSize);
         ALFloatMatrix::zero(parameters_diff);
         WeightMatrix weightDiff(parameters_diff, mInputSize, mOutputSize);
         Cache cacheMatrix(cache, mOutputSize, mTime);
         auto batchSize = before->height();
         size_t index;
-        index = 0;
-        ALSp<ALFloatMatrix> w_i = ALFloatMatrix::createCropVirtualMatrix(weight.W.get(), 0, mOutputSize*index, mInputSize-1, mOutputSize*(index+1)-1);
-        index = 1;
-        ALSp<ALFloatMatrix> w_c = ALFloatMatrix::createCropVirtualMatrix(weight.W.get(), 0, mOutputSize*index, mInputSize-1, mOutputSize*(index+1)-1);
-        index = 2;
-        ALSp<ALFloatMatrix> w_f = ALFloatMatrix::createCropVirtualMatrix(weight.W.get(), 0, mOutputSize*index, mInputSize-1, mOutputSize*(index+1)-1);
-        index = 3;
-        ALSp<ALFloatMatrix> w_o = ALFloatMatrix::createCropVirtualMatrix(weight.W.get(), 0, mOutputSize*index, mInputSize-1, mOutputSize*(index+1)-1);
-        index = 0;
-        ALSp<ALFloatMatrix> u_i = ALFloatMatrix::createCropVirtualMatrix(weight.U.get(), mOutputSize*index, 0, mOutputSize*(index+1)-1, mOutputSize-1);
-        index = 1;
-        ALSp<ALFloatMatrix> u_c = ALFloatMatrix::createCropVirtualMatrix(weight.U.get(), mOutputSize*index, 0, mOutputSize*(index+1)-1, mOutputSize-1);
-        index = 2;
-        ALSp<ALFloatMatrix> u_f = ALFloatMatrix::createCropVirtualMatrix(weight.U.get(), mOutputSize*index, 0, mOutputSize*(index+1)-1, mOutputSize-1);
-        index = 3;
-        ALSp<ALFloatMatrix> u_o = ALFloatMatrix::createCropVirtualMatrix(weight.U.get(), mOutputSize*index, 0, mOutputSize*(index+1)-1, mOutputSize-1);
-        
         //Init Cache
         ALSp<ALFloatMatrix> ot_sec_2_c_t = ALFloatMatrix::create(mOutputSize, batchSize);
         ALSp<ALFloatMatrix> tanh_c_t_o_t_det = ALFloatMatrix::create(mOutputSize, batchSize);
-        ALSp<ALFloatMatrix> w_u_b_i = ALFloatMatrix::create(mOutputSize, batchSize);
-        ALSp<ALFloatMatrix> w_u_b_c = ALFloatMatrix::create(mOutputSize, batchSize);
-        ALSp<ALFloatMatrix> w_u_b_f = ALFloatMatrix::create(mOutputSize, batchSize);
-        ALSp<ALFloatMatrix> w_u_b_o = ALFloatMatrix::create(mOutputSize, batchSize);
+        ALSp<ALFloatMatrix> w_u_b = ALFloatMatrix::create(mOutputSize*4, batchSize);
+        index = 0;
+        ALSp<ALFloatMatrix> w_u_b_i = ALFloatMatrix::createCropVirtualMatrix(w_u_b.get(), index*mOutputSize, 0, mOutputSize*(index+1)-1, batchSize-1);
+        index = 1;
+        ALSp<ALFloatMatrix> w_u_b_c = ALFloatMatrix::createCropVirtualMatrix(w_u_b.get(), index*mOutputSize, 0, mOutputSize*(index+1)-1, batchSize-1);
+        index = 2;
+        ALSp<ALFloatMatrix> w_u_b_f = ALFloatMatrix::createCropVirtualMatrix(w_u_b.get(), index*mOutputSize, 0, mOutputSize*(index+1)-1, batchSize-1);
+        index = 3;
+        ALSp<ALFloatMatrix> w_u_b_o = ALFloatMatrix::createCropVirtualMatrix(w_u_b.get(), index*mOutputSize, 0, mOutputSize*(index+1)-1, batchSize-1);
         
-        ALSp<ALFloatMatrix> x_cache = ALFloatMatrix::create(mInputSize, batchSize);
-        ALSp<ALFloatMatrix> h_cache = ALFloatMatrix::create(mOutputSize, batchSize);
         ALSp<ALFloatMatrix> h_diff_t = ALFloatMatrix::create(mOutputSize, batchSize);
         ALFloatMatrix::zero(h_diff_t.get());
+        ALSp<ALFloatMatrix> c_diff_t = ALFloatMatrix::create(mOutputSize, batchSize);
+        ALFloatMatrix::zero(c_diff_t.get());
         
         ALSp<ALFloatMatrix> time = ALFloatMatrix::createCropVirtualMatrix(before, 0, 0, 0, before->height()-1);
         time = ALFloatMatrix::transpose(time.get());
@@ -372,6 +356,8 @@ namespace ALCNN {
             ALFloatMatrix::productDot(ot_sec_2_c_t.get(), ot_sec_2_c_t.get(), tCache.o.get());
             ALFloatMatrix::productDot(ot_sec_2_c_t.get(), ot_sec_2_c_t.get(), h_diff_t.get());
             
+            ALFloatMatrix::linear(c_diff_t.get(), c_diff_t.get(), 1.0f, ot_sec_2_c_t.get(), 1.0);
+            
             //Compute tanh_c_t_o_t_det * h_diff_t
             ALFloatMatrix::runLineFunction(tanh_c_t_o_t_det.get(), tCache.c.get(), gTanh);
             ALFloatMatrix::productDot(tanh_c_t_o_t_det.get(), tCache.o.get(), tanh_c_t_o_t_det.get());
@@ -382,11 +368,11 @@ namespace ALCNN {
             ALFloatMatrix::runLineFunction(w_u_b_o.get(), tCache.o.get(), gSigmodDetMulti);
             
             //Compute w_u_b_i: ot_sec_2_c_t * c_bar_t * i_t* (1-i_t)
-            ALFloatMatrix::productDot(w_u_b_i.get(), ot_sec_2_c_t.get(), tCache.c_bar.get());
+            ALFloatMatrix::productDot(w_u_b_i.get(), c_diff_t.get(), tCache.c_bar.get());
             ALFloatMatrix::runLineFunction(w_u_b_i.get(), tCache.i.get(), gSigmodDetMulti);
             
             //Compute w_u_b_c: ot_sec_2_c_t * i_t * (1+c_bar_t*c_bar_t) * mask
-            ALFloatMatrix::productDot(w_u_b_c.get(), ot_sec_2_c_t.get(), tCache.i.get());
+            ALFloatMatrix::productDot(w_u_b_c.get(), c_diff_t.get(), tCache.i.get());
             ALFloatMatrix::runLineFunction(w_u_b_c.get(), tCache.c_bar.get(), gTanhDetMulti);
             ALFloatMatrix::productDot(w_u_b_c.get(), w_u_b_c.get(), mask.get());
             
@@ -399,76 +385,30 @@ namespace ALCNN {
             {
                 auto tCache_1 = cacheMatrix.get(t-1);
                 ALSp<ALFloatMatrix> c_t_1 = tCache_1.c;
-                ALFloatMatrix::productDot(w_u_b_f.get(), ot_sec_2_c_t.get(), c_t_1.get());
+                ALFloatMatrix::productDot(w_u_b_f.get(), c_diff_t.get(), c_t_1.get());
                 ALFloatMatrix::runLineFunction(w_u_b_f.get(), tCache.f.get(), gSigmodDetMulti);
             }
+            
             if (NULL!=before_diff)
             {
                 //Compute x_diff_t
                 ALSp<ALFloatMatrix> x_diff_t = ALFloatMatrix::createCropVirtualMatrix(before_diff, t*mInputSize+1, 0, (t+1)*mInputSize, batchSize-1);
-                ALFloatMatrix::product(x_diff_t.get(), w_u_b_o.get(), w_o.get());
-                ALFloatMatrix::product(x_cache.get(), w_u_b_i.get(), w_i.get());
-                ALFloatMatrix::linear(x_diff_t.get(), x_diff_t.get(), 1.0, x_cache.get(), 1.0);
-                ALFloatMatrix::product(x_cache.get(), w_u_b_c.get(), w_c.get());
-                ALFloatMatrix::linear(x_diff_t.get(), x_diff_t.get(), 1.0, x_cache.get(), 1.0);
-                ALFloatMatrix::product(x_cache.get(), w_u_b_f.get(), w_f.get());
-                ALFloatMatrix::linear(x_diff_t.get(), x_diff_t.get(), 1.0, x_cache.get(), 1.0);
+                ALFloatMatrix::product(x_diff_t.get(), w_u_b.get(), weight.W.get());
             }
             //Compute weight bias
-            weightDiff.addBias(3, x_t.get(), h_t_1.get(), w_u_b_o.get());
-            weightDiff.addBias(0, x_t.get(), h_t_1.get(), w_u_b_i.get());
-            weightDiff.addBias(1, x_t.get(), h_t_1.get(), w_u_b_c.get());
-            weightDiff.addBias(2, x_t.get(), h_t_1.get(), w_u_b_f.get());
-            
-            if (false)
-            {
-                if (gNumber % 100 == 99)
-                {
-                    DUMP(tCache.i);
-                    DUMP(tCache.c);
-                    DUMP(tCache.f);
-                    DUMP(tCache.o);
-                    DUMP(tCache.c_bar);
-                    DUMP(h_t);
-                    DUMP(h_diff_t);
-                    DUMP(x_t);
-                    DUMP(ot_sec_2_c_t);
-                    DUMP(w_u_b_o);
-                    DUMP(w_u_b_i);
-                    DUMP(w_u_b_c);
-                    DUMP(w_u_b_f);
-                    DUMP(tanh_c_t_o_t_det);
-                    DUMP(weightDiff.W);
-                    DUMP(weight.W);
-                    auto aaaa = 1;
-                }
-            }
-            
-            //Compute h_diff_t
+            weightDiff.addBias(x_t.get(), h_t_1.get(), w_u_b.get());
+
+            //Compute h_diff_t and c_diff_t_1
             if (t > 0)
             {
-                ALFloatMatrix::product(h_diff_t.get(), w_u_b_o.get(), u_o.get());
-                ALFloatMatrix::product(h_cache.get(), w_u_b_i.get(), u_i.get());
-                ALFloatMatrix::linear(h_diff_t.get(), h_diff_t.get(), 1.0, h_cache.get(), 1.0);
-                ALFloatMatrix::product(h_cache.get(), w_u_b_c.get(), u_c.get());
-                ALFloatMatrix::linear(h_diff_t.get(), h_diff_t.get(), 1.0, h_cache.get(), 1.0);
-                ALFloatMatrix::product(h_cache.get(), w_u_b_f.get(), u_f.get());
-                ALFloatMatrix::linear(h_diff_t.get(), h_diff_t.get(), 1.0, h_cache.get(), 1.0);
+                ALFloatMatrix::productT(h_diff_t.get(), w_u_b.get(), weight.U.get());
                 
                 ALFloatMatrix::productDot(h_diff_t.get(), h_diff_t.get(), mask.get());
+                
+                ALFloatMatrix::productDot(c_diff_t.get(), c_diff_t.get(), tCache.f.get());
+                ALFloatMatrix::productDot(c_diff_t.get(), c_diff_t.get(), mask.get());
             }
         }
-//        DUMP2(before);
-//        DUMP2(after_diff);
-//        DUMP2(after);
-//        DUMP(cacheMatrix.total);
-//        DUMP2(parameters_diff);
-//        DUMP2(parameters);
-//        DUMP(weightDiff.W);
-//        DUMP(weight.W);
-//        DUMP2(before_diff);
-
-        auto aaaa = 0;
     }
     
     //iw and ow is expanded by time
@@ -485,5 +425,4 @@ namespace ALCNN {
     };
     
     static LayerFactoryRegister __reg(gCreateFunction, "LSTM");
-    
 };

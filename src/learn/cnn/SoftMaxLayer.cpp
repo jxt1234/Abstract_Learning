@@ -3,6 +3,7 @@
 #include "math/ALStatistics.h"
 #include <fstream>
 #include "LayerFactoryRegistor.hpp"
+
 namespace ALCNN {
     SoftMaxLayer::SoftMaxLayer(int inputSize, int outputSize):ILayer(inputSize, outputSize, inputSize+1,outputSize, 0, 0)
     {
@@ -73,6 +74,7 @@ namespace ALCNN {
                 dst[j]/=dstSum;
             }
         }
+
     }
     void SoftMaxLayer::vBackward(const ALFloatMatrix* after_diff, const ALFloatMatrix* after, const ALFloatMatrix* parameters, const ALFloatMatrix* before, ALFloatMatrix* before_diff, ALFloatMatrix* parameters_diff, ALFloatMatrix* cache) const
     {
@@ -129,11 +131,6 @@ namespace ALCNN {
                     x[j] += (pd[j]*y[i]-y[i]*ythetadot[j])*ydet[i];
                 }
             }
-        }
-        if (0)
-        {
-            std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/temp_input_diff_soft_max.txt");
-            ALFloatMatrix::print(before_diff, output);
         }
     }
     static auto gCreateFunction = [](const LayerParameters& p) {

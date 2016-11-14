@@ -123,6 +123,8 @@ public:
     /*c(i,j)=a(i,j)/b(i,j)*/
     static void productDivide(ALFloatMatrix* C, const ALFloatMatrix* A, const ALFloatMatrix* B);
     
+    static bool checkNAN(const ALFloatMatrix* C);
+    
     //For Time series
     struct LineInfo:public ALRefCount
     {
