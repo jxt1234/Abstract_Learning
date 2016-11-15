@@ -3,6 +3,7 @@ import Renascence
 def main():
     producer = Renascence.init(["./libAbstract_learning.xml"])
     gd = producer.load('ALGradientMethod', './res/cnn/lenet.json')
+    print gd
     #gd = producer.load('ALGradientMethod', './res/cnn/softmax.json')
 
     trainMerge = producer.load('ALFloatMatrix', '../../machine_exam/handset/train.txt');

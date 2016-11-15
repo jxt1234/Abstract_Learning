@@ -314,7 +314,7 @@ ALFloatMatrix* ALPackageGDMatrixPrepare(ALFloatMatrix* X, ALFloatMatrix* Y, ALGr
     ALSp<ALFloatMatrix> YT = ALFloatMatrix::transpose(Y);
     ALSp<ALFloatMatrix> Y_E = ALFloatMatrix::create(grad->typeNumber, YT->width());
     ALFloatMatrix::typeExpand(Y_E.get(), YT.get());
-    return ALFloatMatrix::unionHorizontal(Y_E.get(), X);
+    return ALFloatMatrix::unionHorizontal(X, Y_E.get());
 }
 ALFloatMatrix* ALPackageMatrixPlusM(ALFloatMatrix* X1, ALFloatMatrix* X2)
 {

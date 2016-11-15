@@ -28,6 +28,7 @@ namespace ALCNN {
         auto h = after->height();
         ALASSERT(parameters->width() == ow);
         ALASSERT(parameters->height() == mNumber);
+        ALFloatMatrix::zero(after);
         for (size_t y=0; y<h; ++y)
         {
             auto dst = after->vGetAddr(y);

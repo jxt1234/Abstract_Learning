@@ -119,7 +119,12 @@ namespace ALCNN {
             if (NULL != h_t_1)
             {
                 ALSp<ALFloatMatrix> u_diff = ALFloatMatrix::create(mOw*4, mOw);
-                ALFloatMatrix::productTA(u_diff.get(), w_u_b, h_t_1);
+                for (int i=0; i<4; ++i)
+                {
+                    ALSp<ALFloatMatrix> sub_u_diff = ALFloatMatrix::createCropVirtualMatrix(u_diff.get(), i*mOw, 0, mOw*(i+1)-1, mOw-1);
+                    ALSp<ALFloatMatrix> sub_w_u_b = ALFloatMatrix::createCropVirtualMatrix(w_u_b, i*mOw, 0, mOw*(i+1)-1, w_u_b->height()-1);
+                    ALFloatMatrix::productTA(sub_u_diff.get(), sub_w_u_b.get(), h_t_1);
+                }
                 ALFloatMatrix::linear(U.get(), U.get(), 1.0, u_diff.get(), 1.0);
             }
         }

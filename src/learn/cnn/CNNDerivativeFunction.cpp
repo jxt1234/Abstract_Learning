@@ -27,7 +27,7 @@ namespace ALCNN {
         mLast = first->getLastLayer();
         //ALASSERT(mFirst.get()!=mLast);
         mOutputSize = outputSize;
-        mDecay = 0.000;//TODO
+        mDecay = 0.001;//TODO
         mCurrentLoss = 11.0;
     }
     CNNDerivativeFunction::~CNNDerivativeFunction()
