@@ -73,17 +73,9 @@ namespace ALCNN {
         
         if(ALFloatMatrix::checkNAN(mOutput.get()))
         {
-            DUMP(input);
-            DUMP(mOutput);
-            if (NULL!=mParameters.get())
-            {
-                DUMP(mParameters);
-            }
-            if (NULL!=mCache.get())
-            {
-                DUMP(mCache);
-            }
-            ALASSERT(false);
+            auto info = mLayer->getInfo();
+            ALPRINT("Error output for layer: %ld, %ld, %ld, %ld,%ld,%ld\n", info.iw, info.ow, info.pw, info.ph, info.cw,info.ch);
+
         }
         
         if (NULL != mForwardDump)

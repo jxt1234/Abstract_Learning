@@ -74,11 +74,7 @@ namespace ALCNN {
         loss/=YP->height();
         if ((!(loss>0)) &&(!(loss<=0)))
         {
-            DUMP(YP);
-            DUMP(X);
-            ALSp<ALFloatMatrix> CT = ALFloatMatrix::transpose(coefficient);
-            DUMP(CT);
-            ALASSERT(false);
+            ALPRINT("Error loss\n");
         }
         
 //        if (mCurrentLoss < loss - 0.01)
