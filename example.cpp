@@ -9,6 +9,10 @@
 #include <sstream>
 #include "cJSON/cJSON.h"
 using namespace std;
+
+//#define PREFIX "/Users/jiangxiaotang/Documents/Abstract_Learning/"
+#define PREFIX
+
 static std::string readAll(const char* file)
 {
     std::ostringstream output;
@@ -19,25 +23,25 @@ static std::string readAll(const char* file)
 
 int test_main(int argc, char* argv[])
 {
-    ALSp<ALStream> inputStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/Abstract_Learning/../data/imdb2/train_x.txt");
+    ALSp<ALStream> inputStream = ALStreamFactory::readFromFile(PREFIX"../data/imdb2/train_x.txt");
     ALSp<ALVaryArray> array = ALVaryArray::create(inputStream.get());
-    ALSp<ALStream> propStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/Abstract_Learning/../data/imdb2/train_y.txt");
-    auto jsonString = readAll("/Users/jiangxiaotang/Documents/Abstract_Learning/./res/cnn/lstm_imdb.json");
+    ALSp<ALStream> propStream = ALStreamFactory::readFromFile(PREFIX"../data/imdb2/train_y.txt");
+    auto jsonString = readAll(PREFIX"./res/cnn/lstm_imdb.json");
     auto jsonObject = cJSON_Parse(jsonString.c_str());
     ALSp<ALVaryArrayLearner> learner = new ALVaryArrayLearner(jsonObject);
     ALSp<ALFloatMatrix> Y = ALFloatMatrix::load(propStream.get());
     
     learner->train(array.get(), Y.get());
     
-    inputStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/data/imdb2/test_x.txt");
+    inputStream = ALStreamFactory::readFromFile(PREFIX"../data/imdb2/test_x.txt");
     ALSp<ALVaryArray> predictArray = ALVaryArray::create(inputStream.get());
     ALSp<ALFloatMatrix> YP = ALFloatMatrix::create(2, predictArray->size());
-    inputStream = ALStreamFactory::readFromFile("/Users/jiangxiaotang/Documents/data/imdb2/test_y.txt");
+    inputStream = ALStreamFactory::readFromFile(PREFIX"../data/imdb2/test_y.txt");
     ALSp<ALFloatMatrix> YP_Real = ALFloatMatrix::load(inputStream.get());
     
     learner->predict(predictArray.get(), YP.get());
     {
-        std::ofstream output("/Users/jiangxiaotang/Documents/Abstract_Learning/output/test_lstm_imdb.txt");
+        std::ofstream output(PREFIX"./output/test_lstm_imdb.txt");
         ALFloatMatrix::print(YP.get(), output);
     }
     auto h = YP->height();

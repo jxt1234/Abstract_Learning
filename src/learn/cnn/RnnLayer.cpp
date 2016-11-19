@@ -7,7 +7,6 @@
 //
 
 #include "RnnLayer.hpp"
-#include "RNNLayer.hpp"
 #include "LayerFactoryRegistor.hpp"
 #include <math.h>
 #include <fstream>
